@@ -1,0 +1,239 @@
+.md-tiny {
+    height: 25px;
+    width: 25px;
+    min-height: 25px;
+    min-width: 25px;
+    max-height: 25px;
+    max-width: 25px;
+    line-height: 25px !important;
+    font-size: 14px;
+    padding: 0;
+}
+
+.md-tiny span {
+    color: white;
+    font-weight: bold;
+}
+
+.md-toolbar-tools md-select-value span {
+    max-height: 30px !important;
+    line-height: 30px !important;
+    color: white !important;
+    white-space: nowrap !important;
+    overflow: scroll !important;
+    text-overflow: ellipsis !important;
+    overflow: -moz-scrollbars-none !important;
+    -ms-overflow-style: none !important;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+.type1 {
+    background-color: red !important;
+}
+
+.md-half-circle {
+    border-width: 3px !important;
+    border-top-color: #15629e !important;
+    border-bottom-color: #15629e !important;
+}
+
+.md-gap {
+    border-top-width: 3px !important;
+}
+
+
+/**
+table
+*/
+table {
+	border-collapse: collapse;
+}
+.table table {
+    border-collapse: collapse;
+    margin-bottom: 3em;
+    width: 100%;
+    background: #fff;
+}
+
+.table td,
+th {
+    padding: 0.75em 1.5em;
+    text-align: left;
+    border: 0.5px solid #15629e;
+}
+
+.table td.err {
+    background-color: #e992b9;
+    color: #fff;
+    font-size: 0.75em;
+    text-align: center;
+    line-height: 1;
+}
+
+.table th {
+    background-color: #2196f3;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.table tbody th {
+    background-color: #2196f3;
+}
+
+.table tbody tr:nth-child(2n-1) {
+    /*background-color: #f5f5f5;*/
+    transition: all .125s ease-in-out;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(21, 98, 158, .3);
+}
+
+
+/* Not needed for sticky header/column functionality */
+
+td.user-name {
+    text-transform: capitalize;
+}
+
+.sticky-wrap.overflow-y {
+    overflow-y: auto;
+    max-height: 50vh;
+}
+
+.table td,
+th {
+    text-align: center;
+}
+
+.sorv {
+    font-style: italic;
+    padding: 0 !important;
+}
+
+.table * {
+    font-size: 95% !important;
+}
+
+.nome {
+    text-transform: capitalize;
+    font-size: 85%;
+}
+
+md-dialog#dayDialogElement {
+    min-width: 90%;
+    min-height: 90%;
+}
+
+md-dialog#dayDialogConfermaElement {
+    min-width: 30%;
+    min-height: 10%;
+}
+
+md-select-menu md-option[selected] {
+    color: #15629e !important;
+    background: rgba(21, 98, 158, .3);
+}
+
+md-select:not([disabled]):focus .md-select-value {
+    border-bottom-color: #15629e;
+    color: rgba(0, 0, 0, 0.87);
+}
+
+md-input-container:not(.md-input-invalid).md-input-has-value label,
+.md-text,
+.md-select-placeholder span {
+    color: #15629e;
+}
+
+md-tab-content {
+    height: 100% !important;
+}
+
+md-content.calendar div:not(.subheader) div {
+    padding: 2px;
+    flex-direction: column;
+}
+
+md-content.calendar div:not(.subheader) div div:first-child {
+    padding-left: 3px;
+    padding-top: 3px;
+    font-size: 1.7em;
+    height: 1em;
+    width: 100%;
+}
+
+md-content.calendar div:not(.subheader) div div:not(:first-child) {
+    padding: 1px;
+    padding-bottom: 3px;
+    /*position: relative;*/
+    display: flex;
+    align-self: flex-end;
+    justify-content: flex-end;
+    flex-direction: initial;
+}
+
+md-content.calendar div:not(.subheader) div div:not(:first-child) button {
+    margin: 1px;
+    bottom: 0;
+    float: right;
+    right: 2px;
+    align-self: flex-end;
+}
+
+.subheader.layout-row div {
+    text-transform: capitalize;
+}
+
+h2.calendar-md-title span {
+    text-transform: capitalize;
+}
+
+md-chips.md-default-theme .md-chips, md-chips .md-chips {
+    box-shadow: none;
+}
+
+.md-chips .md-chip {
+    cursor: default;
+    border-radius: 1px;
+    display: block;
+    height: 26px;
+    line-height: 26px;
+    margin: 8px 8px 0 0;
+    padding: 0 8px 0 8px;
+    float: left;
+    box-sizing: border-box;
+    max-width: 100%;
+    position: relative;
+    font-size: 12px;
+}
+
+.md-whiteframe-12dp {
+	box-shadow: none;
+}
+
+.md-toolbar-tools md-input-container:not(.md-input-invalid).md-input-has-value label,.md-toolbar-tools .md-text,.md-toolbar-tools .md-select-placeholder span {
+    color: white;
+}
+md-list-item.md-3-line, md-list-item.md-3-line > .md-no-style {
+    border-left: 6px solid rgb(1,87,155);
+    padding-left: 12px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+.borderType1 {
+    border-left: 6px solid red !important;
+}
+
+.dotted_false {
+    border-left-style: dotted !important;
+}
+
+md-fab {
+  min-width:10px;
+  max-width:10px;
+}

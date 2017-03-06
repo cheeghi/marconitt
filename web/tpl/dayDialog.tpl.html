@@ -1,0 +1,104 @@
+<md-dialog aria-label="{{ dayString }}" id="dayDialogElement">
+    <form>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>{{ dayString }}</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <i class="material-icons">close</i>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <md-tabs md-dynamic-height md-stretch-tabs="always">
+                <md-tab label="eventi">
+                    <md-content class="md-padding">
+                        <div>
+                            <md-list class="md-dense" flex>
+                                <md-list-item class="md-3-line borderType{{event.type}} dotted_{{event.visible}}" ng-repeat="event in events | orderBy:'hour_start' | orderBy:'hour_end'">
+                                    <div class="md-list-item-text" layout="column">
+                                        <h4>{{ event.hour_start | number:2}} - {{ event.hour_end | number:2}}</h4>
+                                        <p>
+                                            <md-chips ng-model="event.who" name="who" readonly="true">
+                                                <md-chip-template>
+                                                    {{$chip.name}}
+                                                </md-chip-template>
+                                            </md-chips>
+                                        </p>
+                                        <p flex="80">
+                                            {{ event.description }}
+                                        </p>
+                                    </div>
+                                    <md-button class="md-secondary md-icon-button" ng-click="delete($event, event)" aria-label="delete" ng-show="logged">
+                                        <i class="material-icons">delete</i>
+                                        <md-tooltip md-direction="top">
+                                            Elimina evento
+                                        </md-tooltip>
+                                    </md-button>
+                                    <md-button class="md-secondary md-icon-button" ng-click="toggleVisibility($event, event)" aria-label="delete" ng-show="logged" style="margin-right: 34px;">
+                                        <md-tooltip md-direction="top">
+                                            <span ng-if="event.visible">Nascondi</span> <span ng-if="!event.visible">Mostra</span>
+                                        </md-tooltip>
+                                        <i class="material-icons" ng-if="!event.visible">visibility_off</i><i class="material-icons" ng-if="event.visible">visibility</i>
+                                    </md-button>
+                                </md-list-item>
+                            </md-list>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="orario">
+                    <md-content ng-controller="OrarioCtrl" ng-init="init(day)">
+                        <md-content layout-padding>
+                            <div layout="row" ng-hide="isSunday">
+                                <md-input-container>
+                                    <label>Tipologia</label>
+                                    <md-select ng-model="sRoomType" ng-change="getPrenotazioni()" size="20">
+                                        <md-option>
+                                            LAB
+                                        </md-option>
+                                        <md-option>
+                                            AULE
+                                        </md-option>
+                                        <md-option>
+                                            AULA MAGNA
+                                        </md-option>                                                                                
+                                    </md-select>
+                                </md-input-container>                                
+                                <md-input-container>
+                                    <label>Classe</label>
+                                    <md-select ng-model="sClass" ng-change="getOrarioClass()" size="20">
+                                        <md-option ng-repeat="class in classes" value="{{class}}">
+                                            {{class}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+                                <md-input-container class="md-block" flex>
+                                    <label>Insegnante</label>
+                                    <md-select ng-model="sTeacher" ng-change="getOrarioTeacher()">
+                                        <md-option ng-repeat="teacher in teachers" value="{{teacher}}">
+                                            {{teacher}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+                                <md-input-container class="md-block" flex>
+                                    <label>Aula</label>
+                                    <md-select ng-model="sRoom" ng-change="getOrarioRoom()">
+                                        <md-option ng-repeat="room in rooms" value="{{room}}">
+                                            {{room}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+                                <md-switch ng-model="all" aria-label="Vedi tutto" ng-change="viewAll()">
+                                    Tutto
+                                </md-switch>
+                            </div>
+                            <div layout="row" layout-align="center">
+                                <div compile="htmlTable" id="orario"></div>
+                            </div>
+                        </md-content>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+        </md-dialog-content>
+    </form>
+</md-dialog>

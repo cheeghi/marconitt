@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="node_modules/angular-material/angular-material.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="node_modules/angular-material-calendar/dist/angular-material-calendar.min.css" />
+    <link rel="stylesheet" href="vendor/mdPickers.css" />
+    <link rel="stylesheet" href="css/custom.css" />
+    <meta name="theme-color" content="#2196F3">
+    <meta charset="UTF-8">
+    <title>Marconi TT</title>
+</head>
+<script> var a = 0; </script>
+
+<body ng-app="MarconiTT" layout="row" ng-cloak ng-controller="MainCtrl" ng-init="init()">
+    <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
+        <md-toolbar class="md-primary" style="height: 200px; background-image: url(img/marconitt.png); background-repeat: no-repeat; background-position: center center; background-color: transparent; background-size: 50%;">
+        </md-toolbar>
+        <md-content>
+            <md-list ng-cloak>
+                <md-list-item ng-click="view('Visualizza', false)" md-ink-ripple="#2196F3">
+                    <p>Visualizza</p>
+                </md-list-item>
+                <md-list-item ng-click="view('Visualizza', true)" ng-show="logged" md-ink-ripple="#2196F3">
+                    <p>Prenota</p>
+                </md-list-item>
+                <!--<md-list-item ng-click="view('Cerca')">
+                    <p>Cerca</p>
+                </md-list-item>-->
+                <md-divider ng-hide="logged"></md-divider>
+                <md-subheader class="md-no-sticky" ng-hide="logged">Effettua login per poter prenotare</md-subheader>
+                <div layout="column" layout-padding ng-hide="logged">
+                    <div layout-gt-sm="row">
+                        <md-input-container class="md-block" flex-gt-sm>
+                            <label>Username</label>
+                            <input ng-model="logindata.name">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex-gt-sm>
+                            <label>Password</label>
+                            <input ng-model="logindata.password" type="password">
+                        </md-input-container>
+                    </div>
+                    <md-button class="md-accent md-raised" ng-click="login()">Entra</md-button>
+                </div>
+                <md-list-item ng-click="view('Inserisci')" ng-show="logged">
+                    <p>Inserisci</p>
+                </md-list-item>
+                <md-list-item ng-click="logout()" ng-show="logged">
+                    <p>Logout</p>
+                </md-list-item>
+            </md-list>
+        </md-content>
+    </md-sidenav>
+    <md-content flex compile="mainHtml" style="height: 100% !important;">
+    </md-content>
+    <script src="node_modules/angular/angular.js"></script>
+    <script src="node_modules/angular-sanitize/angular-sanitize.min.js"></script>
+    <script src="node_modules/angular-aria/angular-aria.js"></script>
+    <script src="node_modules/angular-animate/angular-animate.js"></script>
+    <script src="node_modules/angular-material/angular-material.js"></script>
+    <script src="node_modules/angular-i18n/angular-locale_it-it.js"></script>
+    <script src="node_modules/angular-material-calendar/dist/angular-material-calendar.js"></script>
+    <script src="node_modules/moment/moment.js"></script>
+    <script src="vendor/mdPickers.js"></script>
+    <script src="app/app.js"></script>
+    <script src="app/main.controller.js"></script>
+    <script src="app/view.controller.js"></script>
+    <script src="app/daydialog.controller.js"></script>
+    <script src="app/orario.controller.js"></script>
+    <script src="app/search.controller.js"></script>
+    <script src="app/insert.controller.js"></script>
+    <script src="app/prenotazione.controller.js"></script>
+</body>
+
+</html>

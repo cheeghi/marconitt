@@ -1,0 +1,25 @@
+{
+  "name": "biblio-marconi",
+  "version": "1.0.0",
+  "description": "An example module to illustrate the usage of a package.json",
+  "author": "Diego Dal Bosco <diegodalbo97@gmail.com>",
+  "contributors": [
+    {
+      "name": "Francesco Martini",
+      "email": "foo.bar@example.com"
+    }
+  ],
+  "dependencies": {
+    "angular": "1.4.x",
+    "angular-animate": "1.4.x",
+    "angular-aria": "1.4.x",
+    "angular-i18n": "^1.5.5",
+    "angular-material": "1.0.x",
+    "angular-material-calendar": "git://github.com/diegodalbosco/angular-material-calendar.git",
+    "angular-messages": "1.4.x",
+    "angular-mocks": "1.4.x",
+    "angular-route": "1.4.x",
+    "angular-sanitize": "1.4.x",
+    "moment": "^2.13.0"
+  }
+}

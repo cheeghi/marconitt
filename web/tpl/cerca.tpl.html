@@ -1,0 +1,27 @@
+<div ng-controller="SearchCtrl" layout-fill style="height: 100% !important;">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <md-button class="md-icon-button" aria-label="Open sidenav" ng-click="toggleLeft()" hide-gt-md>
+                <i class="material-icons">menu</i>
+            </md-button>
+            <h2>
+			<span>Cerca</span>
+		</h2>
+        </div>
+    </md-toolbar>
+    <md-content layout="row" style="height: calc(100% - 64px) !important;" ng-hide="isLoading">
+		<div layout="column">
+			<div layout="row" layot-align="center center" layout-padding>
+                <md-input-container flex="25">
+                    <label>Scegli classe</label>
+                    <md-select ng-model="class" placeholder="Seleziona classi..">
+                        <md-optgroup label="Classi">
+                            <md-option ng-value="who" ng-repeat="who in whos | filter:{type:2} ">{{who.name}}</md-option>
+                        </md-optgroup>
+                    </md-select>
+                </md-input-container>
+			</div>
+		</div>
+    </md-content>
+    <div flex></div>
+</div>

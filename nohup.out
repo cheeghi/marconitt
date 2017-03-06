@@ -1,0 +1,28 @@
+[33m[nodemon] 1.9.1[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching: *.*[39m
+[32m[nodemon] starting `node server.js`[39m
+events.js:154
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: EBADF: bad file descriptor, read
+    at Error (native)
+Magic happens at http://localhost:8080
+[0mGET / [36m304 [0m4.079 ms - -[0m
+[0mGET /favicon.ico [33m404 [0m4.269 ms - 24[0m
+[0mGET / [36m304 [0m1.106 ms - -[0m
+[0mGET / [36m304 [0m0.429 ms - -[0m
+[0mGET / [36m304 [0m0.335 ms - -[0m
+[0mGET /api [36m304 [0m2.094 ms - -[0m
+[0mGET /manager/html [33m404 [0m1.313 ms - 25[0m
+[0mGET / [32m200 [0m3.151 ms - 46[0m
+[0mGET / [32m200 [0m136.533 ms - 46[0m
+[0mGET /HNAP1/ [33m404 [0m3.403 ms - 19[0m
+[0mGET / [32m200 [0m1.837 ms - 46[0m
+[0mGET / [32m200 [0m1.328 ms - 46[0m
+[0mGET / [32m200 [0m1.435 ms - 46[0m
+[0mGET http://httpheader.net/ [32m200 [0m0.867 ms - 46[0m
+[0mGET / [32m200 [0m1.437 ms - 46[0m
+[0mGET / [32m200 [0m3.143 ms - 46[0m
+[0mGET / [32m200 [0m1.634 ms - 46[0m

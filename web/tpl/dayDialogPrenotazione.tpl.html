@@ -1,0 +1,42 @@
+<md-dialog aria-label="{{ dayString }}" id="dayDialogElement">
+    <form>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>{{ dayString }}</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <i class="material-icons">close</i>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <md-tabs md-dynamic-height md-stretch-tabs="always">
+                <md-tab label="PRENOTA">
+                    <md-content ng-controller="PrenotazioneCtrl" ng-init="init(day)">
+                        <md-content layout-padding>
+                            <div layout="row" ng-hide="isSunday">
+                                <md-input-container>
+                                    <label>Seleziona</label>
+                                    <md-select ng-model="sRoomType" ng-change="getPrenotazioni()" size="20">
+                                       <md-option>
+                                            LABORATORIO
+                                        </md-option>
+                                        <md-option>
+                                            AULA
+                                        </md-option>
+                                        <md-option>
+                                            AULA MAGNA
+                                        </md-option>  
+                                    </md-select>
+                                    </md-input-container>
+                            </div>
+                            <div layout="row" layout-align="center">
+                                <div compile="htmlTable" id="orario"></div>
+                            </div>
+                        </md-content>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+        </md-dialog-content>        
+    </form>
+</md-dialog>
