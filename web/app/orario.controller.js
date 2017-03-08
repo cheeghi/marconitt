@@ -67,40 +67,6 @@ controller("OrarioCtrl", function($scope, $filter, $http, $q, $window, $sce, $md
         })
     }
 
-    $scope.getPrenotazioni = function() {
-        $scope.sTeacher = undefined;
-        $scope.sRoom = undefined;
-        $scope.sClass = undefined;
-        $scope.currentItem = $scope.sRoomType;
-        
-        var filteredRooms = [];
-        var responses = {};
-
-        $scope.rooms.forEach(function(element) {
-            if ($scope.sRoomType == "LAB") {
-                if (element[0] == "L")
-                    filteredRooms.push(element);
-            } else {
-                if (element[0] == "A")
-                    filteredRooms.push(element);
-            }
-
-        }, this);
-
-        filteredRooms.forEach(function(element) {
-            $http.get('http://88.149.220.222/orario/api.php', {
-                params: {
-                    room: element
-                }
-            }).success(function(response) {
-                responses[element] = response;
-                if (Object.keys(responses).length == filteredRooms.length) {
-                    $scope.genTablePerTipologia(responses);
-                }
-            })
-        }, this);
-    }
-
     $scope.legend = function() {
         $scope.sTeacher = undefined;
         $scope.sRoom = undefined;
@@ -263,67 +229,5 @@ controller("OrarioCtrl", function($scope, $filter, $http, $q, $window, $sce, $md
         x += "</table>";
         $scope.htmlTable = x;
     }
-
-
-    $scope.genTablePerTipologia = function(responses) {
-        var days = $mdDateLocale.days;
-
-        var x = "<table class=\"table\">\
-                <thead><tr>\
-                    <th>&nbsp;</th>\
-                    <th>1</th>\
-                    <th>2</th>\
-                    <th>3</th>\
-                    <th>4</th>\
-                    <th>5</th>\
-                    <th>6</th>\
-                    <th>7</th>\
-                    <th>8</th>\
-                    <th>9</th>\
-                    <th>10</th>\
-                    <th>11</th>\
-                </tr></thead>";
-        
-        x += "<tbody>";
-
-        Object.keys(responses).sort().forEach(function(key) {
-            m = [ [], [], [], [], [], [] ];
-
-            responses[key].forEach(function(a) {
-                if (m[a.giorno - 1][a.ora - 1] != undefined) {
-                    try {
-                        if (m[a.giorno - 1][a.ora - 1].concorso == "sos" || m[a.giorno - 1][a.ora - 1].concorso[0] == "C") {
-                            m[a.giorno - 1][a.ora - 1].prof = a.prof + " " + m[a.giorno - 1][a.ora - 1].prof;
-                        } else {
-                            m[a.giorno - 1][a.ora - 1].prof += " " + a.prof;
-                        }
-                    } catch (h) {
-                        m[a.giorno - 1][a.ora - 1].prof += " " + a.prof;
-                    }
-                } else {
-                    m[a.giorno - 1][a.ora - 1] = a;
-                }
-            });        
-
-            for (var i = 0; i <= 10; i++) {
-                if (i == $scope.day.getDay()-1) {
-                    x += "<tr><td>" + key + "</td>";
-                    for (var j = 0; j <= 10; j++) {
-                        cella = m[i][j];
-                        try {
-                            x += "<td><span class='nome'>" + cella.prof.toLowerCase() + "</span><br>" + cella.materia + " " + cella.classe + "</td>";
-                            //console.log(cella);
-                        } catch (e) {
-                            x += "<td>&nbsp;</td>";
-                        }
-                    }
-                    x += "</tr>";
-                }
-            };                 
-        });            
-        
-        x += "</tbody>";
-        x += "</table>";
-        $scope.htmlTable = x;
-    }
+    
 });

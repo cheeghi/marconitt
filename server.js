@@ -8,6 +8,7 @@ var morgan = require('morgan');
 var mongoose = require('mongoose');
 var http = require('http');
 var Converter = require("csvtojson").Converter;
+var session = require('express-session');
 
 var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config_default'); // get our config file
@@ -26,6 +27,13 @@ app.set('secret', config.secret); // secret variable
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/web'));
+
+// session management setup
+app.use(session({
+    secret: config.secret,
+    resave: false,
+    saveUninitialized: true
+}));
 
 // use morgan to log requests to the console
 app.use(morgan('dev'));
@@ -145,6 +153,8 @@ apiRoutes.post('/authenticate', function(req, res) {
                     expiresInMinutes: 1440 // expires in 24 hours
                 });
 
+                req.session.user = user;
+
                 // return the information including token as JSON
                 res.json({
                     success: true,
@@ -158,6 +168,16 @@ apiRoutes.post('/authenticate', function(req, res) {
     });
 });
 
+apiRoutes.get('/checklogin', function(req, res) {
+    if (req.session.user)
+        res.json(true);
+    else
+        res.json(false);
+});
+
+apiRoutes.get('/logout', function(req, res) {
+    req.session.destroy();
+});
 
 apiRoutes.post('/prenota', function(req, res) {
     res.json(req.body.lab + ';' + req.body.ora);

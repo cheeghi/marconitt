@@ -9,12 +9,25 @@ app
     $rootScope.inPrenotazione = false;
 
     $scope.init = function() {
-      if (localStorage.token != "undefined") {
-        $scope.logged = true;
-        $rootScope.logged = true;
-        $scope.token = localStorage.token;
-        $rootScope.token = localStorage.token;
-      }
+    /*$http.get('http://88.149.220.222/orario/api3.php', {
+            params: {
+                rooms: ""
+            }
+        }).success(function(response) {
+            console.log(response);
+            response.forEach(function(a) {
+              console.log(a);
+            })
+        })*/
+
+        $http.get('http://'+CONFIG.HOST+':8080/api/checklogin').success(function(response) {
+            if (response) {
+                $scope.logged = true;
+                $rootScope.logged = true;
+                $scope.token = localStorage.token;
+                $rootScope.token = localStorage.token;
+            }
+        })
     };
 
     $scope.isOpenRight = function(){
@@ -90,8 +103,10 @@ app
       );
       
     }
+
     $scope.logout = function() {
       //console.log(localStorage.token);
+      $http.get('http://'+CONFIG.HOST+':8080/api/logout');
       $scope.token = undefined;
       $scope.logged = false;
       $rootScope.token = undefined;

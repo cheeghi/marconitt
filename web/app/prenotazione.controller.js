@@ -62,6 +62,17 @@ controller("PrenotazioneCtrl", function($scope, $filter, $http, $q, $window, $sc
                 }
             })
         }, this);
+    };
+
+
+    $scope.testApi3 = function() {
+        $http.get('http://88.149.220.222/orario/api3.php', {
+            params: {
+                rooms: ""
+            }
+        }).success(function(response) {
+            console.log(response);
+        })
     }
 
     

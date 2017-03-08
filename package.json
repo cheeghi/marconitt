@@ -33,6 +33,7 @@
     "escape-html": "^1.0.3",
     "etag": "^1.7.0",
     "express": "^4.13.4",
+    "express-session": "^1.15.1",
     "finalhandler": "^0.4.1",
     "forwarded": "^0.1.0",
     "fresh": "^0.3.0",
