@@ -1,14 +1,12 @@
 app.
-controller("PrenotazioneCtrl", function($scope, $filter, $http, $q, $window, $sce, $mdDateLocale, CONFIG, $mdDialog, $rootScope) {
+controller("PrenotazioneCtrl", function($scope, $filter, $http, $q, $window, $sce, $mdDateLocale, CONFIG, $mdDialog, $mdToast, $rootScope) {
     $scope.day;
     $scope.currentItem = '';
     $scope.classes = [];
     $scope.isSunday = true;
     $scope.htmlTable = "";
     $scope.all = false;
-    $scope.data;
-    $scope.type;
-    $scope.prenotazione = $rootScope.prenotazione;
+    $scope.prenotazioneString = $rootScope.prenotazioneString;
 
     $http.get('http://88.149.220.222/orario/api.php', {
         params: {
@@ -28,11 +26,6 @@ controller("PrenotazioneCtrl", function($scope, $filter, $http, $q, $window, $sc
         $scope.isSunday = $scope.day.getDay() == 0;
         $scope.htmlTable = ($scope.isSunday) ? "<p>Non c'è scuola di domenica</p>" : "<p>Seleziona una classe, un insegnante o un'aula</p>";
     }
-
-
-    $scope.getPren = function() {
-
-    };
 
 
     $scope.getPrenotazioni = function() {
@@ -132,7 +125,11 @@ controller("PrenotazioneCtrl", function($scope, $filter, $http, $q, $window, $sc
                     for (var j = 0; j <= 8; j++) {
                         cella = m[i][j];
                         try {
-                            x += "<td><span class='nome'>" + cella.prof.toLowerCase() + "</span><br>" + " " + cella.classe + "</td>";
+                            //x += "<td><span class='nome'>" + cella.prof.toLowerCase() + "</span><br>" + " " + cella.classe + "</td>";
+                            exceptionTester = cella.classe;
+                            exceptionTester = cella.prof;
+                            x += '<td><md-button class="md-raised md-primary" style="max-width:30px;min-width:30px;max-height:35px;min-height:35px;background-color:red"'
+                                + '>NP</td>';
                             //console.log(cella);
                         } catch (e) {
                             //x += '<td style="background-color:blue;"> </td>';
@@ -153,7 +150,7 @@ controller("PrenotazioneCtrl", function($scope, $filter, $http, $q, $window, $sc
     $scope.prenotaClick = function(lab, ora) {
         $rootScope.labPrenotato = lab;
         $rootScope.oraPrenotata = ora + 1;
-        $rootScope.prenotazione = lab + ' ' + (ora+1) + '°ora';
+        $rootScope.prenotazioneString = lab + ' ' + (ora+1) + '°ora';
         $mdDialog.show({
                 templateUrl: 'tpl/dialogConfermaPrenotazione.tpl.html',
                 controller: 'PrenotazioneCtrl',
@@ -186,8 +183,8 @@ controller("PrenotazioneCtrl", function($scope, $filter, $http, $q, $window, $sc
                     console.log(data);
                 }
             );
-
         $scope.cancel();
+        $mdToast.show($mdToast.simple().textContent('Prenotazione avvenuta con successo!'));
     };
 
 });
