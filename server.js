@@ -9,6 +9,7 @@ var mongoose = require('mongoose');
 var http = require('http');
 var Converter = require("csvtojson").Converter;
 var session = require('express-session');
+var mysql = require('mysql');
 
 var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config_default'); // get our config file
@@ -27,6 +28,14 @@ app.set('secret', config.secret); // secret variable
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/web'));
+
+//connection to mysql database
+var connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database : 'marconitt'
+});
 
 // session management setup
 app.use(session({
@@ -181,6 +190,19 @@ apiRoutes.get('/logout', function(req, res) {
 
 apiRoutes.post('/prenota', function(req, res) {
     res.json(req.body.lab + ';' + req.body.ora);
+	var aula_p = req.body.lab;
+	var ora_p = req.body.ora;
+	
+	var sql_stmt = "INSERT INTO prenotazioni VALUES (?,?)";
+	var values = [aula_p, ora_p];
+	sql_stmt = mysql.format(sql_stmt, values);
+	
+	connection.query(sql_stmt, function (error, result) {
+        if (error) {
+            console.log('Error: ' + error.message);
+        }
+        console.log("Fatto");
+	});
 });
 
 // route to show a random message (GET http://localhost:8080/api/)

@@ -95,7 +95,8 @@
     "unpipe": "^1.0.0",
     "utils-merge": "^1.0.0",
     "vary": "^1.0.1",
-    "xtend": "^4.0.1"
+    "xtend": "^4.0.1",
+    "mysql": "2.13.0"
   },
   "devDependencies": {},
   "scripts": {

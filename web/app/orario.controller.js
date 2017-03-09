@@ -37,6 +37,7 @@ controller("OrarioCtrl", function($scope, $filter, $http, $q, $window, $sce, $md
                 room: $scope.sRoom
             }
         }).success(function(response) {
+            console.log("ROOM: " + response);
             $scope.genTable(response, 'aula');
         })
     }

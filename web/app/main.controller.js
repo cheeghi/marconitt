@@ -9,16 +9,13 @@ app
     $rootScope.inPrenotazione = false;
 
     $scope.init = function() {
-    /*$http.get('http://88.149.220.222/orario/api3.php', {
+    $http.get('http://88.149.220.222/orario/api3.php', {
             params: {
-                rooms: ""
+                labs: ""
             }
         }).success(function(response) {
             console.log(response);
-            response.forEach(function(a) {
-              console.log(a);
-            })
-        })*/
+        })
 
         $http.get('http://'+CONFIG.HOST+':8080/api/checklogin').success(function(response) {
             if (response) {

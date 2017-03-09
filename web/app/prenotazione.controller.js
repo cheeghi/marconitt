@@ -30,6 +30,11 @@ controller("PrenotazioneCtrl", function($scope, $filter, $http, $q, $window, $sc
     }
 
 
+    $scope.getPren = function() {
+
+    };
+
+
     $scope.getPrenotazioni = function() {
         $scope.sTeacher = undefined;
         $scope.sRoom = undefined;
