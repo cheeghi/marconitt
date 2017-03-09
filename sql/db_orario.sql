@@ -4,6 +4,7 @@ MySQL - 5.5.47-0+deb7u1
 *********************************************************************
 */
 /*!40101 SET NAMES utf8 */;
+USE marconitt;
 
 create table `GPU001` (
 	`Column 0` varchar (150),
@@ -17,6 +18,7 @@ create table `GPU001` (
 	`Column 8` varchar (150),
 	`versione` int (11)
 ); 
+
 insert into `GPU001` (`Column 0`, `Column 1`, `Column 2`, `Column 3`, `Column 4`, `Column 5`, `Column 6`, `Column 7`, `Column 8`, `versione`) values('4982','RIC','MBATTOCC','RGE1','','3','3','','','13');
 insert into `GPU001` (`Column 0`, `Column 1`, `Column 2`, `Column 3`, `Column 4`, `Column 5`, `Column 6`, `Column 7`, `Column 8`, `versione`) values('4818','RIC','SBELLINI','RGEN','AGEN','2','3','','','13');
 insert into `GPU001` (`Column 0`, `Column 1`, `Column 2`, `Column 3`, `Column 4`, `Column 5`, `Column 6`, `Column 7`, `Column 8`, `versione`) values('5193','2HL','SBELLINI','GEO','A218','2','1','','','13');

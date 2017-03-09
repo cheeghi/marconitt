@@ -4,6 +4,7 @@ MySQL - 5.5.47-0+deb7u1
 *********************************************************************
 */
 /*!40101 SET NAMES utf8 */;
+USE marconitt;
 
 create table `GPU004` (
 	`Column 0` varchar (150),

@@ -173,7 +173,7 @@ controller("PrenotazioneCtrl", function($scope, $filter, $http, $q, $window, $sc
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            data: "lab="+$rootScope.labPrenotato+"&ora="+$rootScope.oraPrenotata,
+            data: "lab="+$rootScope.labPrenotato+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoPrenotato,
             token: $rootScope.token
         };
 

@@ -2,6 +2,7 @@ app
     .controller('DayDialogCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, MaterialCalendarData, $q, $mdToast, $mdDialog, $mdDateLocale, $rootScope,$httpParamSerializerJQLike, CONFIG, day) {
 
         $scope.day = day;
+		console.log(day);
         $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();
 
         $scope.logged = $rootScope.logged;
