@@ -10,7 +10,7 @@ var http = require('http');
 var Converter = require("csvtojson").Converter;
 var session = require('express-session');
 var mysql = require('mysql');
-
+var dateFormat = require('dateformat');
 var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config_default'); // get our config file
 var User = require('./app/models/user');
@@ -33,7 +33,7 @@ app.use(express.static(__dirname + '/web'));
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '',
+    password: 'sempre98',
     database : 'marconitt'
 });
 
@@ -191,17 +191,37 @@ apiRoutes.get('/logout', function(req, res) {
 apiRoutes.post('/prenota', function(req, res) {
     res.json(req.body.lab + ';' + req.body.ora);
 	var aula_p = req.body.lab;
+	var day_p;
 	var ora_p = req.body.ora;
+	var data_p = req.body.giorno;
+	var week_day = data_p.split(" ")[0];
+	data_p = dateFormat(data_p, "yyyy/mm/dd");
 	
-	var sql_stmt = "INSERT INTO prenotazioni VALUES (?,?)";
-	var values = [aula_p, ora_p];
+	if(week_day == "Mon") { day_p = 1; }
+	if(week_day == "Tue") { day_p = 2; }
+	if(week_day == "Wed") { day_p = 3; }
+	if(week_day == "Thu") { day_p = 4; }
+	if(week_day == "Fry") { day_p = 5; }
+	if(week_day == "Sat") { day_p = 6; }
+	
+	var sql_stmt = "INSERT INTO prenotazioni VALUES (?,?,?)";
+	var values = [data_p, aula_p, ora_p];
 	sql_stmt = mysql.format(sql_stmt, values);
 	
 	connection.query(sql_stmt, function (error, result) {
         if (error) {
             console.log('Error: ' + error.message);
         }
-        console.log("Fatto");
+	});
+	
+	sql_stmt = "INSERT INTO `GPU001`(`Column 5`, `Column 6`) VALUES (?,?)";
+	values = [day_p, ora_p];
+	sql_stmt = mysql.format(sql_stmt, values);
+	
+	connection.query(sql_stmt, function (error, result) {
+        if (error) {
+            console.log('Error: ' + error.message);
+        }
 	});
 });
 
