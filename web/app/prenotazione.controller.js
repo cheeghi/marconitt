@@ -8,7 +8,7 @@ controller("PrenotazioneCtrl", function($scope, $filter, $http, $q, $window, $sc
     $scope.all = false;
     $scope.prenotazioneString = $rootScope.prenotazioneString;
 
-    $http.get('http://88.149.220.222/orario/api.php', {
+    $http.get('http://88.149.220.222/orario/api.php', {  
         params: {
             search: ""
         }
@@ -39,7 +39,7 @@ controller("PrenotazioneCtrl", function($scope, $filter, $http, $q, $window, $sc
 
         $scope.rooms.forEach(function(element) {
             if ($scope.sRoomType == "LABORATORIO") {
-                if (element[0] == "L")
+                if (element[0] == "L") 
                     filteredRooms.push(element);
             } else {
                 if (element[0] == "A")
@@ -47,19 +47,63 @@ controller("PrenotazioneCtrl", function($scope, $filter, $http, $q, $window, $sc
             }
 
         }, this);
-
+        console.log(filteredRooms);
         filteredRooms.forEach(function(element) {
             $http.get('http://88.149.220.222/orario/api.php', {
                 params: {
                     room: element
                 }
             }).success(function(response) {
+                //console.log(response);
                 responses[element] = response;
                 if (Object.keys(responses).length == filteredRooms.length) {
                     $scope.genTablePerTipologia(responses);
                 }
             })
         }, this);
+        //console.log(filteredRooms);
+    };
+
+    $scope.getPrenotazioni2 = function() {
+
+        var responses = {};
+        var labs = []; 
+        $scope.sTeacher = undefined;
+        $scope.sRoom = undefined;
+        $scope.sClass = undefined;
+        $scope.currentItem = $scope.sRoomType;
+        
+        if ($scope.sRoomType == "LABORATORIO") {
+            $http.get('http://88.149.220.222/orario/api3.php', {
+                params: {
+                    labs: ""
+                }
+            }).success(function(response) {
+                //console.log(response)              //qui ritorna 1 array formato da 998 object con tutti gli orari dei soli laboratori
+                response.forEach(function(element){
+                    
+                    if ((labs.indexOf(element.aula)) == -1) {
+                    labs.push(element.aula);
+                    //console.log(labs);
+                    }                    
+        }, this);
+
+        labs.forEach(function(elemento) {
+            $http.get('http://88.149.220.222/orario/api.php', {
+                params: {
+                    room: elemento
+                }
+            }).success(function(risposta) {
+                //console.log(response);
+                responses[elemento] = risposta;
+
+                if (Object.keys(responses).length == labs.length) {
+                    $scope.genTablePerTipologia(responses);
+                }
+            })
+        }, this);
+        });  
+        }
     };
 
 
@@ -100,7 +144,7 @@ controller("PrenotazioneCtrl", function($scope, $filter, $http, $q, $window, $sc
         
         x += "<tbody>";
 
-        Object.keys(responses).sort().forEach(function(key) {
+        Object.keys(responses).sort().forEach(function(key) { //ad ogni array di oggetto 
             m = [ [], [], [], [], [], [] ];
 
             responses[key].forEach(function(a) {
