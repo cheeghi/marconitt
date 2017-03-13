@@ -38,7 +38,7 @@
                         </md-input-container>
                         <md-input-container class="md-block" flex-gt-sm>
                             <label>Password</label>
-                            <input ng-model="logindata.password" type="password">
+                            <input ng-model="logindata.password" ng-enter="login()" type="password">
                         </md-input-container>
                     </div>
                     <md-button class="md-accent md-raised" ng-click="login()">Entra</md-button>
@@ -71,6 +71,7 @@
     <script src="app/search.controller.js"></script>
     <script src="app/insert.controller.js"></script>
     <script src="app/prenotazione.controller.js"></script>
+    <script src="app/ngenter.directive.js"></script>
 </body>
 
 </html>

@@ -3,15 +3,13 @@ app
 
         $scope.direction = "horizontal";
         $scope.selectedDate;
-
         $scope.isLoading = true;
-
         $scope.currentMonth = new Date().getMonth() + 1;
         $scope.currentYear = new Date().getFullYear();
-
         $scope.events = {};
-
         $scope.calendar = '';
+
+
         var getData = function() {
             console.log("get data");
             var req = {
@@ -33,6 +31,7 @@ app
                 );
         }
 
+
         var numFmt = function(num) {
             num = num.toString();
             if (num.length < 2) {
@@ -46,6 +45,7 @@ app
             setContents();
         }
 
+
         var flushCalendar = function() {
             var date = new Date($scope.currentYear, $scope.currentMonth - 2, 1);
             var days = [];
@@ -54,6 +54,7 @@ app
                 date.setDate(date.getDate() + 1);
             }
         }
+
 
         var setContents = function() {
             var eventsN = new Array();
@@ -75,6 +76,7 @@ app
                 MaterialCalendarData.setDayContent(new Date(key), html);
             });
         }
+
 
         $scope.dayClick = function(date) {
             if ($rootScope.inPrenotazione)
@@ -99,21 +101,26 @@ app
                 });
         };
 
+
         $scope.openMenu = function($mdOpenMenu, ev) {
             originatorEv = ev;
             $mdOpenMenu(ev);
         };
+
 
         $scope.prevMonth = function(date) {
             $scope.currentMonth = date.month;
             $scope.currentYear = date.year;
             getData();
         }
+
+
         $scope.nextMonth = function(date) {
             $scope.currentMonth = date.month;
             $scope.currentYear = date.year;
             getData();
         }
+        
 
         getData();
 

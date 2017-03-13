@@ -6,10 +6,12 @@ app
         $scope.msg = 'Clicca per testare';
         $scope.event;
 
+
         $scope.noSunday = function(date) {
             var day = date.getDay();
             return day !== 0;
         }
+
 
         var init = function() {
             var req = {
@@ -33,6 +35,7 @@ app
             $scope.searchTerm = '';
         };
 
+
         var numFmt = function(num) {
             num = num.toString();
             if (num.length < 2) {
@@ -40,6 +43,7 @@ app
             }
             return num;
         };
+
 
         $scope.insert = function() {
           if ($rootScope.logged) {
@@ -89,6 +93,7 @@ app
         $element.find('input').on('keydown', function(ev) {
             ev.stopPropagation();
         });
+
 
         init();
 

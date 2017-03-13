@@ -1,19 +1,21 @@
 app
-    .controller('DayDialogCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, MaterialCalendarData, $q, $mdToast, $mdDialog, $mdDateLocale, $rootScope,$httpParamSerializerJQLike, CONFIG, day) {
+    .controller('DayDialogCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, MaterialCalendarData, $q, $mdToast, $mdDialog, $mdDateLocale, $rootScope, $httpParamSerializerJQLike, CONFIG, day) {
 
         $scope.day = day;
-		console.log(day);
         $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();
-
         $scope.logged = $rootScope.logged;
-
-        $scope.token = $rootScope.token;
-
         $scope.otherEvents = new Array();
         $scope.spaggiariEvents = new Array();
-
         $scope.data;
         $scope.events = new Array();
+
+
+        /** 
+        $scope.incrementDay = function() {
+            console.log("incrementato");
+            $scope.day.setDate($scope.day.getDate() + 1);
+        };*/
+
 
         getData = function() {
             console.log(day);
@@ -33,6 +35,7 @@ app
                     }
                 );
         };
+        
 
         $scope.delete = function(element, event) {
             var req = {
@@ -60,6 +63,7 @@ app
                 );
         };
 
+
         $scope.toggleVisibility = function(element, event) {
             var req = {
                 method: 'POST',
@@ -86,15 +90,21 @@ app
                 );
         };
 
+
         $scope.hide = function() {
             $mdDialog.hide();
         };
+
+
         $scope.cancel = function() {
             $mdDialog.cancel();
         };
+
+
         $scope.answer = function(answer) {
             $mdDialog.hide(answer);
         };
+
 
         genEvents = function() {
             /*$scope.data.forEach(function(event) {

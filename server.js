@@ -33,7 +33,7 @@ app.use(express.static(__dirname + '/web'));
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'sempre98',
+    password: '',
     database : 'marconitt'
 });
 
@@ -162,13 +162,14 @@ apiRoutes.post('/authenticate', function(req, res) {
                     expiresInMinutes: 1440 // expires in 24 hours
                 });
 
-                req.session.user = user;
+                req.session.username = user.name;
 
                 // return the information including token as JSON
                 res.json({
                     success: true,
                     message: 'Enjoy your token!',
-                    token: token
+                    token: token,
+                    username: req.session.username
                 });
             }
 
@@ -178,10 +179,16 @@ apiRoutes.post('/authenticate', function(req, res) {
 });
 
 apiRoutes.get('/checklogin', function(req, res) {
-    if (req.session.user)
-        res.json(true);
-    else
-        res.json(false);
+    if (req.session.username)
+        res.json({
+            success: true,
+            username: req.session.username
+        });
+    else {
+        res.json({
+            success: false
+        });
+    }
 });
 
 apiRoutes.get('/logout', function(req, res) {
