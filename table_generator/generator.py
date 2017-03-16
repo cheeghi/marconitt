@@ -8,13 +8,13 @@ from datetime import timedelta
 import mysql.connector
 
 ##DOC
-__author__ = 'elsem'
+__author__ = 'Elia Semprebon'
 __description__ = 'Generatore della tabella centrale per marconitt'
 
 
 ##VARIABILI
+global boolD
 boolD = True
-global cursore
 global connessione
 
 
@@ -48,6 +48,8 @@ def fn_getstanze(obj):
         if(i == "" or i == None):
             stanze.remove(i)
             
+    stanze.append("Aula Magna")
+        
     return stanze
 
 
@@ -55,7 +57,7 @@ def fn_getgiorniscuola(nomefile):
     '''
     Funzione che genera i giorni di scuola, escludendo quindi le vacanze(prese da file), e li ritorna in un vettore
     '''
-    start = date(2017, 06, 8)
+    start = date(2017, 06, 7)
     end = date(2017, 06, 9)
     actual = start
     giorni = []
@@ -87,7 +89,6 @@ def fn_getgiorniscuola(nomefile):
             giorni.append(actual)
         actual += timedelta(1)
 
-
     return giorni
 
 
@@ -100,7 +101,7 @@ def fn_generaconnessione():
     except:
         None
     
-    connessione = mysql.connector.connect(user='', password='',host='127.0.0.1',database='marconitt')
+    connessione = mysql.connector.connect(user='root', password='',host='127.0.0.1',database='marconitt')
 
     return connessione
     
@@ -109,7 +110,7 @@ def fn_generarighe():
     '''
     Funzione che elimina, poi rigenera ed invia le righe al database mysql
     '''
-    req = requests.get("http://localhost:8080/api.php")
+    req = requests.get("http://localhost/api.php")
     obj = json.loads(req.text)
     classi = fn_getclassi(obj)
     stanze = fn_getstanze(obj)
@@ -124,9 +125,10 @@ def fn_generarighe():
     cursore.execute(query)
     connessione.commit()
 
-    print(len(ore))
-    print(len(giorni))
-    print(len(stanze))
+    if(boolD):
+        print(len(ore))
+        print(len(giorni))
+        print(len(stanze))
     
     for g in giorni:
         for o in ore:
@@ -148,7 +150,7 @@ def fn_generarighe():
                     cursore = connessione.cursor()
                     
 
-    query = "DELETE FROM timetable WHERE stanza IS NULL or stanza = ''"
+    #query = "DELETE FROM timetable WHERE stanza IS NULL or stanza = ''"
     cursore.close()
     connessione.close()
 
