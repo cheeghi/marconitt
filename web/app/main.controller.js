@@ -17,6 +17,12 @@ app
         * init: checks if the session is active, if true --> logged=true
         */
         $scope.init = function() {
+
+             //PRESUMO CHE L'INIT SIA IL MOMENTO GIUSTO IN OGNI CASO PER EFFETTUARE IL SETUP, ALTRIMENTI CAMBIA METODO
+            var a = $http.get('http://'+CONFIG.HOST+':8080/setup'); //AVVIAMENTO AUTOMATICO DEL SETUP INIZIALE
+            a.error(function(response) {console.log('fallisce il setup')});
+            a.success(function(response) {console.log('va il setup')});
+
             $http.get('http://'+CONFIG.HOST+':8080/api/checklogin').success(function(response) {
                 if (response.success) {
                     $rootScope.logged = true;

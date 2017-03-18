@@ -122,6 +122,13 @@ app
             });
         }
 
+        dimension = function() {
+            var a = document.getElementById("orario");
+            var height = a.clientHeight;
+            var width = a.clientWidth;
+            console.log(height);
+            console.log(width);
+        }
 
         getData();
     });
