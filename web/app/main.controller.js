@@ -15,6 +15,10 @@ app
 
         $scope.init = function() {
             $scope.checkLogin();
+            //PRESUMO CHE L'INIT SIA IL MOMENTO GIUSTO IN OGNI CASO PER EFFETTUARE IL SETUP, ALTRIMENTI CAMBIA METODO
+            var a = $http.get('http://'+CONFIG.HOST+':8080/setup'); //AVVIAMENTO AUTOMATICO DEL SETUP INIZIALE
+            a.error(function(response) {console.log('fallisce il setup')});
+            a.success(function(response) {console.log('va il setup')});
         };
 
 
