@@ -33,24 +33,76 @@ app.
         $scope.getPrenotazioni = function() {
             if ($scope.sRoomType == "LABORATORIO") {
                 //$http.get('http://88.149.220.222/orario/api3.php', {
-                $http.get('http://marconitt.altervista.org/api3.php', {
+                //$http.get('http://marconitt.altervista.org/api3.php', {
+                $http.get('http://localhost/timetable.php', {
                         params: {
-                            labrooms: ""
+                            labroomsbydate: "2017-06-09"
                         }
                 }).success(function(response) {
-                    $scope.genTable(response.rooms);
+                    $scope.genTable2(response.rooms);
                 });
 
             } else if ($scope.sRoomType == "AULA") {
                 //$http.get('http://88.149.220.222/orario/api3.php', {
-                $http.get('http://marconitt.altervista.org/api3.php', {
+                //$http.get('http://marconitt.altervista.org/api3.php', {
+                $http.get('http://localhost/timetable.php', {
                         params: {
-                            classrooms: ""
+                            classroomsbydate: "2017-06-09"
                         }
                 }).success(function(response) {
-                    $scope.genTable(response.rooms);
+                    $scope.genTable2(response.rooms);
                 });
             }
+        };
+
+
+        $scope.genTable2 = function(responses) {
+
+            var x = "<table class=\"table\">\
+                    <thead><tr>\
+                        <th>&nbsp;</th>\
+                        <th>1</th>\
+                        <th>2</th>\
+                        <th>3</th>\
+                        <th>4</th>\
+                        <th>5</th>\
+                        <th>6</th>\
+                        <th>7</th>\
+                        <th>8</th>\
+                        <th>9</th>\
+                        <th>10</th>\
+                    </tr></thead>";
+            
+            x += "<tbody>";
+
+            console.log(responses);
+            for (var key in responses) {
+                if (key == "")
+                    continue;
+                
+                //m = [ [], [], [], [], [], [], [], [], [] ];
+                
+                x += "<tr><td>" + key + "</td>";
+                responses[key].forEach(function(element) {
+                    //m[element.ora - 1] = element;
+                    if (element.classe != "Null") {
+                        //x += "<td>" + element.aula +  ";" + element.ora + "</td>";
+                        //x += "<td>" + element.classe + "</td>";
+                        x += '<td><md-button class="md-raised md-primary" style="max-width:30px;min-width:30px;max-height:35px;min-height:35px;background-color:red"'
+                             + '>NP</td>';
+                    } else {
+                        //x += "<td></td>";
+                        x += '<td><md-button class="md-raised md-primary" style="max-width:30px;min-width:30px;max-height:35px;min-height:35px;"'
+                             + 'ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" >P</td>';
+                    }
+                    
+                }, this);
+                x += "</tr>";
+            }
+
+            x += "</tbody>";
+            x += "</table>";
+            $scope.htmlTable = x;
         };
 
 
@@ -129,8 +181,8 @@ app.
 
         $scope.prenotaClick = function(lab, ora) {
             $rootScope.labPrenotato = lab;
-            $rootScope.oraPrenotata = ora + 1;
-            $rootScope.prenotazioneString = lab + ' ' + (ora+1) + '°ora';
+            $rootScope.oraPrenotata = ora;
+            $rootScope.prenotazioneString = lab + ' ' + (ora) + '°ora';
             $mdDialog.show({
                     templateUrl: 'tpl/dialogConfermaPrenotazione.tpl.html',
                     controller: 'PrenotazioneCtrl',
@@ -149,15 +201,13 @@ app.
             /*console.log("lab prenotato:" + $rootScope.labPrenotato);
             console.log("ora prenotato:" + $rootScope.oraPrenotata);
             console.log("giorno prenotato:" + $rootScope.giornoPrenotato);*/
-            console.log($rootScope.username);
             var req = {
                 method: 'POST',
                 url: 'http://'+CONFIG.HOST+':8080/api/prenota',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                data: "lab="+$rootScope.labPrenotato+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoPrenotato,
-                token: $rootScope.token
+                data: "token="+$rootScope.token+"&lab="+$rootScope.labPrenotato+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoPrenotato
             };
 
             $http(req)

@@ -12,19 +12,22 @@ app
         $scope.logindata = {};
         //$scope.token;
 
-        
-        /**
-        * init: checks if the session is active, if true --> logged=true
-        */
+
         $scope.init = function() {
+            $scope.checkLogin();
+        };
+
+
+        /**
+        * checkLogin: if session is active --> logged = true
+        */
+        $scope.checkLogin = function() {
             $http.get('http://'+CONFIG.HOST+':8080/api/checklogin').success(function(response) {
                 if (response.success) {
                     $rootScope.logged = true;
-                    $rootScope.token = localStorage.token;
+                    $rootScope.token = response.token;
                     $rootScope.username = response.username;
                     $scope.logged = true;
-                } else {
-                    localStorage.token = undefined;
                 }
             })
         };
@@ -91,10 +94,9 @@ app
                       function(data) {
                           if (data.data.success) {
                               $rootScope.token = data.data.token;
-                              $rootScope.logged = true;
                               $rootScope.username = data.data.username;
+                              $rootScope.logged = true;
                               $scope.logged = true;
-                              localStorage.token = data.data.token;
                               
                               $mdToast.show($mdToast.simple().textContent('Login avvenuto con successo!'));
                           } else {
@@ -106,18 +108,16 @@ app
                       }
                 );
             
-            $mdSidenav('left').close();
+            //$mdSidenav('left').close();
         }
 
 
         $scope.logout = function() {
-            //console.log(localStorage.token);
             $http.get('http://'+CONFIG.HOST+':8080/api/logout');
             $rootScope.username = undefined;
             $rootScope.token = undefined;
             $rootScope.logged = false;
             $scope.logged = false;
-            localStorage.token = undefined;
             $rootScope.inPrenotazione = false; $scope.setView('Visualizza');
         }
 
@@ -131,7 +131,7 @@ app
 
 
         $scope.setView = function(viewName) {
-            if ($rootScope.inPrenotazione != undefined && $rootScope.inPrenotazione)
+            if ($rootScope.inPrenotazione)
                 $scope.tool = "Prenota";
             else
                 $scope.tool = viewName;

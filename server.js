@@ -163,6 +163,7 @@ apiRoutes.post('/authenticate', function(req, res) {
                 });
 
                 req.session.username = user.name;
+                req.session.token = token;
 
                 // return the information including token as JSON
                 res.json({
@@ -178,59 +179,22 @@ apiRoutes.post('/authenticate', function(req, res) {
     });
 });
 
+
 apiRoutes.get('/checklogin', function(req, res) {
-    if (req.session.username)
+    if (req.session.username) {
         res.json({
             success: true,
-            username: req.session.username
-        });
-    else {
-        res.json({
-            success: false
+            username: req.session.username,
+            token: req.session.token
         });
     }
 });
+
 
 apiRoutes.get('/logout', function(req, res) {
     req.session.destroy();
 });
 
-apiRoutes.post('/prenota', function(req, res) {
-    res.json(req.body.lab + ';' + req.body.ora);
-	var aula_p = req.body.lab;
-	var day_p;
-	var ora_p = req.body.ora;
-	var data_p = req.body.giorno;
-	var week_day = data_p.split(" ")[0];
-	data_p = dateFormat(data_p, "yyyy/mm/dd");
-	
-	if(week_day == "Mon") { day_p = 1; }
-	if(week_day == "Tue") { day_p = 2; }
-	if(week_day == "Wed") { day_p = 3; }
-	if(week_day == "Thu") { day_p = 4; }
-	if(week_day == "Fry") { day_p = 5; }
-	if(week_day == "Sat") { day_p = 6; }
-	
-	var sql_stmt = "INSERT INTO prenotazioni VALUES (?,?,?)";
-	var values = [data_p, aula_p, ora_p];
-	sql_stmt = mysql.format(sql_stmt, values);
-	
-	connection.query(sql_stmt, function (error, result) {
-        if (error) {
-            console.log('Error: ' + error.message);
-        }
-	});
-	
-	sql_stmt = "INSERT INTO `GPU001`(`Column 5`, `Column 6`) VALUES (?,?)";
-	values = [day_p, ora_p];
-	sql_stmt = mysql.format(sql_stmt, values);
-	
-	connection.query(sql_stmt, function (error, result) {
-        if (error) {
-            console.log('Error: ' + error.message);
-        }
-	});
-});
 
 // route to show a random message (GET http://localhost:8080/api/)
 apiRoutes.get('/', function(req, res) {
@@ -414,6 +378,78 @@ apiRoutes.get('/spaggiari/:year/:month/:day', function(req, res) {
 });
 
 
+// route middleware to verify a token
+// methods declared after this call require token has to be passed 
+apiRoutes.use(function(req, res, next) {
+    // check header or url parameters or post parameters for token
+    var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+    //console.log(req.body);
+    // decode token
+    if (token) {
+
+        // verifies secret and checks exp
+        jwt.verify(token, app.get('secret'), function(err, decoded) {
+            if (err) {
+                return res.json({ success: false, message: 'Failed to authenticate token.' });
+            } else {
+                // if everything is good, save to request for use in other routes
+                req.decoded = decoded;
+                next();
+            }
+        });
+
+    } else {
+
+        // if there is no token
+        // return an error
+        return res.status(403).send({
+            success: false,
+            message: 'No token provided.'
+        });
+
+    }
+});
+
+
+apiRoutes.post('/prenota', function(req, res) {
+    res.json(req.body.lab + ';' + req.body.ora);
+	var aula_p = req.body.lab;
+	var day_p;
+	var ora_p = req.body.ora;
+	var data_p = req.body.giorno;
+	var week_day = data_p.split(" ")[0];
+	data_p = dateFormat(data_p, "yyyy/mm/dd");
+	
+	if(week_day == "Mon") { day_p = 1; }
+	if(week_day == "Tue") { day_p = 2; }
+	if(week_day == "Wed") { day_p = 3; }
+	if(week_day == "Thu") { day_p = 4; }
+	if(week_day == "Fry") { day_p = 5; }
+	if(week_day == "Sat") { day_p = 6; }
+	
+	var sql_stmt = "INSERT INTO prenotazioni VALUES (?,?,?)";
+	var values = [data_p, aula_p, ora_p];
+	sql_stmt = mysql.format(sql_stmt, values);
+	
+	connection.query(sql_stmt, function (error, result) {
+        if (error) {
+            console.log('Error: ' + error.message);
+        }
+	});
+	
+	sql_stmt = "INSERT INTO `GPU001`(`Column 5`, `Column 6`) VALUES (?,?)";
+	values = [day_p, ora_p];
+	sql_stmt = mysql.format(sql_stmt, values);
+	
+	connection.query(sql_stmt, function (error, result) {
+        if (error) {
+            console.log('Error: ' + error.message);
+        }
+	});
+});
+
+
 apiRoutes.post('/events/:year/:month/:day', function(req, res) {
     console.log(req.body);
     var day = new Day({
@@ -455,41 +491,6 @@ apiRoutes.post('/events/visibility/:id', function(req, res) {
       }
     });
 });
-
-
-// route middleware to verify a token
-apiRoutes.use(function(req, res, next) {
-    // check header or url parameters or post parameters for token
-    var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
-    console.log(req.body);
-
-    // decode token
-    if (token) {
-
-        // verifies secret and checks exp
-        jwt.verify(token, app.get('secret'), function(err, decoded) {
-            if (err) {
-                return res.json({ success: false, message: 'Failed to authenticate token.' });
-            } else {
-                // if everything is good, save to request for use in other routes
-                req.decoded = decoded;
-                next();
-            }
-        });
-
-    } else {
-
-        // if there is no token
-        // return an error
-        return res.status(403).send({
-            success: false,
-            message: 'No token provided.'
-        });
-
-    }
-});
-
 
 
 // apply the routes to our application with the prefix /api

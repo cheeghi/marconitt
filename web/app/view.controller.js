@@ -40,6 +40,7 @@ app
             return num;
         };
 
+
         $scope.selectOptions = function() {
             flushCalendar();
             setContents();
