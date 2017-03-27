@@ -33,8 +33,8 @@ app.
         $scope.getPrenotazioni = function() {
             if ($scope.sRoomType == "LABORATORIO") {
                 //$http.get('http://88.149.220.222/orario/api3.php', {
-                //$http.get('http://marconitt.altervista.org/api3.php', {
-                $http.get('http://localhost/timetable.php', {
+                $http.get('http://marconitt.altervista.org/timetable.php', {
+                //$http.get('http://localhost/timetable.php', {
                         params: {
                             labroomsbydate: "2017-06-09"
                         }
@@ -44,8 +44,8 @@ app.
 
             } else if ($scope.sRoomType == "AULA") {
                 //$http.get('http://88.149.220.222/orario/api3.php', {
-                //$http.get('http://marconitt.altervista.org/api3.php', {
-                $http.get('http://localhost/timetable.php', {
+                $http.get('http://marconitt.altervista.org/timetable.php', {
+                //$http.get('http://localhost/timetable.php', {
                         params: {
                             classroomsbydate: "2017-06-09"
                         }
@@ -75,7 +75,6 @@ app.
             
             x += "<tbody>";
 
-            console.log(responses);
             for (var key in responses) {
                 if (key == "")
                     continue;
@@ -85,7 +84,8 @@ app.
                 x += "<tr><td>" + key + "</td>";
                 responses[key].forEach(function(element) {
                     //m[element.ora - 1] = element;
-                    if (element.classe != "Null") {
+                    console.log(element.risorsa);
+                    if (element.risorsa != "Null") {
                         //x += "<td>" + element.aula +  ";" + element.ora + "</td>";
                         //x += "<td>" + element.classe + "</td>";
                         x += '<td><md-button class="md-raised md-primary" style="max-width:30px;min-width:30px;max-height:35px;min-height:35px;background-color:red"'
