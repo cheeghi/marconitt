@@ -11,9 +11,11 @@
         </md-toolbar>
         <md-dialog-content>
             <md-tabs md-dynamic-height md-stretch-tabs="always">
+
                 <md-tab label="eventi">
-                    <md-content class="md-padding">
+                    <md-content class="md-padding"  ng-controller="EventCtrl">
                         <div>
+                        {{test}}
                             <md-list class="md-dense" flex>
                                 <md-list-item class="md-3-line borderType{{event.type}} dotted_{{event.visible}}" ng-repeat="event in events | orderBy:'hour_start' | orderBy:'hour_end'">
                                     <div class="md-list-item-text" layout="column">
@@ -46,6 +48,7 @@
                         </div>
                     </md-content>
                 </md-tab>
+
                 <md-tab label="orario">
                     <md-content ng-controller="OrarioCtrl" ng-init="init(day)">
                         <md-content layout-padding>

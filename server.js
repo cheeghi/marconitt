@@ -414,39 +414,26 @@ apiRoutes.use(function(req, res, next) {
 
 apiRoutes.post('/prenota', function(req, res) {
     res.json(req.body.lab + ';' + req.body.ora);
-	var aula_p = req.body.lab;
-	var day_p;
-	var ora_p = req.body.ora;
-	var data_p = req.body.giorno;
-	var week_day = data_p.split(" ")[0];
-	data_p = dateFormat(data_p, "yyyy/mm/dd");
+	var stanza = req.body.stanza;
+	var i_giorno = req.body.giorno;
+	var ora = req.body.ora;
+	var risorsa = req.body.risorsa;
+	var giorno;
 	
-	if(week_day == "Mon") { day_p = 1; }
-	if(week_day == "Tue") { day_p = 2; }
-	if(week_day == "Wed") { day_p = 3; }
-	if(week_day == "Thu") { day_p = 4; }
-	if(week_day == "Fry") { day_p = 5; }
-	if(week_day == "Sat") { day_p = 6; }
+	giorno = dateFormat(i_giorno, "yyyy-mm-dd");
+	console.log(risorsa);
+	console.log(stanza);
 	
-	var sql_stmt = "INSERT INTO prenotazioni VALUES (?,?,?)";
-	var values = [data_p, aula_p, ora_p];
-	sql_stmt = mysql.format(sql_stmt, values);
+	var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" + stanza +
+	"' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
 	
+	http.get("http://marconitt.altervista.org/timetable.php?doquery=" + sql_stmt)
+	/**
 	connection.query(sql_stmt, function (error, result) {
         if (error) {
             console.log('Error: ' + error.message);
         }
-	});
-	
-	sql_stmt = "INSERT INTO `GPU001`(`Column 5`, `Column 6`) VALUES (?,?)";
-	values = [day_p, ora_p];
-	sql_stmt = mysql.format(sql_stmt, values);
-	
-	connection.query(sql_stmt, function (error, result) {
-        if (error) {
-            console.log('Error: ' + error.message);
-        }
-	});
+	});*/
 });
 
 
