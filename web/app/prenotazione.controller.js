@@ -24,7 +24,8 @@ app.
         $scope.init = function(date) {
             //console.log(date);
             $scope.day = new Date(date);
-            $rootScope.giornoPrenotato = $scope.day;
+            $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1)
+                + "-" + $scope.day.getDate();
             $scope.isSunday = $scope.day.getDay() == 0;
             $scope.htmlTable = ($scope.isSunday) ? "<p>Non c'è scuola di domenica</p>" : "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
         }
@@ -36,7 +37,7 @@ app.
                 $http.get('http://marconitt.altervista.org/timetable.php', {
                 //$http.get('http://localhost/timetable.php', {
                         params: {
-                            labroomsbydate: "2017-05-09"
+                            labroomsbydate: $rootScope.giornoSelezionato
                         }
                 }).success(function(response) {
                     $scope.genTable2(response.rooms);
@@ -47,7 +48,7 @@ app.
                 $http.get('http://marconitt.altervista.org/timetable.php', {
                 //$http.get('http://localhost/timetable.php', {
                         params: {
-                            classroomsbydate: "2017-05-09"
+                            classroomsbydate: $rootScope.giornoSelezionato
                         }
                 }).success(function(response) {
                     $scope.genTable2(response.rooms);
@@ -79,19 +80,12 @@ app.
                 if (key == "")
                     continue;
                 
-                //m = [ [], [], [], [], [], [], [], [], [] ];
-                
                 x += "<tr><td>" + key + "</td>";
                 responses[key].forEach(function(element) {
-                    //m[element.ora - 1] = element;
-                    console.log(typeof element.risorsa);
                     if (element.risorsa != null) {
-                        //x += "<td>" + element.aula +  ";" + element.ora + "</td>";
-                        //x += "<td>" + element.classe + "</td>";
                         x += '<td><md-button class="md-raised md-primary" style="max-width:30px;min-width:30px;max-height:35px;min-height:35px;background-color:red"'
                              + '>NP</td>';
                     } else {
-                        //x += "<td></td>";
                         x += '<td><md-button class="md-raised md-primary" style="max-width:30px;min-width:30px;max-height:35px;min-height:35px;"'
                              + 'ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" >P</td>';
                     }
@@ -179,10 +173,10 @@ app.
         }
 
 
-        $scope.prenotaClick = function(lab, ora) {
-            $rootScope.labPrenotato = lab;
+        $scope.prenotaClick = function(stanza, ora) {
+            $rootScope.stanzaPrenotata = stanza;
             $rootScope.oraPrenotata = ora;
-            $rootScope.prenotazioneString = lab + ' ' + (ora) + '°ora';
+            $rootScope.prenotazioneString = stanza + ' ' + (ora) + '°ora';
             $mdDialog.show({
                     templateUrl: 'tpl/dialogConfermaPrenotazione.tpl.html',
                     controller: 'PrenotazioneCtrl',
@@ -198,18 +192,19 @@ app.
 
 
         $scope.prenota = function() {
-            /*console.log("lab prenotato:" + $rootScope.labPrenotato);
+            /*console.log("lab prenotato:" + $rootScope.stanzaPrenotata);
             console.log("ora prenotato:" + $rootScope.oraPrenotata);
-            console.log("giorno prenotato:" + $rootScope.giornoPrenotato);*/
+            console.log("giorno prenotato:" + $rootScope.giornoSelezionato);*/
             var req = {
                 method: 'POST',
                 url: 'http://'+CONFIG.HOST+':8080/api/prenota',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                data: "token="+$rootScope.token+"&lab="+$rootScope.labPrenotato+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoPrenotato
+                data: "token="+$rootScope.token+"&stanza="+$rootScope.stanzaPrenotata+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoSelezionato
+                    + "risorsa="+$scope.sClass
             };
-
+            console.log(req.data);
             $http(req)
                 .then(
                     function(data) {
