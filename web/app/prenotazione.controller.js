@@ -36,7 +36,7 @@ app.
                 $http.get('http://marconitt.altervista.org/timetable.php', {
                 //$http.get('http://localhost/timetable.php', {
                         params: {
-                            labroomsbydate: "2017-06-09"
+                            labroomsbydate: "2017-05-09"
                         }
                 }).success(function(response) {
                     $scope.genTable2(response.rooms);
@@ -47,7 +47,7 @@ app.
                 $http.get('http://marconitt.altervista.org/timetable.php', {
                 //$http.get('http://localhost/timetable.php', {
                         params: {
-                            classroomsbydate: "2017-06-09"
+                            classroomsbydate: "2017-05-09"
                         }
                 }).success(function(response) {
                     $scope.genTable2(response.rooms);
@@ -84,8 +84,8 @@ app.
                 x += "<tr><td>" + key + "</td>";
                 responses[key].forEach(function(element) {
                     //m[element.ora - 1] = element;
-                    console.log(element.risorsa);
-                    if (element.risorsa != "Null") {
+                    console.log(typeof element.risorsa);
+                    if (element.risorsa != null) {
                         //x += "<td>" + element.aula +  ";" + element.ora + "</td>";
                         //x += "<td>" + element.classe + "</td>";
                         x += '<td><md-button class="md-raised md-primary" style="max-width:30px;min-width:30px;max-height:35px;min-height:35px;background-color:red"'
