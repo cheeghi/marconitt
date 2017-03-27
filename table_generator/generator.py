@@ -47,7 +47,7 @@ def fn_getstanze(obj):
     for i in stanze:
         if(i == "" or i == None):
             stanze.remove(i)
-            
+        
     stanze.append("Aula Magna")
         
     return stanze
@@ -57,8 +57,8 @@ def fn_getgiorniscuola(nomefile):
     '''
     Funzione che genera i giorni di scuola, escludendo quindi le vacanze(prese da file), e li ritorna in un vettore
     '''
-    start = date(2017, 06, 7)
-    end = date(2017, 06, 9)
+    start = date(2017, 05, 01)
+    end = date(2017, 05, 31)
     actual = start
     giorni = []
     ifile = open(nomefile, "r")
@@ -110,18 +110,18 @@ def fn_generarighe():
     '''
     Funzione che elimina, poi rigenera ed invia le righe al database mysql
     '''
-    req = requests.get("http://localhost/api.php")
+    req = requests.get("http://localhost:8080/api.php")
     obj = json.loads(req.text)
     classi = fn_getclassi(obj)
     stanze = fn_getstanze(obj)
     nomefile = "vacanze.csv"
     giorni = fn_getgiorniscuola(nomefile)
     ore = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    cont = 1
-    appo = 0
+    cont = 0
+    appo = 500
     connessione = fn_generaconnessione()
     cursore = connessione.cursor()
-    query = "DELETE FROM timetable"
+    query = "DELETE FROM timetable;"
     cursore.execute(query)
     connessione.commit()
 
@@ -133,17 +133,20 @@ def fn_generarighe():
     for g in giorni:
         for o in ore:
             for s in stanze:
-                if(g.weekday() == 0):
+                if(g.weekday() == 6):
                     break
-                
+
                 str_giorno = g.strftime("%Y-%m-%d")
-                query = "INSERT INTO timetable VALUES (%s, %s, %s, %s, %s, %s);"
-                dati = (cont, str_giorno, str(o), s, "Null", str(g.weekday()))
+                query = "INSERT INTO timetable(id, giorno, ora, stanza, giorno_settimana) VALUES (%s, %s, %s, %s, %s);"
+                dati = (cont, str_giorno, str(o), s, str(g.weekday() + 1))
                 cursore.execute(query, dati)
                 cont += 1
 
-                if (cont == appo + 500):
-                    appo = cont
+                if (cont == appo):
+                    if(boolD):
+                        print("Cont= " + str(cont) + "     appo= " + str(appo))
+                        
+                    appo += 500
                     cursore.close()
                     connessione.commit()
                     connessione = fn_generaconnessione()
@@ -152,6 +155,7 @@ def fn_generarighe():
 
     #query = "DELETE FROM timetable WHERE stanza IS NULL or stanza = ''"
     cursore.close()
+    connessione.commit()
     connessione.close()
 
 
