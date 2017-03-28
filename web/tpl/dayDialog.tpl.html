@@ -52,21 +52,7 @@
                 <md-tab label="orario">
                     <md-content ng-controller="OrarioCtrl" ng-init="init(day)">
                         <md-content layout-padding>
-                            <div layout="row" ng-hide="isSunday">
-                                <md-input-container>
-                                    <label>Tipologia</label>
-                                    <md-select ng-model="sRoomType" ng-change="getPrenotazioni()" size="20">
-                                        <md-option>
-                                            LAB
-                                        </md-option>
-                                        <md-option>
-                                            AULE
-                                        </md-option>
-                                        <md-option>
-                                            AULA MAGNA
-                                        </md-option>                                                                                
-                                    </md-select>
-                                </md-input-container>                                
+                            <div layout="row" ng-hide="isSunday">                             
                                 <md-input-container>
                                     <label>Classe</label>
                                     <md-select ng-model="sClass" ng-change="getOrarioClass()" size="20">

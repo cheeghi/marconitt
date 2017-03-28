@@ -425,11 +425,8 @@ apiRoutes.post('/prenota', function(req, res) {
 	var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" + stanza +
 	"' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
 	
-	http.get("http://marconitt.altervista.org/timetable.php?doquery=" + sql_stmt, function() {
-        res.json(true);
-    });
-
-
+	http.get("http://marconitt.altervista.org/timetable.php?doquery=" + sql_stmt);
+    res.json(true);
 
 
 	/**

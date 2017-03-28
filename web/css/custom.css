@@ -237,3 +237,18 @@ md-fab {
   min-width:10px;
   max-width:10px;
 }
+
+.button_prenotazione {
+    max-width:30px;
+    min-width:30px;
+    max-height:35px;
+    min-height:35px;
+}
+
+#button_p {
+    background-color:green;
+}
+
+#button_np {
+    background-color:red;
+}

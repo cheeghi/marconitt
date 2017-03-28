@@ -12,10 +12,10 @@
         <md-dialog-content>
             <md-tabs md-dynamic-height md-stretch-tabs="always">
                 <md-tab label="CONFERMA">
-                    <md-content ng-controller="PrenotazioneCtrl">
+                    <md-content ng-controller="ConfermaPrenotazioneCtrl">
                         <md-content layout-padding>
                             <div layout="row">
-                                <md-input-container>
+                                <md-input-container class="md-block" flex>
                                     <label>Classe</label>
                                     <md-select ng-model="sClass" ng-change="" size="20">
                                         <md-option ng-repeat="class in classes" value="{{class}}">
@@ -23,7 +23,11 @@
                                         </md-option>
                                     </md-select>
                                 </md-input-container>
-                                    <md-button class="md-raised md-primary" ng-disabled="sClass==undefined" ng-click="prenota()" style="position:absolute; right:0;" >CONFERMA</md-button>
+                                <md-input-container>
+                                    <md-button class="md-raised md-primary" ng-disabled='sClass==undefined||sClass==""' ng-click="prenota()" >
+                                        CONFERMA
+                                    </md-button>
+                                </md-input-container>
                             </div>
                         </md-content>
                     </md-content>
