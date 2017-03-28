@@ -8,6 +8,7 @@ app
         $scope.currentYear = new Date().getFullYear();
         $scope.events = {};
         $scope.calendar = '';
+        
 
 
         var getData = function() {
@@ -122,6 +123,7 @@ app
             getData();
         }
         
+     
 
         getData();
 

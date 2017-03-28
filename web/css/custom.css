@@ -14,6 +14,12 @@
     color: white;
     font-weight: bold;
 }
+.prenotaDate{
+    position: absolute;
+    padding-left: 40%;
+    left: 40px;
+
+}
 
 .md-toolbar-tools md-select-value span {
     max-height: 30px !important;
@@ -24,7 +30,7 @@
     text-overflow: ellipsis !important;
     overflow: -moz-scrollbars-none !important;
     -ms-overflow-style: none !important;
-}
+} 
 
 ::-webkit-scrollbar {
     display: none;
