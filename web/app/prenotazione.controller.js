@@ -8,7 +8,7 @@ app.
         $scope.htmlTable = "";
         $scope.all = false;
         $scope.prenotazioneString = $rootScope.prenotazioneString;
-        
+
 
         $http.get('http://88.149.220.222/orario/api.php', {  
             params: {
@@ -32,7 +32,9 @@ app.
 
 
         $scope.getPrenotazioni = function() {
+            //console.log("****");
             if ($scope.sRoomType == "LABORATORIO") {
+                console.log("****");
                 //$http.get('http://88.149.220.222/orario/api3.php', {
                 $http.get('http://marconitt.altervista.org/timetable.php', {
                 //$http.get('http://localhost/timetable.php', {
@@ -58,7 +60,8 @@ app.
 
 
         $scope.genTable2 = function(responses) {
-
+            console.log(responses);
+            console.log("########");
             var x = "<table class=\"table\">\
                     <thead><tr>\
                         <th>&nbsp;</th>\
@@ -96,13 +99,14 @@ app.
 
             x += "</tbody>";
             x += "</table>";
+            //console.log(x);
             $scope.htmlTable = x;
         };
 
 
         $scope.genTable = function(responses) {
             var days = $mdDateLocale.days;
-
+            
             var x = "<table class=\"table\">\
                     <thead><tr>\
                         <th>&nbsp;</th>\
@@ -177,43 +181,23 @@ app.
             $rootScope.stanzaPrenotata = stanza;
             $rootScope.oraPrenotata = ora;
             $rootScope.prenotazioneString = stanza + ' ' + (ora) + '°ora';
+            $rootScope.sRoomType = $scope.sRoomType;
             $mdDialog.show({
                     templateUrl: 'tpl/dialogConfermaPrenotazione.tpl.html',
-                    controller: 'PrenotazioneCtrl',
+                    controller: 'ConfermaPrenotazioneCtrl',
                     clickOutsideToClose: true,
                     skipHide: true
             })
         };
 
+        $rootScope.$on("getPrenotazioni", function() {
+            $scope.sRoomType = $rootScope.sRoomType;
+            $scope.getPrenotazioni();
+        });
 
-        $scope.cancel = function() {
-            $mdDialog.cancel();
-        };
-
-
-        $scope.prenota = function() {
-            /*console.log("lab prenotato:" + $rootScope.stanzaPrenotata);
-            console.log("ora prenotato:" + $rootScope.oraPrenotata);
-            console.log("giorno prenotato:" + $rootScope.giornoSelezionato);*/
-            var req = {
-                method: 'POST',
-                url: 'http://'+CONFIG.HOST+':8080/api/prenota',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                data: "token="+$rootScope.token+"&stanza="+$rootScope.stanzaPrenotata+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoSelezionato
-                    + "risorsa="+$scope.sClass
-            };
-            console.log(req.data);
-            $http(req)
-                .then(
-                    function(data) {
-                        console.log(data);
-                    }
-                );
-
-            $scope.cancel();
-            $mdToast.show($mdToast.simple().textContent('Prenotazione avvenuta con successo!'));
-        };
+        $scope.$on("refreshEvent", function (event, args) {
+            $scope.sRoomType = $rootScope.sRoomType;
+            $scope.getPrenotazioni();
+        });
 
     });
