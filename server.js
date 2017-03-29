@@ -80,6 +80,20 @@ app.get('/setup', function(req, res) {
       if (err) throw err;
 
       console.log('User saved successfully');
+      //res.json({ success: true });
+    });
+
+    var nick2 = new User({ 
+      name: 'gb', 
+      password: '123456--',
+      admin: false 
+    });
+
+    // save the sample user
+    nick2.save(function(err) {
+      if (err) throw err;
+
+      console.log('User saved successfully');
       res.json({ success: true });
     });
 
@@ -163,6 +177,7 @@ apiRoutes.post('/authenticate', function(req, res) {
                 });
 
                 req.session.username = user.name;
+                req.session.admin = user.admin;
                 req.session.token = token;
 
                 // return the information including token as JSON
@@ -170,7 +185,8 @@ apiRoutes.post('/authenticate', function(req, res) {
                     success: true,
                     message: 'Enjoy your token!',
                     token: token,
-                    username: req.session.username
+                    username: req.session.username,
+                    admin: user.admin
                 });
             }
 
@@ -185,6 +201,7 @@ apiRoutes.get('/checklogin', function(req, res) {
         res.json({
             success: true,
             username: req.session.username,
+            admin: req.session.admin,
             token: req.session.token
         });
     }

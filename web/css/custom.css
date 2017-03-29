@@ -136,8 +136,10 @@ md-dialog#dayDialogElement {
 }
 
 md-dialog#dayDialogConfermaElement {
-    min-width: 30%;
-    min-height: 10%;
+    min-width: 50%;
+    max-width: 50%;
+    min-height: 40%;
+    max-height: 40%;
 }
 
 md-select-menu md-option[selected] {

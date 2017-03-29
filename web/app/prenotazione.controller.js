@@ -7,6 +7,7 @@ app.
         $scope.isSunday = true;
         $scope.htmlTable = "";
         $scope.all = false;
+        $scope.admin = $rootScope.admin;
 
 
         $http.get('http://88.149.220.222/orario/api.php', {  
