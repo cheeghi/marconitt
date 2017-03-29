@@ -38,6 +38,8 @@ app.
                     }
                 }).success(function(response) {
                     $scope.genTable(response.rooms);
+                    //var html = await function() {$scope.genTable(response.rooms);};
+                    //$scope.dim(); //for scrollbar
                 });
 
             } else if ($scope.sRoomType == "AULA") {
@@ -48,9 +50,15 @@ app.
                     }
                 }).success(function(response) {
                     $scope.genTable(response.rooms);
+                    //var html = await function() {$scope.genTable(response.rooms);};
+                    //$scope.dim(); //for scrollbar
                 });
             }
         };
+
+                $scope.dim = function() {
+            $rootScope.$broadcast("dimension", {});
+        }
 
 
         $scope.genTable = function(responses) {
@@ -94,7 +102,6 @@ app.
             x += "</table>";
             $scope.htmlTable = x;
         };
-
 
         $scope.prenotaClick = function(stanza, ora) {
             $rootScope.stanzaPrenotata = stanza;

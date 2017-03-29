@@ -122,7 +122,11 @@ app
             });
         }
 
-        dimension = function() {
+        $scope.$on("dimension", function (event, args) {
+            $scope.dimension();
+        });
+
+        $scope.dimension = function() {
 			var boolD = false;
 		
 			//fix table dimension
@@ -135,22 +139,48 @@ app
 			}
 			
 			//page dimension
-			//implementare anche l'height          !!!
 			var page = document.getElementById("contentPrenotazione");
 			var pageWidth = page.clientWidth;
-			console.log(pageWidth);
+            var pageHeight = page.clientHeight;
 			if (boolD) {
 				console.log("page dimension width: " + pageWidth);
-				//
+                console.log("page dimension height: " + pageHeight);
 			}
 			
-			if (tableWidth > pageWidth) {
+            if (tableWidth > pageWidth && tableHeight > pageHeight) {
+                console.log("inserire scroll verticale");
+                if (boolD) {
+                    console.log("width fix table: " + tableWidth);
+                    console.log("width page: " + pageWidth);
+                    console.log("inserire scroll orizzontale");
+                    console.log("height fix table: " + tableHeight);
+                    console.log("height page: " + pageHeight);
+                    console.log("inserire scroll verticale");
+                }
+                //add vertical and orizzontal scroll
+            } else if (tableWidth > pageWidth) {
+                console.log("inserire scroll orizzontale");
 				if (boolD) {
 					console.log("width fix table: " + tableWidth);
 					console.log("width page: " + pageWidth);
-					console.log("inserire scroll");
+					console.log("inserire scroll orizzontale");
 				}
-			}
+                //add orizzontal scroll
+			} else if (tableHeight > pageHeight) {
+                console.log("inserire scroll verticale");
+                if (boolD) {
+                    console.log("height fix table: " + tableHeight);
+                    console.log("height page: " + pageHeight);
+                    console.log("inserire scroll verticale");
+                }
+                //add vertical scroll
+            } else {
+                console.log("normal dimension");
+                console.log("table width: " + tableWidth);
+                console.log("table height: " + tableHeight);
+                console.log("page width: " + pageWidth);
+                console.log("page height: " + pageHeight);
+            }
 			
         }
 
