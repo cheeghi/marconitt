@@ -31,6 +31,7 @@ app
                     $rootScope.logged = true;
                     $rootScope.token = response.token;
                     $rootScope.username = response.username;
+                    $rootScope.admin = response.admin;
                     $scope.logged = true;
                 }
             })
@@ -99,9 +100,9 @@ app
                           if (data.data.success) {
                               $rootScope.token = data.data.token;
                               $rootScope.username = data.data.username;
+                              $rootScope.admin = data.data.admin;
                               $rootScope.logged = true;
                               $scope.logged = true;
-                              
                               $mdToast.show($mdToast.simple().textContent('Login avvenuto con successo!'));
                           } else {
                               $mdToast.show($mdToast.simple().textContent('Errore! '+data.data.message));
@@ -128,17 +129,17 @@ app
 
         $scope.view = function(e, inPrenotazione) {
             $rootScope.inPrenotazione = inPrenotazione;
-            //console.log(localStorage.token);
             $mdSidenav('left').close();
             $scope.setView(e);
         }
 
 
         $scope.setView = function(viewName) {
+
             if ($rootScope.inPrenotazione)
                 $scope.tool = "Prenota";
             else
-                $scope.tool = viewName;
+                $scope.tool = "Visualizza";
 
             tpl = $filter('lowercase')(viewName);
             $http
@@ -154,5 +155,5 @@ app
         }
 
         // on start
-        $scope.setView('Visualizza');
+        $scope.setView('Calendario');
     });

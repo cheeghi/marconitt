@@ -23,6 +23,19 @@
                                         </md-option>
                                     </md-select>
                                 </md-input-container>
+                                <md-input-container ng-show="admin" class="md-block" flex>
+                                    <label>Evento</label>
+                                    <md-select ng-model="sClass" ng-change="" size="20">
+                                        <md-option ng-repeat="class in classes" value="{{class}}">
+                                            {{class}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+                                <md-input-container ng-show="admin" class="md-block" flex>
+                                    <label>Descrizione</label>
+                                    <input size="50" ng-model="user.address">
+                                    </md-select>
+                                </md-input-container>                                
                                 <md-input-container>
                                     <md-button class="md-raised md-primary" ng-disabled='sClass==undefined||sClass==""' ng-click="prenota()" >
                                         CONFERMA
