@@ -429,29 +429,63 @@ apiRoutes.use(function(req, res, next) {
 });
 
 
-apiRoutes.post('/prenota', function(req, res) {
-    //res.json(req.body.stanza + ';' + req.body.ora);
+apiRoutes.post('/prenota', function(req, res1) {
 	var stanza = req.body.stanza;
 	var giorno = req.body.giorno;
 	var ora = req.body.ora;
 	var risorsa = req.body.risorsa;
-
-	console.log(risorsa);
-	console.log(stanza);
+	var id;
 	
 	var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" + stanza +
 	"' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
+	console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
+	http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
+	sql_stmt = "SELECT id FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
 	
-	http.get("http://marconitt.altervista.org/timetable.php?doquery=" + sql_stmt);
-    res.json(true);
+	http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
+		var str = '';
 
+		res.on('data', function (chunk) {
+			str += chunk;
+		});
 
-	/**
-	connection.query(sql_stmt, function (error, result) {
-        if (error) {
-            console.log('Error: ' + error.message);
-        }
-	});*/
+		res.on('end', function () {
+			var strbello = str.replace('"', '');
+			var strbello2 = strbello.replace('"', '');			  
+			var id = Number(strbello2);
+
+			sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", 'non si sa');";
+			http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
+			console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
+		});
+	
+	
+	sql_stmt = "SELECT stanza FROM timetable WHERE risorsa = '" + risorsa + "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
+	http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
+		var str = '';
+
+		res.on('data', function (chunk) {
+			str += chunk;
+		});
+
+		res.on('end', function () {
+			console.log("asasasa" + str);
+			stanza = str;
+			sql_stmt = "UPDATE timetable SET risorsa = Null WHERE stanza = " + stanza + 
+			" AND ora = " + ora + " AND giorno ='" + giorno + "';";
+			http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
+			console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
+			res1.json(true);
+		});
+	});	
+	
+		/** query per il mysql su db locale
+		connection.query(sql_stmt, function (error, result) {
+			if (error) {
+				console.log('Error: ' + error.message);
+			}
+		});*/
+	});
 });
 
 

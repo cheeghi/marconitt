@@ -1,3 +1,5 @@
+
+
 CREATE TABLE timetable (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	giorno DATE NOT NULL,
