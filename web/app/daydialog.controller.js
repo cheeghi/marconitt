@@ -123,11 +123,35 @@ app
         }
 
         dimension = function() {
-            var a = document.getElementById("orario");
-            var height = a.clientHeight;
-            var width = a.clientWidth;
-            console.log(height);
-            console.log(width);
+			var boolD = false;
+		
+			//fix table dimension
+            var table = document.getElementById("orario");
+            var tableHeight = table.clientHeight;
+            var tableWidth = table.clientWidth;
+            if (boolD) {
+				console.log("fix table dimension height: " + tableHeight);
+				console.log("fix table dimension width: " + tableWidth);
+			}
+			
+			//page dimension
+			//implementare anche l'height          !!!
+			var page = document.getElementById("contentPrenotazione");
+			var pageWidth = page.clientWidth;
+			console.log(pageWidth);
+			if (boolD) {
+				console.log("page dimension width: " + pageWidth);
+				//
+			}
+			
+			if (tableWidth > pageWidth) {
+				if (boolD) {
+					console.log("width fix table: " + tableWidth);
+					console.log("width page: " + pageWidth);
+					console.log("inserire scroll");
+				}
+			}
+			
         }
 
         getData();
