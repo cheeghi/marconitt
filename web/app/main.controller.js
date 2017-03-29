@@ -10,6 +10,7 @@ app
         $scope.mainHtml;
         $scope.tool = 'Visualizza';
         $scope.logindata = {};
+        $scope.customStyle = {};
         //$scope.token;
 
 
@@ -124,6 +125,7 @@ app
             $rootScope.logged = false;
             $scope.logged = false;
             $rootScope.inPrenotazione = false; $scope.setView('Visualizza');
+            $scope.highlight(1);
         }
 
 
@@ -154,6 +156,34 @@ app
                     );
         }
 
+
+        $scope.highlight = function(type) {
+            if (type == 1) {
+                $scope.customStyle.visualizza = {"background-color" : "#2196F3"};
+                $scope.customStyle.visualizzaText = {"color" : "white"};
+                $scope.customStyle.prenota = {"background-color" : "white"};
+                $scope.customStyle.prenotaText = {"color" : "black"};
+                $scope.customStyle.inserisci = {"background-color" : "white"};
+                $scope.customStyle.inserisciText = {"color" : "black"};
+            } else if (type == 2) {
+                $scope.customStyle.visualizza = {"background-color" : "white"};
+                $scope.customStyle.visualizzaText = {"color" : "black"};
+                $scope.customStyle.prenota = {"background-color" : "#2196F3"};
+                $scope.customStyle.prenotaText = {"color" : "white"};
+                $scope.customStyle.inserisci = {"background-color" : "white"};
+                $scope.customStyle.inserisciText = {"color" : "black"};                
+            } else if (type == 3) {
+                $scope.customStyle.visualizza = {"background-color" : "white"};
+                $scope.customStyle.visualizzaText = {"color" : "black"};
+                $scope.customStyle.prenota = {"background-color" : "white"};
+                $scope.customStyle.prenotaText = {"color" : "black"};
+                $scope.customStyle.inserisci = {"background-color" : "#2196F3"};
+                $scope.customStyle.inserisciText = {"color" : "white"};  
+            }
+        };
+
+
         // on start
         $scope.setView('Calendario');
+        $scope.highlight(1);
     });

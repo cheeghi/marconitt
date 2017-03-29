@@ -38,9 +38,9 @@ app.
             
             if ($scope.isSunday){
                  $scope.htmlTable = "<p>Non c'è scuola di domenica</p>";
-            }
-
-            else {
+            } else if($scope.sRoomType == undefined) {
+                $scope.htmlTable = "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
+            } else {
                 $scope.getPrenotazioni();
             }
         }
