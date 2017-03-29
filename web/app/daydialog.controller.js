@@ -13,12 +13,14 @@ app
         $scope.nextDay = function(){
             day.setDate(day.getDate()+1);
             $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();
-        }
+            $rootScope.$broadcast('reInit',{day:day});
+    }
 
         $scope.previousDay = function(){
             day.setDate(day.getDate()-1);
             $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();
-        }
+            $rootScope.$broadcast('reInit',{day:day});
+    }
 
 
         getData = function() {

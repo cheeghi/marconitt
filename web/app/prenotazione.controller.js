@@ -1,6 +1,6 @@
 app.
     controller("PrenotazioneCtrl", function($scope, $http, $window, $mdDialog, $rootScope) {
-        
+     
         $scope.day;
         $scope.currentItem = '';
         $scope.classes = [];
@@ -27,6 +27,22 @@ app.
                 + "-" + $scope.day.getDate();
             $scope.isSunday = $scope.day.getDay() == 0;
             $scope.htmlTable = ($scope.isSunday) ? "<p>Non c'è scuola di domenica</p>" : "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
+        }
+
+        $scope.reInit = function(date) {
+            $scope.htmlTable = '';
+            $scope.day = new Date(date);
+            $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1)
+                + "-" + $scope.day.getDate();
+            $scope.isSunday = $scope.day.getDay() == 0;
+            
+            if ($scope.isSunday){
+                 $scope.htmlTable = "<p>Non c'è scuola di domenica</p>";
+            }
+
+            else {
+                $scope.getPrenotazioni();
+            }
         }
 
 
@@ -114,5 +130,11 @@ app.
         $scope.$on("refreshTable", function (event, args) {
             $scope.getPrenotazioni();
         });
+
+        
+        $scope.$on("reInit", function (event, args) {
+            $scope.reInit(args.day);
+        });
+
 
     });
