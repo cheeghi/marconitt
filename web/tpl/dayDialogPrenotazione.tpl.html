@@ -1,5 +1,3 @@
-
-
 <md-dialog aria-label="{{ dayString }}" id="dayDialogElement">
     <form>
         <md-toolbar>
@@ -22,35 +20,39 @@
                 </md-button>
             </div>
         </md-toolbar>
-        <md-dialog-content>
-            <md-tabs md-dynamic-height md-stretch-tabs="always">
-                <md-tab label="PRENOTA">
-                    <md-content ng-controller="PrenotazioneCtrl" ng-init="init(day)">
-                        <md-content layout-padding>
-                            <div layout="row" ng-hide="isSunday">
-                                <md-input-container>
-                                    <label>Seleziona</label>
-                                    <md-select ng-model="sRoomType" ng-change="getPrenotazioni()" size="20">
-                                       <md-option>
-                                            LABORATORIO
-                                        </md-option>
+            <md-dialog-content>
+                <md-tabs md-dynamic-height md-stretch-tabs="always">
+                    <md-tab label="PRENOTA">
+                        <md-content ng-controller="PrenotazioneCtrl" ng-init="init(day)">
+                            <md-content layout-padding>
+                                <div layout="row" ng-hide="isSunday">
+                                    <md-input-container>
+                                        <label>Seleziona</label>
+                                        <md-select ng-model="sRoomType" ng-change="getPrenotazioni()" size="20">
                                         <md-option>
-                                            AULA
-                                        </md-option>
-                                        <md-option ng-show="admin">
-                                            AULA MAGNA
-                                        </md-option>
-                                    </md-select>
-                                    </md-input-container>
-                            </div>
-                            <div layout="row" layout-align="center">
-                                <div compile="htmlTable" id="orario"></div>
-                            </div>
+                                                LABORATORIO
+                                            </md-option>
+                                            <md-option>
+                                                AULA
+                                            </md-option>
+                                            <md-option ng-show="admin">
+                                                AULA MAGNA
+                                            </md-option>
+                                        </md-select>
+                                        </md-input-container>
+                                </div>
+
+                                <div layout="row" layout-sm="column" layout-align="center center" ng-show="loading" layout-fill>
+                                    <md-progress-circular md-mode="indeterminate" md-diameter="200"></md-progress-circular>
+                                </div>
+                                    <div layout="row" layout-align="center">
+                                        <div compile="htmlTable" id="orario"></div>
+                                    </div>
+                                
+                            </md-content>
                         </md-content>
-                    </md-content>
-                </md-tab>
-            </md-tabs>
-        </md-dialog-content>        
+                    </md-tab>
+                </md-tabs>
+            </md-dialog-content>      
     </form>
 </md-dialog>
-
