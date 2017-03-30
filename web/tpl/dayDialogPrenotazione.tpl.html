@@ -1,69 +1,58 @@
-
-
 <md-dialog aria-label="{{ dayString }}" id="dayDialogElement">
     <form>
-        <md-toolbar>  
-            <div layout="row" layout-align="space-between center">
-                <div>
-                    <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="cursor: pointer;" ng-click="previousDay()" align-layout="start center">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fit="" height="100%" width="100%" preserveAspectRatio="xMidYMid meet" focusable="false">
-                        <g><polygon points="15.4,7.4 14,6 8,12 14,18 15.4,16.6 10.8,12 "></polygon></g></svg>
-                    </md-icon>
-                </div>
-                <div >
-                    {{ dayString }}
-                </div>
-                <!-- <span flex></span>-->
+        <md-toolbar>
+           <div class="md-toolbar-tools">
+                <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="cursor: pointer;" ng-click="previousDay()">
+                    <svg version="1.1" x="0px" y="0px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fit="" height="100%" width="100%" preserveAspectRatio="xMidYMid meet" focusable="false">
+                    <g><polygon points="15.4,7.4 14,6 8,12 14,18 15.4,16.6 10.8,12 "></polygon></g></svg>
+                </md-icon>
 
-                <div>
-                    <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="transform: rotate(180deg); cursor: pointer;" ng-click="nextDay()" align-layout="end center">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fit="" height="100%" width="100%" preserveAspectRatio="xMidYMid meet" focusable="false">
-                        <g><polygon points="15.4,7.4 14,6 8,12 14,18 15.4,16.6 10.8,12 "></polygon></g></svg>
-                    </md-icon>
-                    <md-button class="md-icon-button" ng-click="cancel()" style="
-                                                                                    padding-top: 0px;
-                                                                                    padding-bottom: 0px;
-                                                                                    height: 24px;
-                                                                                    padding-right: 0px;
-                                                                                    margin-right: 0px;
-                                                                                    padding-left: 0px;
-                                                                                    margin-left: 0px;
-                                                                                    width: 24px;">
-                        <i class="material-icons">close</i>
-                    </md-button>
-                    
-                </div>
+                <h2 style="padding-left:2%;">{{ dayString }}</h2>
+                <span flex></span>
+
+                <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="transform: rotate(180deg); cursor: pointer;" ng-click="nextDay()">
+                    <svg version="1.1" x="0px" y="0px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fit="" height="100%" width="100%" preserveAspectRatio="xMidYMid meet" focusable="false">
+                    <g><polygon points="15.4,7.4 14,6 8,12 14,18 15.4,16.6 10.8,12 "></polygon></g></svg>
+                </md-icon>
+
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <i class="material-icons">close</i>
+                </md-button>
             </div>
         </md-toolbar>
-        <md-dialog-content>
-            <md-tabs md-dynamic-height md-stretch-tabs="always">
-                <md-tab label="PRENOTA">
-                    <md-content ng-controller="PrenotazioneCtrl" ng-init="init(day)">
-                        <md-content layout-padding>
-                            <div layout="row" ng-hide="isSunday">
-                                <md-input-container>
-                                    <label>Seleziona</label>
-                                    <md-select ng-model="sRoomType" ng-change="getPrenotazioni()" size="20">
-                                       <md-option>
-                                            LABORATORIO
-                                        </md-option>
+            <md-dialog-content>
+                <md-tabs md-dynamic-height md-stretch-tabs="always">
+                    <md-tab label="PRENOTA">
+                        <md-content ng-controller="PrenotazioneCtrl" ng-init="init(day)">
+                            <md-content layout-padding>
+                                <div layout="row" ng-hide="isSunday">
+                                    <md-input-container>
+                                        <label>Seleziona</label>
+                                        <md-select ng-model="sRoomType" ng-change="getPrenotazioni()" size="20">
                                         <md-option>
-                                            AULA
-                                        </md-option>
-                                        <md-option ng-show="admin">
-                                            AULA MAGNA
-                                        </md-option>
-                                    </md-select>
-                                    </md-input-container>
-                            </div>
-                            <div layout="row" layout-align="center">
-                                <div compile="htmlTable" id="orario"></div>
-                            </div>
+                                                LABORATORIO
+                                            </md-option>
+                                            <md-option>
+                                                AULA
+                                            </md-option>
+                                            <md-option ng-show="admin">
+                                                AULA MAGNA
+                                            </md-option>
+                                        </md-select>
+                                        </md-input-container>
+                                </div>
+
+                                <div layout="row" layout-sm="column" layout-align="center center" ng-show="loading" layout-fill>
+                                    <md-progress-circular md-mode="indeterminate" md-diameter="200"></md-progress-circular>
+                                </div>
+                                    <div layout="row" layout-align="center">
+                                        <div compile="htmlTable" id="orario"></div>
+                                    </div>
+                                
+                            </md-content>
                         </md-content>
-                    </md-content>
-                </md-tab>
-            </md-tabs>
-        </md-dialog-content>        
+                    </md-tab>
+                </md-tabs>
+            </md-dialog-content>      
     </form>
 </md-dialog>
-
