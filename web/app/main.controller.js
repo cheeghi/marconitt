@@ -137,8 +137,10 @@ app
 
 
         $scope.setView = function(viewName) {
-
-            if ($rootScope.inPrenotazione)
+            
+            if ($rootScope.inPrenotazione == undefined)
+                $scope.tool = viewName;
+            else if ($rootScope.inPrenotazione)
                 $scope.tool = "Prenota";
             else
                 $scope.tool = "Visualizza";
