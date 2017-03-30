@@ -15,7 +15,6 @@ __description__ = 'Generatore della tabella centrale per marconitt'
 ##VARIABILI
 global boolD
 boolD = True
-global connessione
 
 
 ##FUNZIONI
@@ -82,7 +81,9 @@ def fn_getgiorniscuola(nomefile):
         agg = True
         
         for i in range(0, len(inizio_vac)):
-            if (actual >= inizio_vac[i] and actual <= fine_vac[i]):
+            if(actual >= inizio_vac[i] and actual <= fine_vac[i]):
+                agg = False
+            if(actual.weekday() == 6):
                 agg = False
 
         if(agg):
@@ -96,13 +97,7 @@ def fn_generaconnessione():
     '''
     Funzione che genera e ritorna la connessione a mysql
     '''
-    try:
-        connessione.close()
-    except:
-        None
-    
     connessione = mysql.connector.connect(user='root', password='',host='127.0.0.1',database='marconitt')
-
     return connessione
     
 
@@ -110,7 +105,7 @@ def fn_generarighe():
     '''
     Funzione che elimina, poi rigenera ed invia le righe al database mysql
     '''
-    req = requests.get("http://localhost:8080/api.php")
+    req = requests.get("http://localhost:80/api.php")
     obj = json.loads(req.text)
     classi = fn_getclassi(obj)
     stanze = fn_getstanze(obj)
@@ -133,12 +128,9 @@ def fn_generarighe():
     for g in giorni:
         for o in ore:
             for s in stanze:
-                if(g.weekday() == 6):
-                    break
-
                 str_giorno = g.strftime("%Y-%m-%d")
-                query = "INSERT INTO timetable(id, giorno, ora, stanza, giorno_settimana) VALUES (%s, %s, %s, %s, %s);"
-                dati = (cont, str_giorno, str(o), s, str(g.weekday() + 1))
+                query = "INSERT INTO timetable(giorno, ora, stanza, giorno_settimana) VALUES (%s, %s, %s, %s);"
+                dati = (str_giorno, str(o), s, str(g.weekday() + 1))
                 cursore.execute(query, dati)
                 cont += 1
 
@@ -149,6 +141,7 @@ def fn_generarighe():
                     appo += 500
                     cursore.close()
                     connessione.commit()
+                    connessione.close()
                     connessione = fn_generaconnessione()
                     cursore = connessione.cursor()
                     

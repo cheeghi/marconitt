@@ -4,15 +4,12 @@ import mysql.connector
 
 ##DOC
 __author__ = 'Elia Semprebon'
-__description__ = "Carica l'orario nella tabella centrale"
+__description__ = "Carica l'orario nella time table"
 
 
 ##VARIABILI
 global boolD
-#global connessione
 boolD = True
-
-
 
 ##FUNZIONI
 def fn_creaconnesione():
@@ -25,25 +22,52 @@ def fn_caricaorario():
     connessione2 = fn_creaconnesione()
     cursore = connessione.cursor()
     cursore2 = connessione2.cursor()
-    query = "SELECT `Column 1`, `Column 4`, `Column 5`, `Column 6` FROM GPU001 WHERE(`Column 1`IS NOT NULL AND `Column 4` IS NOT NULL AND `Column 5` IS NOT NULL AND `Column 6` IS NOT NULL);"
+    query = "SELECT `Column 1`, `Column 2`, `Column 4`, `Column 5`, `Column 6` FROM GPU001 WHERE(`Column 1`IS NOT NULL AND `Column 4` IS NOT NULL AND `Column 5` IS NOT NULL AND `Column 6` IS NOT NULL);"
     cursore.execute(query)
     cont = 0
-    appo = 1000
+    appo = 500
+    prof1 = True
+    prof2 = False
     
-    for classe, aula, giorno, ora in cursore:
+    for classe, prof, aula, giorno, ora in cursore:
         if (classe != "D1" and classe != "RIC"):
+            query = "SELECT DISTINCT professore1 FROM timetable WHERE (stanza = '" + aula + "' AND giorno_settimana = " + giorno + " AND ora = " + ora + ");"
+            cursore2.execute(query)
+            
+            for profe in cursore2:
+                profe = str(profe)
+                profe = profe.replace("(", "")
+                profe = profe.replace(")", "")
+                profe = profe.replace(",", "")
+                
+                if(profe != "None"):
+                    #print("E' il secondo")
+                    prof1 = False
+
+            if(prof1 == False):
+                prof2 = True
+
+            if(prof1):
+                query = "UPDATE timetable SET professore1 = '" + prof + "' WHERE (stanza = '" + aula + "' AND giorno_settimana = " + giorno + " AND ora = " + ora + ");"
+            elif(prof2):
+                query = "UPDATE timetable SET professore2 = '" + prof + "' WHERE (stanza = '" + aula + "' AND giorno_settimana = " + giorno + " AND ora = " + ora + ");"
+
+            cursore2.execute(query)
             query = "UPDATE timetable SET risorsa = '" + classe + "' WHERE (stanza = '" + aula + "' AND giorno_settimana = " + giorno + " AND ora = " + ora + ");"
+            cursore2.execute(query)
             cont = cont + 1
 
             if(cont == appo):
-                appo += 1000
+                print(appo)
+                appo += 500
                 connessione2.commit()
                 cursore2.close()
                 connessione2.close()
                 connessione2 = fn_creaconnesione()
                 cursore2 = connessione2.cursor()
-                
-            cursore2.execute(query)
+
+            prof1 = True
+            prof2 = False
 
     connessione2.commit()
     cursore.close()

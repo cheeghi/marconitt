@@ -11,6 +11,3 @@ CREATE TABLE aulamagna (
 	PRIMARY KEY(id, occupante),
 	FOREIGN KEY(id) REFERENCES timetable(id)
 );
-
-SELECT giorno,ora, stanza, risorsa, who FROM timetable, prenotazioni WHERE timetable.id = prenotazioni.id;
-	

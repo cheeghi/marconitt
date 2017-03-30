@@ -8,7 +8,7 @@ app.
         $scope.htmlTable = "";
         $scope.all = false;
         $scope.admin = $rootScope.admin;
-
+        $scope.loading;
 
         $http.get('http://88.149.220.222/orario/api.php', {  
             params: {
@@ -38,7 +38,7 @@ app.
             
             if ($scope.isSunday){
                  $scope.htmlTable = "<p>Non c'è scuola di domenica</p>";
-            } else if($scope.sRoomType == undefined) {
+            } else if($scope.sRoomType == undefined || $scope.loading) {
                 $scope.htmlTable = "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
             } else {
                 $scope.getPrenotazioni();
@@ -47,6 +47,8 @@ app.
 
 
         $scope.getPrenotazioni = function() {
+            $scope.htmlTable = '';
+            $scope.loading = true;
             if ($scope.sRoomType == "LABORATORIO") {
                 $http.get('http://marconitt.altervista.org/timetable.php', {
                     cache: false,
@@ -54,7 +56,10 @@ app.
                         labroomsbydate: $rootScope.giornoSelezionato
                     }
                 }).success(function(response) {
+
                     $scope.genTable(response.rooms);
+                    $scope.loading = false;
+                    
                 });
 
             } else if ($scope.sRoomType == "AULA") {
@@ -64,7 +69,10 @@ app.
                         classroomsbydate: $rootScope.giornoSelezionato
                     }
                 }).success(function(response) {
+
                     $scope.genTable(response.rooms);
+                    $scope.loading = false;
+                   
                 });
             }
         };
