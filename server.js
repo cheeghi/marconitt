@@ -438,7 +438,7 @@ apiRoutes.post('/prenota', function(req, res1) {
 	
 	var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" + stanza +
 	"' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
-	console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
+	//console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
 	http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
 	sql_stmt = "SELECT id FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
 	
@@ -446,7 +446,7 @@ apiRoutes.post('/prenota', function(req, res1) {
 		var str = '';
 
 		res.on('data', function (chunk) {
-			str += chunk;
+			str += chunk; 
 		});
 
 		res.on('end', function () {
@@ -456,7 +456,7 @@ apiRoutes.post('/prenota', function(req, res1) {
 
 			sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", 'non si sa');";
 			http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
-			console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
+			//console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
 		});
 	
 	
@@ -469,13 +469,14 @@ apiRoutes.post('/prenota', function(req, res1) {
 		});
 
 		res.on('end', function () {
-			console.log("asasasa" + str);
+			//console.log("asasasa" + str);
 			stanza = str;
 			sql_stmt = "UPDATE timetable SET risorsa = Null WHERE stanza = " + stanza + 
 			" AND ora = " + ora + " AND giorno ='" + giorno + "';";
-			http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
-			console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
-			res1.json(true);
+			http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
+				res1.json(true);
+			});
+			//console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
 		});
 	});	
 	
