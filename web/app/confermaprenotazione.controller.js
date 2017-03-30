@@ -2,11 +2,15 @@ app.
     controller("ConfermaPrenotazioneCtrl", function($scope, $http, $window, CONFIG, $mdDialog, $mdToast, $rootScope) {
 
         $scope.prenotazioneString = $rootScope.prenotazioneString;
-        $scope.sClass = $rootScope.sClass;
         $scope.classes;
         $scope.rooms;
         $scope.teachers;
         $scope.admin = $rootScope.admin;
+        $scope.tipoPrenotazione;
+        $scope.sProgetto;
+        $scope.sClass;
+        $scope.sDescrizione;
+
 
         $http.get('http://88.149.220.222/orario/api.php', {  
             params: {
@@ -25,14 +29,35 @@ app.
             console.log($rootScope.prenotazioneString);
             console.log($rootScope.giornoSelezionato);
             console.log($scope.sClass);*/
+            var risorsa;
+            var isClasse = false;
+
+            if ($scope.admin) {
+                if ($scope.tipoPrenotazione == 'Classe') {
+                    risorsa = $scope.sClass;
+                    isClasse = true;
+                } else if ($scope.tipoPrenotazione == 'Progetto') {
+                    risorsa = $scope.sProgetto;
+                } else if ($scope.tipoPrenotazione == 'Altro') {
+                    risorsa = $scope.sDescrizione;
+                } else {
+                    risorsa = $scope.tipoPrenotazione + ": " + $scope.sClass;
+                }
+            } else {
+                risorsa = $scope.sClass;
+                isClasse = true;
+            }
+
+            var data = "token="+$rootScope.token+"&stanza="+$rootScope.stanzaPrenotata+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoSelezionato
+                    + "&risorsa="+risorsa + "&isclasse="+isClasse;
+
             var req = {
                 method: 'POST',
                 url: 'http://'+CONFIG.HOST+':8080/api/prenota',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                data: "token="+$rootScope.token+"&stanza="+$rootScope.stanzaPrenotata+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoSelezionato
-                    + "&risorsa="+$scope.sClass
+                data: data
             };
             
             $http(req)
@@ -55,6 +80,13 @@ app.
                 
         $scope.cancel = function() {
             $mdDialog.cancel();
+        };
+
+
+        $scope.resetMdSelect = function() {
+            $scope.sClass = undefined;
+            $scope.sProgetto = undefined;
+            $scope.sDescrizione = undefined;
         };
 
     });

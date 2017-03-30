@@ -105,6 +105,7 @@ app
                               $rootScope.logged = true;
                               $scope.logged = true;
                               $mdToast.show($mdToast.simple().textContent('Login avvenuto con successo!'));
+                              $scope.highlight(1);
                           } else {
                               $mdToast.show($mdToast.simple().textContent('Errore! '+data.data.message));
                           }
@@ -125,7 +126,7 @@ app
             $rootScope.logged = false;
             $scope.logged = false;
             $rootScope.inPrenotazione = false; $scope.setView('Visualizza');
-            $scope.highlight(1);
+            $scope.highlight(2);
         }
 
 
@@ -160,32 +161,33 @@ app
 
 
         $scope.highlight = function(type) {
-            if (type == 1) {
-                $scope.customStyle.visualizza = {"background-color" : "#2196F3"};
-                $scope.customStyle.visualizzaText = {"color" : "white"};
-                $scope.customStyle.prenota = {"background-color" : "white"};
-                $scope.customStyle.prenotaText = {"color" : "black"};
-                $scope.customStyle.inserisci = {"background-color" : "white"};
-                $scope.customStyle.inserisciText = {"color" : "black"};
-            } else if (type == 2) {
-                $scope.customStyle.visualizza = {"background-color" : "white"};
-                $scope.customStyle.visualizzaText = {"color" : "black"};
-                $scope.customStyle.prenota = {"background-color" : "#2196F3"};
-                $scope.customStyle.prenotaText = {"color" : "white"};
-                $scope.customStyle.inserisci = {"background-color" : "white"};
-                $scope.customStyle.inserisciText = {"color" : "black"};                
-            } else if (type == 3) {
-                $scope.customStyle.visualizza = {"background-color" : "white"};
-                $scope.customStyle.visualizzaText = {"color" : "black"};
-                $scope.customStyle.prenota = {"background-color" : "white"};
-                $scope.customStyle.prenotaText = {"color" : "black"};
-                $scope.customStyle.inserisci = {"background-color" : "#2196F3"};
-                $scope.customStyle.inserisciText = {"color" : "white"};  
+            if ($scope.logged) {
+                if (type == 1) {
+                    $scope.customStyle.visualizza = {"background-color" : "#2196F3"};
+                    $scope.customStyle.visualizzaText = {"color" : "white"};
+                    $scope.customStyle.prenota = {"background-color" : "white"};
+                    $scope.customStyle.prenotaText = {"color" : "black"};
+                    $scope.customStyle.inserisci = {"background-color" : "white"};
+                    $scope.customStyle.inserisciText = {"color" : "black"};
+                } else if (type == 2) {
+                    $scope.customStyle.visualizza = {"background-color" : "white"};
+                    $scope.customStyle.visualizzaText = {"color" : "black"};
+                    $scope.customStyle.prenota = {"background-color" : "#2196F3"};
+                    $scope.customStyle.prenotaText = {"color" : "white"};
+                    $scope.customStyle.inserisci = {"background-color" : "white"};
+                    $scope.customStyle.inserisciText = {"color" : "black"};                
+                } else if (type == 3) {
+                    $scope.customStyle.visualizza = {"background-color" : "white"};
+                    $scope.customStyle.visualizzaText = {"color" : "black"};
+                    $scope.customStyle.prenota = {"background-color" : "white"};
+                    $scope.customStyle.prenotaText = {"color" : "black"};
+                    $scope.customStyle.inserisci = {"background-color" : "#2196F3"};
+                    $scope.customStyle.inserisciText = {"color" : "white"};  
+                }
             }
         };
 
 
         // on start
         $scope.setView('Calendario');
-        $scope.highlight(1);
     });
