@@ -10,6 +10,7 @@ app
         $scope.mainHtml;
         $scope.tool = 'Visualizza';
         $scope.logindata = {};
+        $scope.customStyle = {};
         //$scope.token;
 
 
@@ -31,6 +32,7 @@ app
                     $rootScope.logged = true;
                     $rootScope.token = response.token;
                     $rootScope.username = response.username;
+                    $rootScope.admin = response.admin;
                     $scope.logged = true;
                 }
             })
@@ -99,10 +101,11 @@ app
                           if (data.data.success) {
                               $rootScope.token = data.data.token;
                               $rootScope.username = data.data.username;
+                              $rootScope.admin = data.data.admin;
                               $rootScope.logged = true;
                               $scope.logged = true;
-                              
                               $mdToast.show($mdToast.simple().textContent('Login avvenuto con successo!'));
+                              $scope.highlight(1);
                           } else {
                               $mdToast.show($mdToast.simple().textContent('Errore! '+data.data.message));
                           }
@@ -123,22 +126,25 @@ app
             $rootScope.logged = false;
             $scope.logged = false;
             $rootScope.inPrenotazione = false; $scope.setView('Visualizza');
+            $scope.highlight(2);
         }
 
 
         $scope.view = function(e, inPrenotazione) {
             $rootScope.inPrenotazione = inPrenotazione;
-            //console.log(localStorage.token);
             $mdSidenav('left').close();
             $scope.setView(e);
         }
 
 
         $scope.setView = function(viewName) {
-            if ($rootScope.inPrenotazione)
+            
+            if ($rootScope.inPrenotazione == undefined)
+                $scope.tool = viewName;
+            else if ($rootScope.inPrenotazione)
                 $scope.tool = "Prenota";
             else
-                $scope.tool = viewName;
+                $scope.tool = "Visualizza";
 
             tpl = $filter('lowercase')(viewName);
             $http
@@ -153,6 +159,35 @@ app
                     );
         }
 
+
+        $scope.highlight = function(type) {
+            if ($scope.logged) {
+                if (type == 1) {
+                    $scope.customStyle.visualizza = {"background-color" : "#2196F3"};
+                    $scope.customStyle.visualizzaText = {"color" : "white"};
+                    $scope.customStyle.prenota = {"background-color" : "white"};
+                    $scope.customStyle.prenotaText = {"color" : "black"};
+                    $scope.customStyle.inserisci = {"background-color" : "white"};
+                    $scope.customStyle.inserisciText = {"color" : "black"};
+                } else if (type == 2) {
+                    $scope.customStyle.visualizza = {"background-color" : "white"};
+                    $scope.customStyle.visualizzaText = {"color" : "black"};
+                    $scope.customStyle.prenota = {"background-color" : "#2196F3"};
+                    $scope.customStyle.prenotaText = {"color" : "white"};
+                    $scope.customStyle.inserisci = {"background-color" : "white"};
+                    $scope.customStyle.inserisciText = {"color" : "black"};                
+                } else if (type == 3) {
+                    $scope.customStyle.visualizza = {"background-color" : "white"};
+                    $scope.customStyle.visualizzaText = {"color" : "black"};
+                    $scope.customStyle.prenota = {"background-color" : "white"};
+                    $scope.customStyle.prenotaText = {"color" : "black"};
+                    $scope.customStyle.inserisci = {"background-color" : "#2196F3"};
+                    $scope.customStyle.inserisciText = {"color" : "white"};  
+                }
+            }
+        };
+
+
         // on start
-        $scope.setView('Visualizza');
+        $scope.setView('Calendario');
     });

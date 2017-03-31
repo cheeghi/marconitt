@@ -1,5 +1,5 @@
 app
-    .controller('ViewCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, MaterialCalendarData, $q, $mdToast, $mdDialog, CONFIG, $rootScope) {
+    .controller('CalendarioCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, MaterialCalendarData, $q, $mdToast, $mdDialog, CONFIG, $rootScope) {
 
         $scope.direction = "horizontal";
         $scope.selectedDate;
@@ -8,7 +8,6 @@ app
         $scope.currentYear = new Date().getFullYear();
         $scope.events = {};
         $scope.calendar = '';
-        
 
 
         var getData = function() {
@@ -84,7 +83,7 @@ app
             if ($rootScope.inPrenotazione)
                 tplUrl = 'tpl/dayDialogPrenotazione.tpl.html';
             else
-                tplUrl = 'tpl/dayDialog.tpl.html';
+                tplUrl = 'tpl/dayDialogVisualizza.tpl.html';
                 
             $mdDialog.show({
                     templateUrl: tplUrl,

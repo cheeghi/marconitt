@@ -1,13 +1,14 @@
 app.
     controller("PrenotazioneCtrl", function($scope, $http, $window, $mdDialog, $rootScope) {
-        
+     
         $scope.day;
         $scope.currentItem = '';
         $scope.classes = [];
         $scope.isSunday = true;
         $scope.htmlTable = "";
         $scope.all = false;
-
+        $scope.admin = $rootScope.admin;
+        $scope.loading;
 
         $http.get('http://88.149.220.222/orario/api.php', {  
             params: {
@@ -28,8 +29,26 @@ app.
             $scope.htmlTable = ($scope.isSunday) ? "<p>Non c'è scuola di domenica</p>" : "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
         }
 
+        $scope.reInit = function(date) {
+            $scope.htmlTable = '';
+            $scope.day = new Date(date);
+            $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1)
+                + "-" + $scope.day.getDate();
+            $scope.isSunday = $scope.day.getDay() == 0;
+            
+            if ($scope.isSunday){
+                 $scope.htmlTable = "<p>Non c'è scuola di domenica</p>";
+            } else if($scope.sRoomType == undefined || $scope.loading) {
+                $scope.htmlTable = "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
+            } else {
+                $scope.getPrenotazioni();
+            }
+        }
+
 
         $scope.getPrenotazioni = function() {
+            $scope.htmlTable = '';
+            $scope.loading = true;
             if ($scope.sRoomType == "LABORATORIO") {
                 $http.get('http://marconitt.altervista.org/timetable.php', {
                     cache: false,
@@ -37,7 +56,7 @@ app.
                         labroomsbydate: $rootScope.giornoSelezionato
                     }
                 }).success(function(response) {
-                    async.parallel([
+                    /*async.parallel([
                         function(){ 
                             console.log("generation table");
                             $scope.genTable(response.rooms); 
@@ -46,7 +65,7 @@ app.
                             console.log("generation dimension");
                             $scope.dim(); 
                         }
-                    ], callback);
+                    ], callback);*/
                     /*async.parallel({
                         generationTable: function (callback) {
                             alert("gen table");
@@ -57,6 +76,10 @@ app.
                             $scope.dim();
                         }
                     });*/
+
+                    $scope.genTable(response.rooms);
+                    $scope.loading = false;
+                    $scope.dim(); //for scrollbar
                 });
 
             } else if ($scope.sRoomType == "AULA") {
@@ -66,13 +89,17 @@ app.
                         classroomsbydate: $rootScope.giornoSelezionato
                     }
                 }).success(function(response) {
+
                     $scope.genTable(response.rooms);
+                    $scope.loading = false;
                     $scope.dim(); //for scrollbar
-                });//.done...
-            }
+                });
+                    
+                   
+            });
         };
 
-                $scope.dim = function() {
+        $scope.dim = function() {
             $rootScope.$broadcast("dimension", {});
         }
 
@@ -123,7 +150,7 @@ app.
             $rootScope.stanzaPrenotata = stanza;
             $rootScope.oraPrenotata = ora;
             $rootScope.prenotazioneString = stanza + ' ' + (ora) + '°ora';
-            $rootScope.sClass = $scope.sClass;
+            //$rootScope.sClass = $scope.sClass;
             $mdDialog.show({
                     templateUrl: 'tpl/dialogConfermaPrenotazione.tpl.html',
                     controller: 'ConfermaPrenotazioneCtrl',
@@ -136,5 +163,11 @@ app.
         $scope.$on("refreshTable", function (event, args) {
             $scope.getPrenotazioni();
         });
+
+        
+        $scope.$on("reInit", function (event, args) {
+            $scope.reInit(args.day);
+        });
+
 
     });

@@ -26,15 +26,16 @@
     line-height: 30px !important;
     color: white !important;
     white-space: nowrap !important;
-    overflow: scroll !important;
+    overflow: auto !important;
     text-overflow: ellipsis !important;
-    overflow: -moz-scrollbars-none !important;
-    -ms-overflow-style: none !important;
+    overflow: -moz-scrollbars !important;
+    -ms-overflow-style: auto !important;
+    -webkit-overflow-scrolling: auto !important;
 } 
 
-::-webkit-scrollbar {
+/*::-webkit-scrollbar {
     display: none;
-}
+}*/
 
 .type1 {
     background-color: red !important;
@@ -136,8 +137,10 @@ md-dialog#dayDialogElement {
 }
 
 md-dialog#dayDialogConfermaElement {
-    min-width: 30%;
-    min-height: 10%;
+    min-width: 50%;
+    max-width: 50%;
+    min-height: 40%;
+    max-height: 40%;
 }
 
 md-select-menu md-option[selected] {
@@ -257,4 +260,8 @@ md-fab {
 
 #button_np {
     background-color:red;
+}
+
+.scroll-container {
+  overflow-x: scroll;
 }

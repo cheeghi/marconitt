@@ -36,16 +36,19 @@ app.
             $scope.sClass = undefined;
             $scope.currentItem = $scope.sRoom;
             //console.log($scope.sRoom);
-            $http.get('http://88.149.220.222/orario/api.php', {
+            $http.get('http://marconitt.altervista.org/timetable.php', {
                 params: {
-                    room: $scope.sRoom
+                    ttroom: $scope.sRoom
                 }
             }).success(function(response) {
+                console.log($scope.sRoom);
                 console.log("ROOM: " + response);
                 $scope.genTable(response, 'aula');
             })
         }
-
+//http://marconitt.altervista.org/timetable.php
+//http://88.149.220.222/orario/api.php?room=L247
+//http://marconitt.altervista.org/timetable.php?ttroom=L247
 
         $scope.getOrarioTeacher = function() {
             $scope.sClass = undefined;

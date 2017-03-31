@@ -1,3 +1,4 @@
+<md-progress-circular md-mode="indeterminate" ng-show="loading"></md-progress-circular>
 <md-dialog aria-label="{{ prenotazione }}" id="dayDialogConfermaElement">
     <form>
         <md-toolbar>
@@ -14,19 +15,79 @@
                 <md-tab label="CONFERMA">
                     <md-content ng-controller="ConfermaPrenotazioneCtrl">
                         <md-content layout-padding>
-                            <div layout="row">
+                            <div layout="row" ng-show="admin">
                                 <md-input-container class="md-block" flex>
+                                    <label>Seleziona</label>
+                                    <md-select ng-change="resetMdSelect()" ng-model="tipoPrenotazione">
+                                        <md-option>
+                                            Classe
+                                        </md-option>
+                                        <md-option>
+                                            Progetto
+                                        </md-option>
+                                        <md-option>
+                                            Ricevimento generale
+                                        </md-option>
+                                        <md-option>
+                                            Consiglio di classe
+                                        </md-option>
+                                        <md-option>
+                                            Altro
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+                                <md-input-container ng-show="tipoPrenotazione=='Classe'||tipoPrenotazione=='Ricevimento generale'
+                                ||tipoPrenotazione=='Consiglio di classe'">
                                     <label>Classe</label>
-                                    <md-select ng-model="sClass" ng-change="" size="20">
+                                    <md-select ng-model="sClass">
                                         <md-option ng-repeat="class in classes" value="{{class}}">
                                             {{class}}
                                         </md-option>
                                     </md-select>
                                 </md-input-container>
+                                <md-input-container ng-show="tipoPrenotazione=='Progetto'">
+                                    <label>Progetto</label>
+                                    <md-select ng-model="sProgetto">
+                                        <md-option>
+                                            INSIEME
+                                        </md-option>
+                                        <md-option>
+                                            Wolkswagen
+                                        </md-option>
+                                        <md-option>
+                                            RFI
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+                                <md-input-container ng-show="tipoPrenotazione=='Altro'">
+                                    <label>Descrizione</label>
+                                    <input size="50" ng-model="sDescrizione">                                    
+                                </md-input-container>                              
                                 <md-input-container>
-                                    <md-button class="md-raised md-primary" ng-disabled='sClass==undefined||sClass==""' ng-click="prenota()" >
-                                        CONFERMA
-                                    </md-button>
+                                    <div layout="row" layout-align="space-between center">
+                                        <md-button class="md-raised md-primary" ng-disabled="
+                                        (sClass==undefined||sClass=='')&&sProgetto==undefined&&(sDescrizione==undefined||sDescrizione=='')
+                                        " ng-click="prenota()" class="md-block" flex >
+                                            CONFERMA
+                                        </md-button>
+                                    </div>
+                                </md-input-container>
+                            </div>
+                            <div layout="row" ng-hide="admin">
+                                <md-input-container class="md-block" flex>
+                                    <label>Classe</label>
+                                    <md-select ng-model="sClass">
+                                        <md-option ng-repeat="class in classes" value="{{class}}">
+                                            {{class}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>                                
+                                <md-input-container>
+                                    <div layout="row" layout-align="space-between center">
+                                        <md-button class="md-raised md-primary" ng-disabled="sClass==undefined||sClass==''" ng-click="prenota()" class="md-block" flex >
+                                            CONFERMA
+                                        </md-button>
+                                    </div>
                                 </md-input-container>
                             </div>
                         </md-content>

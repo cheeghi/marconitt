@@ -19,22 +19,22 @@
         </md-toolbar>
         <md-content>
             <md-list ng-cloak>
-                <md-list-item ng-click="view('Visualizza', false)" md-ink-ripple="#2196F3">
-                    <p>Visualizza</p>
+                <md-list-item ng-style="customStyle.visualizza" ng-click="view('Calendario', false); highlight(1);" md-ink-ripple="#2196F3">
+                    <p ng-style="customStyle.visualizzaText">Visualizza</p>
                 </md-list-item>
-                <md-list-item ng-click="view('Visualizza', true)" ng-show="logged" md-ink-ripple="#2196F3">
-                    <p>Prenota</p>
+                <md-list-item ng-style="customStyle.prenota" ng-click="view('Calendario', true); highlight(2);" ng-show="logged" md-ink-ripple="#2196F3">
+                    <p ng-style="customStyle.prenotaText">Prenota</p>
                 </md-list-item>
                 <!--<md-list-item ng-click="view('Cerca')">
                     <p>Cerca</p>
                 </md-list-item>-->
                 <md-divider ng-hide="logged"></md-divider>
-                <md-subheader class="md-no-sticky" ng-hide="logged">Effettua login per poter prenotare</md-subheader>
+                <md-subheader class="md-no-sticky" ng-hide="logged">Effettua il login per poter prenotare</md-subheader>
                 <div layout="column" layout-padding ng-hide="logged">
                     <div layout-gt-sm="row">
                         <md-input-container class="md-block" flex-gt-sm>
                             <label>Username</label>
-                            <input ng-model="logindata.name">
+                            <input ng-model="logindata.name" ng-enter="login()">
                         </md-input-container>
                         <md-input-container class="md-block" flex-gt-sm>
                             <label>Password</label>
@@ -43,8 +43,8 @@
                     </div>
                     <md-button class="md-accent md-raised" ng-click="login()">Entra</md-button>
                 </div>
-                <md-list-item ng-click="view('Inserisci')" ng-show="logged">
-                    <p>Inserisci</p>
+                <md-list-item ng-style="customStyle.inserisci" ng-click="view('Inserisci'); highlight(3)" ng-show="logged">
+                    <p ng-style="customStyle.inserisciText">Inserisci</p>
                 </md-list-item>
                 <md-list-item ng-click="logout()" ng-show="logged">
                     <p>Logout</p>
@@ -65,7 +65,7 @@
     <script src="vendor/mdPickers.js"></script>
     <script src="app/app.js"></script>
     <script src="app/main.controller.js"></script>
-    <script src="app/view.controller.js"></script>
+    <script src="app/calendario.controller.js"></script>
     <script src="app/daydialog.controller.js"></script>
     <script src="app/orario.controller.js"></script>
     <script src="app/search.controller.js"></script>

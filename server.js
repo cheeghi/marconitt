@@ -80,6 +80,20 @@ app.get('/setup', function(req, res) {
       if (err) throw err;
 
       console.log('User saved successfully');
+      //res.json({ success: true });
+    });
+
+    var nick2 = new User({ 
+      name: 'gb', 
+      password: '123456--',
+      admin: false 
+    });
+
+    // save the sample user
+    nick2.save(function(err) {
+      if (err) throw err;
+
+      console.log('User saved successfully');
       res.json({ success: true });
     });
 
@@ -163,6 +177,7 @@ apiRoutes.post('/authenticate', function(req, res) {
                 });
 
                 req.session.username = user.name;
+                req.session.admin = user.admin;
                 req.session.token = token;
 
                 // return the information including token as JSON
@@ -170,7 +185,8 @@ apiRoutes.post('/authenticate', function(req, res) {
                     success: true,
                     message: 'Enjoy your token!',
                     token: token,
-                    username: req.session.username
+                    username: req.session.username,
+                    admin: user.admin
                 });
             }
 
@@ -185,6 +201,7 @@ apiRoutes.get('/checklogin', function(req, res) {
         res.json({
             success: true,
             username: req.session.username,
+            admin: req.session.admin,
             token: req.session.token
         });
     }
@@ -412,30 +429,127 @@ apiRoutes.use(function(req, res, next) {
 });
 
 
-apiRoutes.post('/prenota', function(req, res) {
-    //res.json(req.body.stanza + ';' + req.body.ora);
+apiRoutes.post('/prenota', function(req, res1) {
 	var stanza = req.body.stanza;
 	var giorno = req.body.giorno;
 	var ora = req.body.ora;
 	var risorsa = req.body.risorsa;
+	var isClasse = true;
 
-	console.log(risorsa);
-	console.log(stanza);
-	
-	var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" + stanza +
-	"' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
-	
-	http.get("http://marconitt.altervista.org/timetable.php?doquery=" + sql_stmt);
-    res.json(true);
-
-
-	/**
-	connection.query(sql_stmt, function (error, result) {
-        if (error) {
-            console.log('Error: ' + error.message);
-        }
-	});*/
+    if(isClasse == true) {
+        var appo = liberaRisorse(stanza, giorno, ora, risorsa, res1);
+    } else {
+        var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" + stanza +
+	    "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
+        http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
+            res1.json(true);
+        });
+    }
 });
+
+
+function liberaRisorse(stanza, giorno, ora, risorsa, res1) {
+    var id;
+    var sql_stmt;
+    var stanzaLib;
+    var professore1;
+    var professore2;
+
+    //robe dipendenti dall'id
+    sql_stmt = "SELECT id FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
+	http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
+        //console.log('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt);
+		var str = '';
+
+		res.on('data', function (chunk) {
+			str += chunk; 
+		});
+
+		res.on('end', function () {
+			var strbello = str.replace('"', '');
+			var strbello2 = strbello.replace('"', '');			  
+			id = Number(strbello2);
+
+			sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", 'non si sa');";
+			//console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
+            http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
+                //robe dipendenti dalla stanza
+                sql_stmt = "SELECT stanza FROM timetable WHERE risorsa = '" + risorsa + "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
+                //console.log('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt);
+                http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
+                    var str = '';
+
+                    res.on('data', function (chunk) {
+                        str += chunk;
+                        stanzaLib = str;
+                    });
+
+                    res.on('end', function () {
+                        professore1 = getProf1(stanzaLib, giorno, ora);
+                        console.log(typeof professore1, professore1);
+                        professore2 = getProf2(stanzaLib, giorno, ora);
+                        console.log(typeof professore2, professore2);
+                        sql_stmt = "UPDATE timetable SET risorsa = Null WHERE stanza = " + stanzaLib + 
+                                " AND ora = " + ora + " AND giorno ='" + giorno + "';";
+                        http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
+                        //console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
+                        var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" + stanza +
+                            "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
+                                
+                        var a = http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function(res) {
+                            //console.log('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt);
+                            var str = '';
+
+                            res.on('data', function (chunk) {
+                                str += chunk; 
+                            });
+
+                            res.on('end', function () {
+                                var result = (str == "true")
+                                //console.log("ci sono");
+                                res1.json(result);
+                            })
+                        });        
+                    });
+                });
+            });
+		});
+    });
+}
+
+
+function getProf1(stanza, giorno, ora) {
+    var sql_stmt = "SELECT professore1 FROM timetable WHERE stanza = " + stanza + " AND giorno = '" + giorno + "' AND ora = " + ora + ";";
+    //console.log('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt);
+    http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
+		var str = '';
+
+		res.on('data', function (chunk) {
+			str += chunk; 
+		});
+
+		res.on('end', function () {
+            return(str);
+        });
+    });
+}
+
+
+function getProf2(stanza, giorno, ora) {
+    var sql_stmt = "SELECT professore2 FROM timetable WHERE stanza = " + stanza + " AND giorno = '" + giorno + "' AND ora = " + ora + ";";
+    //console.log('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt);
+    http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
+		var str = '';
+
+		res.on('data', function (chunk) {
+			str += chunk; 
+		});
+
+		res.on('end', function () {
+            return(str);
+        });
+    });
+}
 
 
 apiRoutes.post('/events/:year/:month/:day', function(req, res) {
