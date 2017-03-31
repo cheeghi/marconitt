@@ -1,5 +1,5 @@
 app.
-    controller("PrenotazioneCtrl", function($scope, $http, $window, $mdDialog, $rootScope) {
+    controller("PrenotazioneCtrl", function($scope, $http, $window, $mdDialog,$mdToast, $rootScope) {
      
         $scope.day;
         $scope.currentItem = '';
@@ -56,10 +56,30 @@ app.
                         labroomsbydate: $rootScope.giornoSelezionato
                     }
                 }).success(function(response) {
+                    /*async.parallel([
+                        function(){ 
+                            console.log("generation table");
+                            $scope.genTable(response.rooms); 
+                        },
+                        function(){ 
+                            console.log("generation dimension");
+                            $scope.dim(); 
+                        }
+                    ], callback);*/
+                    /*async.parallel({
+                        generationTable: function (callback) {
+                            alert("gen table");
+                            $scope.genTable(response.rooms);
+                        },
+                        calculateDimension: function (callback) {
+                            alert("gen dimension");
+                            $scope.dim();
+                        }
+                    });*/
 
                     $scope.genTable(response.rooms);
                     $scope.loading = false;
-                    
+                    $scope.dim(); //for scrollbar
                 });
 
             } else if ($scope.sRoomType == "AULA") {
@@ -72,10 +92,15 @@ app.
 
                     $scope.genTable(response.rooms);
                     $scope.loading = false;
-                   
+                    $scope.dim(); //for scrollbar
                 });
+                    
             }
         };
+
+        $scope.dim = function() {
+            $rootScope.$broadcast("dimension", {});
+        }
 
 
         $scope.genTable = function(responses) {
@@ -105,7 +130,7 @@ app.
                 responses[key].forEach(function(element) {
                     if (element.risorsa != null) {
                         x += '<td><md-button class="md-raised md-primary button_prenotazione" id="button_np"'
-                             + '>NP</td>';
+                             + 'ng-click="aulaPrenotata()">NP</td>';
                     } else {
                         x += '<td><md-button class="md-raised md-primary button_prenotazione" id="button_p"'
                              + 'ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" >P</td>';
@@ -119,7 +144,6 @@ app.
             x += "</table>";
             $scope.htmlTable = x;
         };
-
 
         $scope.prenotaClick = function(stanza, ora) {
             $rootScope.stanzaPrenotata = stanza;
@@ -145,4 +169,21 @@ app.
         });
 
 
+        $scope.aulaPrenotata = function(){
+
+            if ($scope.sRoomType == "LABORATORIO"){
+                $mdToast.show($mdToast.simple()
+                                .textContent('Laboratorio non prenotabile!')
+                                .hideDelay(1500)
+                                );
+            }
+            
+            if ($scope.sRoomType == "AULA"){
+                $mdToast.show($mdToast.simple()
+                                .textContent('Aula non prenotabile!')
+                                .hideDelay(1500)
+                                );
+            }
+
+        }
     });
