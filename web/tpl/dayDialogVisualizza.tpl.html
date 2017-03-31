@@ -77,10 +77,11 @@
                                         </md-option>
                                     </md-select>
                                 </md-input-container>
-                                <md-switch ng-model="all" aria-label="Vedi tutto" ng-change="viewAll()">
+                                <!--<md-switch ng-model="all" aria-label="Vedi tutto" ng-change="viewAll()">
                                     Tutto
-                                </md-switch>
+                                </md-switch>-->
                             </div>
+                            <div ng-show="selected" ><center>Situazione al Marconi il giorno:<br> {{ dayString }}</center></div>
                             <div layout="row" layout-align="center">
                                 <div compile="htmlTable" id="orario"></div>
                             </div>
