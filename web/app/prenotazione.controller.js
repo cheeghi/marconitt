@@ -95,8 +95,7 @@ app.
                     $scope.dim(); //for scrollbar
                 });
                     
-                   
-            });
+            }
         };
 
         $scope.dim = function() {
