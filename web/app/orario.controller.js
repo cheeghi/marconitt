@@ -10,6 +10,7 @@ app.
         $scope.all = false;
         $scope.data;
         $scope.type;
+        $scope.selected = false;
         
 
         $http.get('http://88.149.220.222/orario/api.php', {
@@ -27,28 +28,54 @@ app.
             //console.log(date);
             $scope.day = new Date(date);
             $scope.isSunday = $scope.day.getDay() == 0;
+            $scope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1) + "-" + $scope.day.getDate();
             $scope.htmlTable = ($scope.isSunday) ? "<p>Non c'è scuola di domenica</p>" : "<p>Seleziona una classe, un insegnante o un'aula</p>";
         }
 
 
-        $scope.getOrarioRoom = function() {
+        /*$scope.getOrarioRoom = function() {
+            //alert($scope.giornoSelezionato);
             $scope.sTeacher = undefined;
             $scope.sClass = undefined;
             $scope.currentItem = $scope.sRoom;
             //console.log($scope.sRoom);
             $http.get('http://marconitt.altervista.org/timetable.php', {
                 params: {
-                    ttroom: $scope.sRoom
+                    ttroom: $scope.sRoom,
+                    date: $scope.giornoSelezionato
                 }
             }).success(function(response) {
-                console.log($scope.sRoom);
-                console.log("ROOM: " + response);
+                console.log("stanza: " +$scope.sRoom);
+                console.log("giorno: " +$scope.giornoSelezionato);
+                console.log("response: " + response);
                 $scope.genTable(response, 'aula');
+            })
+        }*/
+        $scope.getOrarioRoom = function() {
+            //alert($scope.giornoSelezionato);
+            $scope.selected = true;
+            $scope.sTeacher = undefined;
+            $scope.sClass = undefined;
+            $scope.currentItem = $scope.sRoom;
+            $scope.query = "select * from timetable where stanza = '" + $scope.sRoom + "' and giorno = '" + $scope.giornoSelezionato + "' order by ora";
+;
+            //console.log($scope.sRoom);
+            $http.get('http://marconitt.altervista.org/timetable.php', {
+                params: {
+                    doquery: $scope.query
+                }
+            }).success(function(response) {
+                console.log("stanza: " +$scope.sRoom);
+                console.log("giorno: " +$scope.giornoSelezionato);
+                console.log("response: " + response);
+                //$scope.test = response[0];
+                $scope.genTest(response, 'aula');
             })
         }
 //http://marconitt.altervista.org/timetable.php
 //http://88.149.220.222/orario/api.php?room=L247
 //http://marconitt.altervista.org/timetable.php?ttroom=L247
+//select * from timetable where stanza = 'L247' and giorno = '2017-5-8'
 
         $scope.getOrarioTeacher = function() {
             $scope.sClass = undefined;
@@ -131,8 +158,61 @@ app.
             if ($scope.sClass != undefined) $scope.getOrarioClass();
             if ($scope.sRoom != undefined) $scope.getOrarioRoom();
         }
-        
 
+        $scope.genTest = function(data, tipo) {
+            var days = $mdDateLocale.days;
+            m = [
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ];
+            var x = "<table class=\"table\">\
+                    <thead><tr>\
+                        <th>1</th>\
+                        <th>2</th>\
+                        <th>3</th>\
+                        <th>4</th>\
+                        <th>5</th>\
+                        <th>6</th>\
+                        <th>7</th>\
+                        <th>8</th>\
+                        <th>9</th>\
+                        <th>10</th>\
+                    </tr></thead>\
+                    <tbody>";
+
+            data.forEach(function(a) {
+
+                if (a.risorsa == null) {
+                    x += "<td>&nbsp;</td>";
+                }else if(a.professore2 == null && a.professoreS == null ){
+                    x += "<td><span class='nome'>" + a.professore1.toLowerCase() + "</span><br>" + a.risorsa + " </td>";
+                }else if(a.professore1 == null && a.professore2 == null){
+                    x += "<td><span class='nome'>nessun professore</span><br>" + a.risorsa + " </td>";
+                }else if(a.professore2 == null && a.professoreS == null){
+                    x += "<td><span class='nome'>" + a.professore1.toLowerCase() + "</span><br>" + a.risorsa + " </td>";
+                }else if(a.professoreS == null){
+                    x += "<td><span class='nome'>" + a.professore1.toLowerCase() +"<br>" + a.professore2.toLowerCase() + "</span><br>" + a.risorsa + " </td>";
+                }else{
+                    x += "<td><span class='nome'>" + a.professore1.toLowerCase() + "<br>" + a.professore2.toLowerCase() + "<br>" + a.professoreS.toLowerCase() + "</span><br>" + a.risorsa + " </td>";
+                }
+                });
+                
+            
+
+            x += "</tbody>";
+            x += "</table>";
+            $scope.htmlTable = x;
+        };});
+        
+            /*
         $scope.genTable = function(data, tipo) {
             var days = $mdDateLocale.days;
             m = [
@@ -243,6 +323,6 @@ app.
             x += "</tbody>";
             x += "</table>";
             $scope.htmlTable = x;
-        }
-
-    });
+        }*/
+    
+    //});
