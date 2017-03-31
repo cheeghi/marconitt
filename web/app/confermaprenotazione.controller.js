@@ -5,11 +5,18 @@ app.
         $scope.classes;
         $scope.rooms;
         $scope.teachers;
+        $scope.progetti;
         $scope.admin = $rootScope.admin;
         $scope.tipoPrenotazione;
         $scope.sProgetto;
         $scope.sClass;
         $scope.sDescrizione;
+
+
+        $http.get('http://marconitt.altervista.org/progetti.php?progetti').success(function(response) {
+            //console.log(response.processi);
+            $scope.progetti = response.progetti;
+        });
 
 
         $http.get('http://88.149.220.222/orario/api.php', {  
@@ -49,7 +56,7 @@ app.
             }
 
             var data = "token="+$rootScope.token+"&stanza="+$rootScope.stanzaPrenotata+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoSelezionato
-                    + "&risorsa="+risorsa + "&isclasse="+isClasse;
+                    + "&risorsa="+ risorsa+ "&isclasse="+ isClasse+ "&user="+ $rootScope.username;
 
             var req = {
                 method: 'POST',

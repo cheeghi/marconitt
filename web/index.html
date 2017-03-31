@@ -25,6 +25,9 @@
                 <md-list-item ng-style="customStyle.prenota" ng-click="view('Calendario', true); highlight(2);" ng-show="logged" md-ink-ripple="#2196F3">
                     <p ng-style="customStyle.prenotaText">Prenota</p>
                 </md-list-item>
+                <md-list-item ng-style="customStyle.lmp" ng-click="view('Calendario', true); highlight(3);" ng-show="logged" md-ink-ripple="#2196F3">
+                    <p ng-style="customStyle.lmpText">Le mie prenotazioni</p>
+                </md-list-item>                
                 <!--<md-list-item ng-click="view('Cerca')">
                     <p>Cerca</p>
                 </md-list-item>-->
@@ -43,8 +46,8 @@
                     </div>
                     <md-button class="md-accent md-raised" ng-click="login()">Entra</md-button>
                 </div>
-                <md-list-item ng-style="customStyle.inserisci" ng-click="view('Inserisci'); highlight(3)" ng-show="logged">
-                    <p ng-style="customStyle.inserisciText">Inserisci</p>
+                <md-list-item ng-style="" ng-click="view('Inserisci');" ng-show="logged">
+                    <p ng-style="">Inserisci</p>
                 </md-list-item>
                 <md-list-item ng-click="logout()" ng-show="logged">
                     <p>Logout</p>

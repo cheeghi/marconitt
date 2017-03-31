@@ -48,14 +48,8 @@
                                 <md-input-container ng-show="tipoPrenotazione=='Progetto'">
                                     <label>Progetto</label>
                                     <md-select ng-model="sProgetto">
-                                        <md-option>
-                                            INSIEME
-                                        </md-option>
-                                        <md-option>
-                                            Wolkswagen
-                                        </md-option>
-                                        <md-option>
-                                            RFI
+                                        <md-option ng-repeat="progetto in progetti" value="{{progetto}}">
+                                            {{progetto}}
                                         </md-option>
                                     </md-select>
                                 </md-input-container>
