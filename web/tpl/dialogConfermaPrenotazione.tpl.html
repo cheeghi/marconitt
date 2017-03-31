@@ -13,12 +13,12 @@
         <md-dialog-content>
             <md-tabs md-dynamic-height md-stretch-tabs="always">
                 <md-tab label="CONFERMA">
-                    <md-content ng-controller="ConfermaPrenotazioneCtrl">
+                    <md-content ng-controller="ConfermaPrenotazioneCtrl" ng-init="init()">
                         <md-content layout-padding>
                             <div layout="row" ng-show="admin">
                                 <md-input-container class="md-block" flex>
                                     <label>Seleziona</label>
-                                    <md-select ng-change="resetMdSelect()" ng-model="tipoPrenotazione">
+                                    <md-select ng-change="clearMdSelect()" ng-model="tipoPrenotazione">
                                         <md-option>
                                             Classe
                                         </md-option>
@@ -60,7 +60,7 @@
                                 <md-input-container>
                                     <div layout="row" layout-align="space-between center">
                                         <md-button class="md-raised md-primary" ng-disabled="
-                                        (sClass==undefined||sClass=='')&&sProgetto==undefined&&(sDescrizione==undefined||sDescrizione=='')
+                                        (sClass==undefined||sClass=='')&&sProgetto==undefined&&(sDescrizione==undefined||sDescrizione=='')||disabled
                                         " ng-click="prenota()" class="md-block" flex >
                                             CONFERMA
                                         </md-button>
@@ -78,7 +78,7 @@
                                 </md-input-container>                                
                                 <md-input-container>
                                     <div layout="row" layout-align="space-between center">
-                                        <md-button class="md-raised md-primary" ng-disabled="sClass==undefined||sClass==''" ng-click="prenota()" class="md-block" flex >
+                                        <md-button class="md-raised md-primary" ng-disabled="sClass==undefined||sClass==''||disabled" ng-click="prenota()" class="md-block" flex >
                                             CONFERMA
                                         </md-button>
                                     </div>
