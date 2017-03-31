@@ -1,5 +1,5 @@
 app.
-    controller("PrenotazioneCtrl", function($scope, $http, $window, $mdDialog, $rootScope) {
+    controller("PrenotazioneCtrl", function($scope, $http, $window, $mdDialog,$mdToast, $rootScope) {
      
         $scope.day;
         $scope.currentItem = '';
@@ -130,7 +130,7 @@ app.
                 responses[key].forEach(function(element) {
                     if (element.risorsa != null) {
                         x += '<td><md-button class="md-raised md-primary button_prenotazione" id="button_np"'
-                             + '>NP</td>';
+                             + 'ng-click="aulaPrenotata()">NP</td>';
                     } else {
                         x += '<td><md-button class="md-raised md-primary button_prenotazione" id="button_p"'
                              + 'ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" >P</td>';
@@ -169,4 +169,21 @@ app.
         });
 
 
+        $scope.aulaPrenotata = function(){
+
+            if ($scope.sRoomType == "LABORATORIO"){
+                $mdToast.show($mdToast.simple()
+                                .textContent('Laboratorio non prenotabile!')
+                                .hideDelay(1500)
+                                );
+            }
+            
+            if ($scope.sRoomType == "AULA"){
+                $mdToast.show($mdToast.simple()
+                                .textContent('Aula non prenotabile!')
+                                .hideDelay(1500)
+                                );
+            }
+
+        }
     });
