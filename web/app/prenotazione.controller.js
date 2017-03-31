@@ -37,9 +37,26 @@ app.
                         labroomsbydate: $rootScope.giornoSelezionato
                     }
                 }).success(function(response) {
-                    $scope.genTable(response.rooms);
-                    //var html = await function() {$scope.genTable(response.rooms);};
-                    //$scope.dim(); //for scrollbar
+                    async.parallel([
+                        function(){ 
+                            console.log("generation table");
+                            $scope.genTable(response.rooms); 
+                        },
+                        function(){ 
+                            console.log("generation dimension");
+                            $scope.dim(); 
+                        }
+                    ], callback);
+                    /*async.parallel({
+                        generationTable: function (callback) {
+                            alert("gen table");
+                            $scope.genTable(response.rooms);
+                        },
+                        calculateDimension: function (callback) {
+                            alert("gen dimension");
+                            $scope.dim();
+                        }
+                    });*/
                 });
 
             } else if ($scope.sRoomType == "AULA") {
@@ -50,9 +67,8 @@ app.
                     }
                 }).success(function(response) {
                     $scope.genTable(response.rooms);
-                    //var html = await function() {$scope.genTable(response.rooms);};
-                    //$scope.dim(); //for scrollbar
-                });
+                    $scope.dim(); //for scrollbar
+                });//.done...
             }
         };
 
