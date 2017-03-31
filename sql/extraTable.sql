@@ -1,6 +1,7 @@
 CREATE TABLE prenotazioni (
 	id INT PRIMARY KEY,
 	who VARCHAR(250) NOT NULL,
+	isSchoolHour BOOLEAN DEFAULT FALSE,
 	FOREIGN KEY(id) REFERENCES timetable(id)
 );
 
