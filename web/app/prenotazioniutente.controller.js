@@ -31,8 +31,8 @@ app.
         /**
          * call the server method for removing a 'prenotazione'
          */
-        $scope.removePrenotazione = function(giorno, stanza, risorsa) {
-            console.log(giorno, stanza, risorsa, $rootScope.username);
+        $scope.removePrenotazione = function(giorno, stanza, risorsa, ora) {
+            console.log(giorno, stanza, risorsa, ora, $rootScope.username);
         };
 
     });

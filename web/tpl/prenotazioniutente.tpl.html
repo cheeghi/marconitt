@@ -15,10 +15,10 @@
       <md-list-item ng-repeat="prenotazione in prenotazioni" class="md-3-line">
         <div class="md-list-item-text">
           <h3>{{prenotazione.giorno}}</h3>
-          <h4>{{prenotazione.stanza}}</h4>
+          <h4>{{prenotazione.stanza}}  {{prenotazione.ora}}°ORA</h4>
           <p>{{prenotazione.risorsa}}</p>
         </div>
-        <md-button ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa)" style="background-color: #2196F3; color:white" class="md-secondary">Rimuovi</md-button>
+        <md-button ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" style="background-color: #2196F3; color:white" class="md-secondary">Rimuovi</md-button>
         <md-divider ng-if=""></md-divider>
       </md-list-item>
     </md-list>
