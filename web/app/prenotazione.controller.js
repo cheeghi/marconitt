@@ -81,7 +81,7 @@ app.
          */
         $scope.getPrenotazioni = function() {
             $scope.htmlTable = '';
-            //$scope.loading = true;
+            $scope.loading = true;
             if ($scope.sRoomType == "LABORATORIO") {
                 $http.get('http://marconitt.altervista.org/timetable.php', {
                     cache: false,

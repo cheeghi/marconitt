@@ -18,6 +18,7 @@ app.
          */
         $scope.initializeHttpCalls = function() {
             $http.get('http://marconitt.altervista.org/progetti.php', {  
+                cache: false,
                 params: {
                     prenotazioni: $rootScope.username
                 }
