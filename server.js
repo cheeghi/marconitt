@@ -388,7 +388,6 @@ apiRoutes.get('/spaggiari', function(req,res) {
 
 
 apiRoutes.get('/spaggiari/:year/:month/:day', function(req, res) {
-
     var day = new Date(parseInt(req.params.year), parseInt(req.params.month), parseInt(req.params.day));
     salva(req,res,day);
     res.json({ success: true });
@@ -435,10 +434,10 @@ apiRoutes.post('/prenota', function(req, res1) {
 	var ora = req.body.ora;
 	var risorsa = req.body.risorsa;
 	var isClasse = (req.body.isclasse == "true");
-    var user = req.body.username;
+    var user = req.body.user;
 
     if(isClasse == true) {
-        var appo = liberaRisorse(stanza, giorno, ora, risorsa, res1);
+        var appo = liberaRisorse(stanza, giorno, ora, risorsa, user, res1);
     } else {
         addPrenotazione(stanza, giorno, ora, risorsa, user, false);
         var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" + stanza +
@@ -499,7 +498,7 @@ apiRoutes.post('/events/visibility/:id', function(req, res) {
 
 
 //Release resources that are not in use
-function liberaRisorse(stanza, giorno, ora, risorsa, res1) {
+function liberaRisorse(stanza, giorno, ora, risorsa, user, res1) {
     var id;
     var sql_stmt;
     var stanzaLib;
@@ -519,7 +518,8 @@ function liberaRisorse(stanza, giorno, ora, risorsa, res1) {
 
         res.on('end', function () {
             sql_stmt = "UPDATE timetable SET risorsa = Null WHERE stanza = " + stanzaLib + 
-                    " AND ora = " + ora + " AND giorno ='" + giorno + "';";
+                " AND ora = " + ora + " AND giorno ='" + giorno + "';";
+            controllaPrenotazione(stanzaLib, giorno, ora);
             http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
             //console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
             var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" + stanza +
@@ -597,7 +597,7 @@ function getProf2(stanza, giorno, ora, stanzaDaLiberare, res1) {
                 sql_stmt = "UPDATE timetable SET professore2 = Null WHERE stanza = " 
                     + stanzaDaLiberare + " AND giorno = " + giorno + " AND ora = " + ora;
                 http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
-                    console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
+                    //console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
                     res1.json(true);
                 });
             });
@@ -624,6 +624,44 @@ function addPrenotazione(stanza, giorno, ora, risorsa, user, isClasse) {
 			sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", '" + user + "', " + isClasse + ");";
             http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
                 //console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
+            });
+        });
+    });
+}
+
+function controllaPrenotazione(stanza, giorno, ora) {
+    sql_stmt = "SELECT id FROM timetable WHERE stanza = " + stanza + " AND giorno = '" + giorno + "' AND ora = " + ora + ";";
+    http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
+        console.log(sql_stmt);
+        var str = '';
+
+		res.on('data', function (chunk) {
+			str += chunk; 
+		});
+
+        res.on('end', function () {
+            var strbello = str.replace('"', '');
+			var strbello2 = strbello.replace('"', '');			  
+			id = Number(strbello2);
+            sql_stmt = "SELECT id FROM prenotazioni WHERE id = " + id;
+            http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
+                console.log('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt);
+                var str = '';
+
+                res.on('data', function (chunk) {
+                    str += chunk; 
+                });
+
+                res.on('end', function () {
+                    id = Number(str)
+
+                    if(id != 0) {
+                        sql_stmt = "DELETE FROM prenotazioni WHERE id = " + str;
+                        http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function() {
+                            console.log("Fatto");
+                        });
+                    }
+                });
             });
         });
     });
