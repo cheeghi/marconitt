@@ -449,6 +449,23 @@ apiRoutes.post('/prenota', function(req, res1) {
 });
 
 
+apiRoutes.post('/cancellaPrenotazione', function(req, res) {
+    var stanza = req.body.stanza;
+	var giorno = req.body.giorno;
+	var ora = req.body.ora;
+    var risorsa = req.body.risorsa;
+
+    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null WHERE stanza = '" 
+    + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+
+    http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
+        isSchoolOur(stanza, giorno, ora, risorsa,  function() {
+            res.json(true);
+        });
+    });
+});
+
+
 apiRoutes.post('/events/:year/:month/:day', function(req, res) {
     console.log(req.body);
     var day = new Day({
@@ -663,6 +680,96 @@ function controllaPrenotazione(stanza, giorno, ora) {
                     }
                 });
             });
+        });
+    });
+}
+
+
+function isSchoolOur(stanza, giorno, ora, risorsa, res) {
+    var sql_stmt = "SELECT id FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
+    var id;
+
+    http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
+        //console.log(sql_stmt);
+        var str = '';
+
+		res.on('data', function (chunk) {
+			str += chunk; 
+		});
+
+        res.on('end', function () {
+            var strbello = str.replace('"', '');
+			var strbello2 = strbello.replace('"', '');			  
+			id = Number(strbello2);
+            sql_stmt = "SELECT isSchoolHour FROM prenotazioni WHERE id = " + id;
+
+            http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
+                //console.log(sql_stmt);
+                var str = '';
+
+                res.on('data', function (chunk) {
+                    str += chunk; 
+                });
+
+                res.on('end', function () {
+                    var strbello = str.replace('"', '');
+			        var strbello2 = strbello.replace('"', '');
+                    var n = Number(strbello2);
+
+                    if(n == 1) {
+                        console.log("E' ora di scuola");
+                        sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
+                        console.log('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt);
+
+                        http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
+                            var str = '';
+
+                            res.on('data', function (chunk) {
+                                str += chunk;
+                            });
+
+                            res.on('end', function () {
+                                console.log(str);
+                                var strbello = str.replace('"', '');
+                                var strbello2 = strbello.replace('"', '');
+                                var week_day = str;
+                                console.log("rwjdvheg", str);
+
+                                sql_stmt = "SELECT `Column 4` FROM GPU001 WHERE `Column 5` = '" + week_day + "' AND `Column 6` = '" 
+                                    + ora + "' `Column 1` = '" + risorsa + "';";
+
+                                http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
+                                    console.log(sql_stmt);
+                                    var str = '';
+
+                                    res.on('data', function (chunk) {
+                                        str += chunk; 
+                                    });
+
+                                    res.on('end', function () {
+                                        console.log(str);
+                                        
+                                    });
+                                });
+                            });
+                        });
+                    } else {
+                        console.log("Non era ora di scuola");
+                    }
+                });
+            });
+        });
+    });
+}
+
+
+function cancellaP(id, res) {
+    sql_stmt = "DELETE FROM prenotazioni WHERE id = " + id;
+    http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function() {
+        sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null, professoreP = Null" +
+        " WHERE id = " + id;
+        http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function() {
+            res.json(true);
         });
     });
 }
