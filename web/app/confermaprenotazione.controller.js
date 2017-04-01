@@ -5,30 +5,55 @@ app.
         $scope.classes;
         $scope.rooms;
         $scope.teachers;
-        $scope.admin = $rootScope.admin;
-        $scope.tipoPrenotazione;
-        $scope.sProgetto;
-        $scope.sClass;
-        $scope.sDescrizione;
+        $scope.progetti;
+        $scope.admin = $rootScope.admin; // is protocollo or not
+        $scope.tipoPrenotazione; // tipo di prenotazione (ex. classe, consiglio di classe, progetto, ecc...)
+        $scope.sProgetto; // progetto selezionato
+        $scope.sClass; // selected class
+        $scope.sDescrizione; // descrizione inserita
+        $scope.disabled; // boolean for confirm button disabling
 
 
-        $http.get('http://88.149.220.222/orario/api.php', {  
-            params: {
-                search: ""
-            }
-        }).success(function(response) {
-            $scope.classes = response.classes;
-            $scope.rooms = response.rooms;
-            $scope.teachers = response.teachers;
-        });
+        /**
+         * initialize method
+         */
+        $scope.init = function() {
+            $scope.initializeHttpCalls();
+        };
 
 
+        /**
+         * makes http requests to populate classes, rooms, teachers, progetti arrays
+         */
+        $scope.initializeHttpCalls = function() {
+            $http.get('http://marconitt.altervista.org/progetti.php?progetti').success(function(response) {
+                //console.log(response.processi);
+                $scope.progetti = response.progetti;
+            });
+
+
+            $http.get('http://88.149.220.222/orario/api.php', {
+                params: {
+                    search: ""
+                }
+            }).success(function(response) {
+                $scope.classes = response.classes;
+                $scope.rooms = response.rooms;
+                $scope.teachers = response.teachers;
+            });
+        };
+
+
+        /**
+         * makes a 'prenotazione' request to the server
+         */
         $scope.prenota = function() {
             /*console.log($rootScope.stanzaPrenotata);
             console.log($rootScope.oraPrenotata);
             console.log($rootScope.prenotazioneString);
             console.log($rootScope.giornoSelezionato);
             console.log($scope.sClass);*/
+            $scope.disabled = true;
             var risorsa;
             var isClasse = false;
 
@@ -49,7 +74,7 @@ app.
             }
 
             var data = "token="+$rootScope.token+"&stanza="+$rootScope.stanzaPrenotata+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoSelezionato
-                    + "&risorsa="+risorsa + "&isclasse="+isClasse;
+                    + "&risorsa="+ risorsa+ "&isclasse="+ isClasse+ "&user="+ $rootScope.username;
 
             var req = {
                 method: 'POST',
@@ -73,17 +98,26 @@ app.
         };
 
 
+        /**
+         * refreshes 'prenotazioni' table
+         */
         $scope.refresh = function() {
             $rootScope.$broadcast("refreshTable", {});
         }
 
-                
+
+        /**
+         * closes the mdDialog
+         */                
         $scope.cancel = function() {
             $mdDialog.cancel();
         };
 
 
-        $scope.resetMdSelect = function() {
+        /**
+         * clears sClass, sProgetto, sDescrizione options
+         */
+        $scope.clearMdSelect = function() {
             $scope.sClass = undefined;
             $scope.sProgetto = undefined;
             $scope.sDescrizione = undefined;

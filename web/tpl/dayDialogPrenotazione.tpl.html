@@ -28,8 +28,8 @@
                                 <div layout="row" ng-hide="isSunday">
                                     <md-input-container>
                                         <label>Seleziona</label>
-                                        <md-select ng-model="sRoomType" ng-change="getPrenotazioni()" size="20">
-                                        <md-option>
+                                        <md-select ng-model="sRoomType" ng-change="getPrenotazioni();clearMdSelect()" size="20">
+                                            <md-option>
                                                 LABORATORIO
                                             </md-option>
                                             <md-option>
@@ -39,7 +39,41 @@
                                                 AULA MAGNA
                                             </md-option>
                                         </md-select>
-                                        </md-input-container>
+                                    </md-input-container>
+                                    <md-input-container ng-show="sRoomType=='AULA'">
+                                        <label>Aula</label>
+                                        <md-select ng-model="sRoom" ng-change="getPrenotazioni()">
+                                            <md-option>Qualsiasi</md-option>
+                                            <md-option ng-repeat="classroom in classrooms" value="{{classroom}}">
+                                                {{classroom}}
+                                            </md-option>
+                                        </md-select>
+                                    </md-input-container>                                    
+                                    <md-input-container ng-show="sRoomType=='LABORATORIO'">
+                                        <label>Lab</label>
+                                        <md-select ng-model="sRoom" ng-change="getPrenotazioni()">
+                                            <md-option>Qualsiasi</md-option>
+                                            <md-option ng-repeat="lab in labs" value="{{lab}}">
+                                                {{lab}}
+                                            </md-option>
+                                        </md-select>
+                                    </md-input-container>                                    
+                                    <md-input-container>
+                                        <label>Ora</label>
+                                        <md-select ng-model="sHour" ng-show="sRoomType!=undefined" ng-change="getPrenotazioni()" size="20">
+                                        <md-option>Qualsiasi</md-option>
+                                        <md-option>1</md-option>
+                                        <md-option>2</md-option>
+                                        <md-option>3</md-option>
+                                        <md-option>4</md-option>
+                                        <md-option>5</md-option>
+                                        <md-option>6</md-option>
+                                        <md-option>7</md-option>
+                                        <md-option>8</md-option>
+                                        <md-option>9</md-option>
+                                        <md-option>10</md-option>
+                                        </md-select>
+                                    </md-input-container>
                                 </div>
 
                                 <div layout="row" layout-sm="column" layout-align="center center" ng-show="loading" layout-fill>

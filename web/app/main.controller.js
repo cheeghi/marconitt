@@ -34,6 +34,7 @@ app
                     $rootScope.username = response.username;
                     $rootScope.admin = response.admin;
                     $scope.logged = true;
+                    $scope.highlight(1);
                 }
             })
         };
@@ -120,13 +121,13 @@ app
 
 
         $scope.logout = function() {
+            $scope.highlight(2);
             $http.get('http://'+CONFIG.HOST+':8080/api/logout');
             $rootScope.username = undefined;
             $rootScope.token = undefined;
             $rootScope.logged = false;
             $scope.logged = false;
             $rootScope.inPrenotazione = false; $scope.setView('Visualizza');
-            $scope.highlight(2);
         }
 
 
@@ -167,22 +168,22 @@ app
                     $scope.customStyle.visualizzaText = {"color" : "white"};
                     $scope.customStyle.prenota = {"background-color" : "white"};
                     $scope.customStyle.prenotaText = {"color" : "black"};
-                    $scope.customStyle.inserisci = {"background-color" : "white"};
-                    $scope.customStyle.inserisciText = {"color" : "black"};
+                    $scope.customStyle.lmp = {"background-color" : "white"};
+                    $scope.customStyle.lmpText = {"color" : "black"};
                 } else if (type == 2) {
                     $scope.customStyle.visualizza = {"background-color" : "white"};
                     $scope.customStyle.visualizzaText = {"color" : "black"};
                     $scope.customStyle.prenota = {"background-color" : "#2196F3"};
                     $scope.customStyle.prenotaText = {"color" : "white"};
-                    $scope.customStyle.inserisci = {"background-color" : "white"};
-                    $scope.customStyle.inserisciText = {"color" : "black"};                
+                    $scope.customStyle.lmp = {"background-color" : "white"};
+                    $scope.customStyle.lmpText = {"color" : "black"};                
                 } else if (type == 3) {
                     $scope.customStyle.visualizza = {"background-color" : "white"};
                     $scope.customStyle.visualizzaText = {"color" : "black"};
                     $scope.customStyle.prenota = {"background-color" : "white"};
                     $scope.customStyle.prenotaText = {"color" : "black"};
-                    $scope.customStyle.inserisci = {"background-color" : "#2196F3"};
-                    $scope.customStyle.inserisciText = {"color" : "white"};  
+                    $scope.customStyle.lmp = {"background-color" : "#2196F3"};
+                    $scope.customStyle.lmpText = {"color" : "white"};  
                 }
             }
         };
