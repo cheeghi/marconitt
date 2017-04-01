@@ -10,6 +10,7 @@ app.
         $scope.tipoPrenotazione; // tipo di prenotazione (ex. classe, consiglio di classe, progetto, ecc...)
         $scope.sProgetto; // progetto selezionato
         $scope.sClass; // selected class
+        $scope.sTeacher; // selected teacher
         $scope.sDescrizione; // descrizione inserita
         $scope.disabled; // boolean for confirm button disabling
 
@@ -31,12 +32,25 @@ app.
                 $scope.progetti = response.progetti;
             });
 
+            $http.get('http://88.149.220.222/orario/api.php').success(function(response) {
+                $scope.classes = response.classes;
+                $scope.teachers = response.teachers;
+                //$scope.rooms
+            });
+
 
             $http.get('http://marconitt.altervista.org/progetti.php?classi').success(function(response) {
-                $scope.classes = response.classi;
+                //$scope.classes = response.classi;
                 //$scope.rooms = response.rooms;
                 //$scope.teachers = response.teachers;
             });
+
+            $http.get('http://marconitt.altervista.org/progetti.php?docenti').success(function(response) {
+                //$scope.classes = response.classi;
+                //$scope.rooms = response.rooms;
+                //$scope.teachers = response.teachers;  
+            });
+
         };
 
 
@@ -59,6 +73,8 @@ app.
                     isClasse = true;
                 } else if ($scope.tipoPrenotazione == 'Progetto') {
                     risorsa = $scope.sProgetto;
+                } else if ($scope.tipoPrenotazione == 'Sportello') {
+                    risorsa = "Sportello: " + $scope.sTeacher;
                 } else if ($scope.tipoPrenotazione == 'Altro') {
                     risorsa = $scope.sDescrizione;
                 } else {

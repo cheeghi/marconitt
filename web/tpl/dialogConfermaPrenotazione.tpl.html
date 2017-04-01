@@ -32,6 +32,9 @@
                                             Consiglio di classe
                                         </md-option>
                                         <md-option>
+                                            Sportello
+                                        </md-option>                                      
+                                        <md-option>
                                             Altro
                                         </md-option>
                                     </md-select>
@@ -42,6 +45,14 @@
                                     <md-select ng-model="sClass">
                                         <md-option ng-repeat="class in classes" value="{{class}}">
                                             {{class}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+                                <md-input-container ng-show="tipoPrenotazione=='Sportello'">
+                                    <label>Insegnante</label>
+                                    <md-select ng-model="sTeacher">
+                                        <md-option ng-repeat="teacher in teachers" value="{{teacher}}">
+                                            {{teacher}}
                                         </md-option>
                                     </md-select>
                                 </md-input-container>
@@ -60,7 +71,7 @@
                                 <md-input-container>
                                     <div layout="row" layout-align="space-between center">
                                         <md-button class="md-raised md-primary" ng-disabled="
-                                        (sClass==undefined||sClass=='')&&sProgetto==undefined&&(sDescrizione==undefined||sDescrizione=='')||disabled
+                                        (sClass==undefined||sClass=='')&&(sProgetto==undefined)&&(sDescrizione==undefined||sDescrizione=='')&&(sTeacher==undefined)||disabled
                                         " ng-click="prenota()" class="md-block" flex >
                                             CONFERMA
                                         </md-button>

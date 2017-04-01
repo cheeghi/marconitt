@@ -16,15 +16,17 @@ app.
         /**
          * makes http requests to populate 'prenotazioni' arrays
          */
-        $scope.initializeHttpCalls = function() {
+        $scope.initializeHttpCalls = function() {       
+            console.log("admin profile");
             $http.get('http://marconitt.altervista.org/progetti.php', {  
                 params: {
-                    prenotazioni: $rootScope.username
+                    prenotazioni: $rootScope.username,
+                    isprotocollo: $scope.admin
                 }
             }).success(function(response) {
                 $scope.prenotazioni = response;
                 console.log(response);
-            });            
+            });         
         };
 
 
