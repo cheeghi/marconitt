@@ -103,6 +103,7 @@ app.
                 }).success(function(response) {
                     $scope.genTable(response.rooms);
                     $scope.loading = false;
+                    $scope.dim(); //for scrollbar (leo)
                 });
                     
             }
