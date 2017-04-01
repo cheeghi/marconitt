@@ -1,0 +1,26 @@
+<div ng-controller="PrenotazioniUtenteCtrl" ng-init="init()" layout-fill style="height: 100% !important;">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <md-button class="md-icon-button" aria-label="Open sidenav" ng-click="toggleLeft()" hide-gt-md>
+                <i class="material-icons">menu</i>
+            </md-button>
+            <h2>
+			<span>{{ tool }}</span>
+            </h2>
+            <span flex=""></span>
+        </div>
+    </md-toolbar>
+    <md-content>
+    <md-list>
+      <md-list-item ng-repeat="prenotazione in prenotazioni" class="md-3-line">
+        <div class="md-list-item-text">
+          <h3>{{prenotazione.giorno}}</h3>
+          <h4>{{prenotazione.stanza}}</h4>
+          <p>{{prenotazione.risorsa}}</p>
+        </div>
+        <md-button ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa)" style="background-color: #2196F3; color:white" class="md-secondary">Rimuovi</md-button>
+        <md-divider ng-if=""></md-divider>
+      </md-list-item>
+    </md-list>
+  </md-content>
+</div>

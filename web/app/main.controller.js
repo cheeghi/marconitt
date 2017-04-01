@@ -14,6 +14,9 @@ app
         //$scope.token;
 
 
+        /**
+         * initialize method
+         */
         $scope.init = function() {
             $scope.checkLogin();
             //PRESUMO CHE L'INIT SIA IL MOMENTO GIUSTO IN OGNI CASO PER EFFETTUARE IL SETUP, ALTRIMENTI CAMBIA METODO
@@ -40,6 +43,9 @@ app
         };
 
 
+        /**
+         * says if side bar is open or not
+         */
         $scope.isOpenRight = function() {
             return $mdSidenav('right').isOpen();
         };
@@ -74,6 +80,9 @@ app
         }
 
 
+        /**
+         * closes side bar
+         */
         $scope.close = function () {
             $mdSidenav('left').close()
                 .then(function () {
@@ -82,6 +91,9 @@ app
         };
 
 
+        /**
+         * performs login
+         */
         $scope.login = function() {
             //chiamata http che ritorna il token da utilizzare nelle prossime chiamate
             console.log($scope.logindata);
@@ -120,6 +132,9 @@ app
         }
 
 
+        /**
+         * performs logout
+         */
         $scope.logout = function() {
             $scope.highlight(2);
             $http.get('http://'+CONFIG.HOST+':8080/api/logout');
@@ -127,29 +142,38 @@ app
             $rootScope.token = undefined;
             $rootScope.logged = false;
             $scope.logged = false;
-            $rootScope.inPrenotazione = false; $scope.setView('Visualizza');
+            $scope.setInPrenotazione(false);
+            $scope.setView('calendario', 'Visualizza');
         }
 
 
-        $scope.view = function(e, inPrenotazione) {
-            $rootScope.inPrenotazione = inPrenotazione;
+        /**
+         * closes side bar and calls setView method
+         */
+        $scope.view = function(tplName, viewName) {
             $mdSidenav('left').close();
-            $scope.setView(e);
+            $scope.setView(tplName, viewName);
         }
 
 
-        $scope.setView = function(viewName) {
-            
-            if ($rootScope.inPrenotazione == undefined)
-                $scope.tool = viewName;
-            else if ($rootScope.inPrenotazione)
-                $scope.tool = "Prenota";
-            else
-                $scope.tool = "Visualizza";
+        /**
+         * because 'Visualizza' and 'Prenota' share the same template (calendario.tpl.html) we need 
+         * to know which of them the user has selected
+         */
+        $scope.setInPrenotazione = function(inPrenotazione) {
+            $rootScope.inPrenotazione = inPrenotazione;
+        };
 
-            tpl = $filter('lowercase')(viewName);
+
+        /**
+         * sets the view (the middle content of the page)
+         */
+        $scope.setView = function(tplName, viewName) {
+            
+            $scope.tool = viewName;
+
             $http
-                .get('tpl/'+tpl+'.tpl.html')
+                .get('tpl/'+tplName+'.tpl.html')
                     .then(
                         function(res) {
                             //console.log(res.data);
@@ -161,6 +185,9 @@ app
         }
 
 
+        /**
+         * highlight selected option of side bar
+         */
         $scope.highlight = function(type) {
             if ($scope.logged) {
                 if (type == 1) {
@@ -190,5 +217,6 @@ app
 
 
         // on start
-        $scope.setView('Calendario');
+        $scope.setView('calendario', 'Visualizza');
+        $scope.setInPrenotazione(false);
     });

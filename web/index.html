@@ -19,13 +19,13 @@
         </md-toolbar>
         <md-content>
             <md-list ng-cloak>
-                <md-list-item ng-style="customStyle.visualizza" ng-click="view('Calendario', false); highlight(1);" md-ink-ripple="#2196F3">
+                <md-list-item ng-style="customStyle.visualizza" ng-click="view('calendario', 'Visualizza'); highlight(1); setInPrenotazione(false);" md-ink-ripple="#2196F3">
                     <p ng-style="customStyle.visualizzaText">Visualizza</p>
                 </md-list-item>
-                <md-list-item ng-style="customStyle.prenota" ng-click="view('Calendario', true); highlight(2);" ng-show="logged" md-ink-ripple="#2196F3">
+                <md-list-item ng-style="customStyle.prenota" ng-click="view('calendario', 'Prenota'); highlight(2); setInPrenotazione(true)" ng-show="logged" md-ink-ripple="#2196F3">
                     <p ng-style="customStyle.prenotaText">Prenota</p>
                 </md-list-item>
-                <md-list-item ng-style="customStyle.lmp" ng-click="view('Calendario', true); highlight(3);" ng-show="logged" md-ink-ripple="#2196F3">
+                <md-list-item ng-style="customStyle.lmp" ng-click="view('prenotazioniutente', 'Le mie prenotazioni'); highlight(3);" ng-show="logged" md-ink-ripple="#2196F3">
                     <p ng-style="customStyle.lmpText">Le mie prenotazioni</p>
                 </md-list-item>                
                 <!--<md-list-item ng-click="view('Cerca')">
@@ -77,6 +77,7 @@
     <script src="app/prenotazione.controller.js"></script>
     <script src="app/confermaprenotazione.controller.js"></script>
     <script src="app/ngenter.directive.js"></script>
+    <script src="app/prenotazioniutente.controller.js"></script>
 </body>
 
 </html>
