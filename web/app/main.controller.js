@@ -10,7 +10,7 @@ app
         $scope.mainHtml;
         $scope.tool = 'Visualizza';
         $scope.logindata = {};
-        $scope.customStyle = {};
+        $scope.customStyle = {}; 
         //$scope.token;
 
 
@@ -169,15 +169,16 @@ app
          * sets the view (the middle content of the page)
          */
         $scope.setView = function(tplName, viewName) {
-            
+            $scope.cambiaSchermata = true;
             $scope.tool = viewName;
-
+           
             $http
                 .get('tpl/'+tplName+'.tpl.html')
                     .then(
                         function(res) {
                             //console.log(res.data);
                             $scope.mainHtml = res.data;
+                            $scope.cambiaSchermata = false;
                         }, function(err) {
                             console.log(err);
                         }
