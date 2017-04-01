@@ -32,14 +32,10 @@ app.
             });
 
 
-            $http.get('http://88.149.220.222/orario/api.php', {
-                params: {
-                    search: ""
-                }
-            }).success(function(response) {
-                $scope.classes = response.classes;
-                $scope.rooms = response.rooms;
-                $scope.teachers = response.teachers;
+            $http.get('http://marconitt.altervista.org/progetti.php?classi').success(function(response) {
+                $scope.classes = response.classi;
+                //$scope.rooms = response.rooms;
+                //$scope.teachers = response.teachers;
             });
         };
 
