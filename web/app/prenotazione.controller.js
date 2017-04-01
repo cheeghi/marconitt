@@ -48,7 +48,7 @@ app.
 
         $scope.getPrenotazioni = function() {
             $scope.htmlTable = '';
-            $scope.loading = true;
+            //$scope.loading = true;
             if ($scope.sRoomType == "LABORATORIO") {
                 $http.get('http://marconitt.altervista.org/timetable.php', {
                     cache: false,
@@ -56,31 +56,11 @@ app.
                         labroomsbydate: $rootScope.giornoSelezionato
                     }
                 }).success(function(response) {
-                    /*async.parallel([
-                        function(){ 
-                            console.log("generation table");
-                            $scope.genTable(response.rooms); 
-                        },
-                        function(){ 
-                            console.log("generation dimension");
-                            $scope.dim(); 
-                        }
-                    ], callback);*/
-                    /*async.parallel({
-                        generationTable: function (callback) {
-                            alert("gen table");
-                            $scope.genTable(response.rooms);
-                        },
-                        calculateDimension: function (callback) {
-                            alert("gen dimension");
-                            $scope.dim();
-                        }
-                    });*/
-
                     $scope.genTable(response.rooms);
                     $scope.loading = false;
-                    $scope.dim(); //for scrollbar
+                   
                 });
+                $scope.dim(); //for scrollbar
 
             } else if ($scope.sRoomType == "AULA") {
                 $http.get('http://marconitt.altervista.org/timetable.php', {
