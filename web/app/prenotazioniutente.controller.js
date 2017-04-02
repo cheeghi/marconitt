@@ -36,11 +36,30 @@ app.
          * calls the server method for removing a 'prenotazione'
          */
         $scope.removePrenotazione = function(giorno, stanza, risorsa, ora) {
-            console.log(giorno, stanza, risorsa, ora, $rootScope.username);
+            //console.log(giorno, stanza, risorsa, ora, $rootScope.username);
             $scope.disabled = true;
-            //chiamata .success 
-            $scope.initializeHttpCalls();
-            console.clear();
+            var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
+                    + "&risorsa="+ risorsa;
+            console.log(ora);
+            var req = {
+                method: 'POST',
+                url: 'http://'+CONFIG.HOST+':8080/api/cancellaPrenotazione',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                data: data
+            };
+
+
+            $http(req)
+                .success(function(data) {
+                    $scope.initializeHttpCalls();
+                    console.log("ciao");
+
+                }).error(function(err) {
+                    $mdToast.show($mdToast.simple().textContent('lol'));
+                });
+
         };
 
     });
