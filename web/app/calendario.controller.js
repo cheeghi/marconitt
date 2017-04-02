@@ -81,9 +81,9 @@ app
 
         $scope.dayClick = function(date) {
             if ($rootScope.inPrenotazione)
-                tplUrl = 'tpl/dayDialogPrenotazione.tpl.html';
+                tplUrl = 'tpl/daydialogprenotazione.tpl.html';
             else
-                tplUrl = 'tpl/dayDialogVisualizza.tpl.html';
+                tplUrl = 'tpl/daydialogvisualizza.tpl.html';
                 
             $mdDialog.show({
                     templateUrl: tplUrl,

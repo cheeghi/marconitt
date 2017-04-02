@@ -143,7 +143,7 @@ app
             $rootScope.logged = false;
             $scope.logged = false;
             $scope.setInPrenotazione(false);
-            $scope.setView('calendario', 'Visualizza');
+            $scope.setView('calendariovisualizza', 'Visualizza');
         }
 
 
@@ -218,6 +218,6 @@ app
 
 
         // on start
-        $scope.setView('calendario', 'Visualizza');
+        $scope.setView('calendariovisualizza', 'Visualizza');
         $scope.setInPrenotazione(false);
     });

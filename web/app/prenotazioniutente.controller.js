@@ -3,6 +3,7 @@ app.
 
         $scope.admin = $rootScope.admin; // is protocollo or not
         $scope.prenotazioni;
+        $scope.disabled;
 
 
         /**
@@ -16,25 +17,30 @@ app.
         /**
          * makes http requests to populate 'prenotazioni' arrays
          */
-        $scope.initializeHttpCalls = function() {       
-            console.log("admin profile");
+        $scope.initializeHttpCalls = function() {
+            $scope.disabled = false;       
             $http.get('http://marconitt.altervista.org/progetti.php', {  
+                cache: false,
                 params: {
                     prenotazioni: $rootScope.username,
                     isprotocollo: $scope.admin
                 }
             }).success(function(response) {
+                console.log("****");
                 $scope.prenotazioni = response;
-                console.log(response);
             });         
         };
 
 
         /**
-         * call the server method for removing a 'prenotazione'
+         * calls the server method for removing a 'prenotazione'
          */
         $scope.removePrenotazione = function(giorno, stanza, risorsa, ora) {
             console.log(giorno, stanza, risorsa, ora, $rootScope.username);
+            $scope.disabled = true;
+            //chiamata .success 
+            $scope.initializeHttpCalls();
+            console.clear();
         };
 
     });

@@ -28,29 +28,13 @@ app.
          */
         $scope.initializeHttpCalls = function() {
             $http.get('http://marconitt.altervista.org/progetti.php?progetti').success(function(response) {
-                //console.log(response.processi);
                 $scope.progetti = response.progetti;
             });
 
             $http.get('http://88.149.220.222/orario/api.php').success(function(response) {
                 $scope.classes = response.classes;
                 $scope.teachers = response.teachers;
-                //$scope.rooms
             });
-
-
-            $http.get('http://marconitt.altervista.org/progetti.php?classi').success(function(response) {
-                //$scope.classes = response.classi;
-                //$scope.rooms = response.rooms;
-                //$scope.teachers = response.teachers;
-            });
-
-            $http.get('http://marconitt.altervista.org/progetti.php?docenti').success(function(response) {
-                //$scope.classes = response.classi;
-                //$scope.rooms = response.rooms;
-                //$scope.teachers = response.teachers;  
-            });
-
         };
 
 

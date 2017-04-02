@@ -1,0 +1,20 @@
+<div ng-controller="CalendarioCtrl" ng-init="getData()" layout-fill style="height: 100% !important;">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <md-button class="md-icon-button" aria-label="Open sidenav" ng-click="toggleLeft()" hide-gt-md>
+                <i class="material-icons">menu</i>
+            </md-button>
+            <h2>
+			<span>{{ tool }} </span>
+            </h2>
+            <span flex=""></span>
+        </div>
+    </md-toolbar>
+    <div layout="row" layout-sm="column" layout-align="center center" ng-show="isLoading" layout-fill>
+        <md-progress-circular md-mode="indeterminate" md-diameter="200"></md-progress-circular>
+    </div>
+    <md-content layout="row" style="height: calc(100% - 64px) !important;">
+        <calendar-md flex layout-fill calendar-direction="direction" on-prev-month="prevMonth" on-next-month="nextMonth" on-day-click="dayClick" title-format="'MMMM y'" ng-model='selectedDate' week-starts-on="1" day-format="dayFormat" day-label-format="'EEE'" day-label-tooltip-format="'EEEE'" day-tooltip-format="'fullDate'" day-content="" disable-future-selection="false" style="height: calc(100% - 46px) !important;"></calendar-md>
+    </md-content>
+    <div flex></div>
+</div>

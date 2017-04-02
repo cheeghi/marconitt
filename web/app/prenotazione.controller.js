@@ -17,18 +17,25 @@ app.
         $scope.sRoomType; // type of selected room (lab or classroom)
         $scope.sRoom; // selected room
         $scope.sHour; // selected hour
-        
+        giorniLimite = 14; // range in cui un prof può effettuare una prenotazione
+
 
         /**
          * initialize method
          */
         $scope.init = function(date) {
-            $scope.initializeHttpCalls();
             $scope.day = new Date(date);
-            $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1)
-                + "-" + $scope.day.getDate();
-            $scope.isSunday = $scope.day.getDay() == 0;
-            $scope.htmlTable = ($scope.isSunday) ? "<p>Non c'è scuola di domenica</p>" : "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
+            var limitDay = new Date();
+            limitDay.setDate(limitDay.getDate() + giorniLimite);
+            if ($scope.day > limitDay && !$rootScope.admin) {
+                $scope.htmlTable = "Seleziona una data più vicina!";
+            } else {
+                $scope.initializeHttpCalls();
+                $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1)
+                    + "-" + $scope.day.getDate();
+                $scope.isSunday = $scope.day.getDay() == 0;
+                $scope.htmlTable = ($scope.isSunday) ? "<p>Non c'è scuola di domenica</p>" : "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
+            }
         }
 
 
@@ -228,7 +235,7 @@ app.
             $rootScope.prenotazioneString = stanza + ' ' + (ora) + '°ora';
             //$rootScope.sClass = $scope.sClass;
             $mdDialog.show({
-                    templateUrl: 'tpl/dialogConfermaPrenotazione.tpl.html',
+                    templateUrl: 'tpl/dialogconfermaprenotazione.tpl.html',
                     controller: 'ConfermaPrenotazioneCtrl',
                     clickOutsideToClose: true,
                     skipHide: true
