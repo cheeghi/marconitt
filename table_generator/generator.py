@@ -56,7 +56,7 @@ def fn_getgiorniscuola(nomefile):
     '''
     Funzione che genera i giorni di scuola, escludendo quindi le vacanze(prese da file), e li ritorna in un vettore
     '''
-    start = date(2017, 05, 01)
+    start = date(2017, 04, 01)
     end = date(2017, 05, 31)
     actual = start
     giorni = []
