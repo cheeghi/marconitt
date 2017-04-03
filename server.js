@@ -460,9 +460,7 @@ apiRoutes.post('/cancellaPrenotazione', function(req, res) {
     + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
 
     http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
-        isSchoolOur(stanza, giorno, ora, risorsa,  function() {
-            res.json(true);
-        });
+        isSchoolOur(stanza, giorno, ora, risorsa, res);
     });
 });
 
@@ -806,7 +804,7 @@ function cancellaP(id, res) {
         " WHERE id = " + id;
 
         http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function() {
-            //res.json(true);
+            res.json(true);
         });
     });
 }
