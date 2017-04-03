@@ -13,14 +13,18 @@ app.
         $scope.selected = false;
         
 
-        $http.get('http://88.149.220.222/orario/api.php', {
+        //$http.get('http://88.149.220.222/orario/api.php', {
+        $http.get('http://marconitt.altervista.org/timetable.php', {
             params: {
                 search: ""
             }
         }).success(function(response) {
-            $scope.classes = response.classes;
+          
+            $scope.classes = response.classes;        
             $scope.rooms = response.rooms;
             $scope.teachers = response.teachers;
+            $scope.projects = response.projects;
+
         })
 
 
@@ -55,15 +59,12 @@ app.
         $scope.getOrarioRoom = function() {
 
             $scope.selected = true;
-            $scope.sTeacher = undefined;
-            $scope.sClass = undefined;
-            $scope.currentItem = $scope.sRoom;
             $scope.htmlTable = '<p><div layout="row" layout-sm="column" layout-align="center center" layout-fill>\
                                 <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>\
                                 </div></p>';
             $scope.query = "select * from timetable where stanza = '" + $scope.sRoom + "' and\
                             giorno = '" + $scope.giornoSelezionato + "' order by ora";
-;
+
             $http.get('http://marconitt.altervista.org/timetable.php', {
                 cache: false,
                 params: {
@@ -82,15 +83,20 @@ app.
 //select * from timetable where stanza = 'L247' and giorno = '2017-5-8'
 
         $scope.getOrarioTeacher = function() {
-            $scope.sClass = undefined;
-            $scope.sRoom = undefined;
-            $scope.currentItem = $scope.sTeacher;
-            $http.get('http://88.149.220.222/orario/api.php', {
+
+            $scope.selected = true;          
+            $scope.htmlTable = '<p><div layout="row" layout-sm="column" layout-align="center center" layout-fill>\
+                                <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>\
+                                </div></p>';
+            $scope.query = "select * from timetable where professore1 = '" + $scope.sTeacher + "' or professore2 = '" + $scope.sTeacher + "' and\
+                            giorno = '" + $scope.giornoSelezionato + "' order by ora";
+
+            $http.get('http://marconitt.altervista.org/timetable.php', {
                 params: {
-                    teacher: $scope.sTeacher
+                    doquery: $scope.query
                 }
             }).success(function(response) {
-                $scope.genTable(response, 'prof');
+                $scope.genTest(response, 'prof');
             })
         }
 
@@ -111,17 +117,14 @@ app.
             })
         }*/
 
-         $scope.getOrarioClass = function() {
+        $scope.getOrarioClass = function() {
 
             $scope.selected = true;
-            $scope.sTeacher = undefined;
-            $scope.sRoom = undefined;
-            $scope.currentItem = $scope.sClass;
             $scope.htmlTable = '<p><div layout="row" layout-sm="column" layout-align="center center" layout-fill>\
                                 <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>\
                                 </div></p>';
-
             $scope.query = "select * from timetable where risorsa = '" + $scope.sClass + "' and giorno = '" + $scope.giornoSelezionato + "' order by ora";
+            
             $http.get('http://marconitt.altervista.org/timetable.php', {
                 cache: false,
                 params: {
@@ -136,7 +139,7 @@ app.
         }
 
 
-        $scope.legend = function() {
+        /*$scope.legend = function() {
             $scope.sTeacher = undefined;
             $scope.sRoom = undefined;
             $scope.sClass = undefined;
@@ -190,6 +193,7 @@ app.
             if ($scope.sRoom != undefined) $scope.getOrarioRoom();
         }
 
+*/
         $scope.genTest = function(data, tipo) {
             var days = $mdDateLocale.days;
 
@@ -214,13 +218,13 @@ app.
 
                     if (a.risorsa == null) {
                         x += "<td>&nbsp;</td>";
-                    }else if(a.professore2 == null && a.professoreS == null ){
+                    }else if(a.professore2 == null && a.professoreS == null && a.professore1 != null){
                         x += "<td><span class='nome'>" + a.professore1.toLowerCase() + "</span><br>" + a.risorsa + " </td>";
-                    }else if(a.professore1 == null && a.professore2 == null){
-                        x += "<td><span class='nome'>nessun professore</span><br>" + a.risorsa + " </td>";
-                    }else if(a.professore2 == null && a.professoreS == null){
+                    }else if(a.professore1 == null && a.professore2 == null && a.professoreS == null){
+                        x += "<td>" + a.risorsa + " </td>";
+                    }else if(a.professore2 == null && a.professoreS == null && a.professore1 != null){
                         x += "<td><span class='nome'>" + a.professore1.toLowerCase() + "</span><br>" + a.risorsa + " </td>";
-                    }else if(a.professoreS == null){
+                    }else if(a.professoreS == null && a.professore1 != null && a.professore2 != null){
                         x += "<td><span class='nome'>" + a.professore1.toLowerCase() +"<br>" + a.professore2.toLowerCase() + "</span><br>" + a.risorsa + " </td>";
                     }else{
                         x += "<td><span class='nome'>" + a.professore1.toLowerCase() + "<br>" + a.professore2.toLowerCase() + "<br>" + a.professoreS.toLowerCase() + "</span><br>" + a.risorsa + " </td>";
@@ -249,45 +253,64 @@ app.
 
             for (var i = 0; i < 6; i++) {
 
-            try{
+                try{
 
 
-                if (data[i].risorsa == undefined){
-                    x += "<td>&nbsp;</td>";
-                }else if (data[i].professore2 == null && data[i].professoreS == null){
-                    x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
-                }else if (data[i].professoreS == null){
-                    x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + " , " + data[i].professore2.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
-                }else if (data[i].professore1 == null && data[i].professore2 != null){
-                    x += "<td><span class='nome'>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
-                }else if (data[i].professore2 == null && data[i].professoreS != null){
-                    x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + " , " + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
-                }
-            }catch(e){
-                x += "<td>&nbsp;</td>";
-            }
-
+                    if (data[i].risorsa == undefined){
+                        x += "<td>&nbsp;</td>";
+                    }else if (data[i].professore2 == null && data[i].professoreS == null){
+                        x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                    }else if (data[i].professoreS == null){
+                        x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                    }else if (data[i].professore1 == null && data[i].professore2 != null && data[i].professoreS != null){
+                        x += "<td><span class='nome'>" + data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
                     }
-            /*data.forEach(function(a) {
 
-                
-                if (a.risorsa == null){
+                }catch(e){
                     x += "<td>&nbsp;</td>";
-                }else if (a.professore2 == null && a.professoreS == null){
-                    x += "<td><span class='nome'>" + a.professore1.toLowerCase() + "</span><br>" + a.stanza + "</td>";
-                }else if (a .professoreS == null){
-                    x += "<td><span class='nome'>" + a.professore1.toLowerCase() + " , " + a.professore2.toLowerCase() + "</span><br>" + a.stanza + "</td>";
-                }else if (a.professore1 == null && a.professore2 != null){
-                    x += "<td><span class='nome'>" + a.professoreS.toLowerCase() + "</span><br>" + a.stanza + "</td>";
-                }else if (a.professore2 == null && a.professoreS != null){
-                    x += "<td><span class='nome'>" + a.professore1.toLowerCase() + " , " + a.professoreS.toLowerCase() + "</span><br>" + a.stanza + "</td>";
                 }
-            });*/
 
+            }
             x += "</tbody>";
             x += "</table>";
             $scope.htmlTable = x;
 
+            }else if(tipo == 'prof'){
+            //alert("CLASSE");
+               var x = "<table class=\"table\">\
+                        <thead><tr>\
+                        <th>1</th>\
+                        <th>2</th>\
+                        <th>3</th>\
+                        <th>4</th>\
+                        <th>5</th>\
+                        <th>6</th>\
+                    </tr></thead>\
+                    <tbody>";
+
+            for (var i = 0; i < 6; i++) {
+
+                try{
+
+
+                    if (data[i].risorsa == undefined){
+                        x += "<td>&nbsp;</td>";
+                    }else if (data[i].professore2 == null && data[i].professoreS == null){
+                        x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                    }else if (data[i].professoreS == null){
+                        x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                    }else if (data[i].professore1 == null && data[i].professore2 != null && data[i].professoreS != null){
+                        x += "<td><span class='nome'>" + data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                    }
+
+                }catch(e){
+                    x += "<td>&nbsp;</td>";
+                }
+
+            }
+            x += "</tbody>";
+            x += "</table>";
+            $scope.htmlTable = x;
             }
         };
     });
