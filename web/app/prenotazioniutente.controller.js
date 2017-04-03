@@ -10,6 +10,7 @@ app.
          * initialize method
          */
         $scope.init = function() {
+            $scope.caricamentoPrenotazioni = true;
             $scope.initializeHttpCalls();
         };
 
@@ -18,7 +19,7 @@ app.
          * makes http requests to populate 'prenotazioni' arrays
          */
         $scope.initializeHttpCalls = function() {
-            $scope.caricamentoPrenotazioni = true;
+           
             $scope.disabled = false;       
             $http.get('http://marconitt.altervista.org/progetti.php', {  
                 cache: false,
@@ -38,6 +39,7 @@ app.
          */
         $scope.removePrenotazione = function(giorno, stanza, risorsa, ora) {
             //console.log(giorno, stanza, risorsa, ora, $rootScope.username);
+            $scope.caricamentoPrenotazioni = true;
             $scope.disabled = true;
             var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
                     + "&risorsa="+ risorsa;
@@ -56,9 +58,9 @@ app.
                 .success(function(data) {
                     $scope.prenotazioni = null;
                     $scope.initializeHttpCalls();
-
+                    $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                   
                 }).error(function(err) {
-                    $mdToast.show($mdToast.simple().textContent('lol'));
+                    $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
                 });
 
         };

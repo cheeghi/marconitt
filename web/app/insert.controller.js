@@ -5,30 +5,29 @@ app
         $scope.searchTerm;
         $scope.msg = 'Clicca per testare';
         $scope.event;
-
+        $scope.teachers;
+        $scope.classes;
 
         $scope.noSunday = function(date) {
             var day = date.getDay();
             return day !== 0;
-        }
+        };
 
+
+           /* $http.get('http://88.149.220.222/orario/api.php').success(function(response) {
+                $scope.classes = response.classes;
+                $scope.teachers = response.teachers;
+            });
+        }*/
 
         var init = function() {
-            var req = {
-                method: 'GET',
-                url: 'http://'+CONFIG.HOST+':8080/api/who'
-            }
-
-            $http(req)
-                .then(
-                    function(data) {
-                        $scope.whos = data.data;
-                    },
-                    function(err) {
-                        console.log(err);
-                    }
-                );
-        }
+             $http.get('http://marconitt.altervista.org/timetable.php').success(function(response) {
+                $scope.classes = response.classes;
+                $scope.teachers = response.teachers;
+                $scope.rooms = response.rooms;
+                console.log($scope.teachers + "---------" + $scope.classes);
+            });
+        };
 
 
         $scope.clearSearchTerm = function() {
