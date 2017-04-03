@@ -26,7 +26,6 @@ app.
                     isprotocollo: $scope.admin
                 }
             }).success(function(response) {
-                console.log("****");
                 $scope.prenotazioni = response;
             });         
         };
@@ -53,8 +52,8 @@ app.
 
             $http(req)
                 .success(function(data) {
+                    $scope.prenotazioni = null;
                     $scope.initializeHttpCalls();
-                    console.log("ciao");
 
                 }).error(function(err) {
                     $mdToast.show($mdToast.simple().textContent('lol'));
