@@ -4,7 +4,7 @@ app.
         $scope.admin = $rootScope.admin; // is protocollo or not
         $scope.prenotazioni;
         $scope.disabled;
-
+        $scope.caricamentoPrenotazioni;
 
         /**
          * initialize method
@@ -18,6 +18,7 @@ app.
          * makes http requests to populate 'prenotazioni' arrays
          */
         $scope.initializeHttpCalls = function() {
+            $scope.caricamentoPrenotazioni = true;
             $scope.disabled = false;       
             $http.get('http://marconitt.altervista.org/progetti.php', {  
                 cache: false,
@@ -27,6 +28,7 @@ app.
                 }
             }).success(function(response) {
                 $scope.prenotazioni = response;
+                $scope.caricamentoPrenotazioni = false;
             });         
         };
 

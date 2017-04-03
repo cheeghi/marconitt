@@ -3,6 +3,7 @@ app
       
         $rootScope.logged = false;
         $rootScope.token;
+        $rootScope.admin;
         $scope.logged = false;
         $scope.logged = $rootScope.logged;
         $scope.toggleLeft = buildDelayedToggler('left');
