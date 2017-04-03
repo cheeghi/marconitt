@@ -59,6 +59,8 @@ app.
         $scope.getOrarioRoom = function() {
 
             $scope.selected = true;
+            $scope.sTeacher = undefined;
+            $scope.sClass = undefined;
             $scope.htmlTable = '<p><div layout="row" layout-sm="column" layout-align="center center" layout-fill>\
                                 <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>\
                                 </div></p>';
@@ -84,7 +86,9 @@ app.
 
         $scope.getOrarioTeacher = function() {
 
-            $scope.selected = true;          
+            $scope.selected = true; 
+            $scope.sRoom = undefined; 
+            $scope.sClass = undefined;        
             $scope.htmlTable = '<p><div layout="row" layout-sm="column" layout-align="center center" layout-fill>\
                                 <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>\
                                 </div></p>';
@@ -120,6 +124,8 @@ app.
         $scope.getOrarioClass = function() {
 
             $scope.selected = true;
+            $scope.sTeacher = undefined;
+            $scope.sRoom = undefined;
             $scope.htmlTable = '<p><div layout="row" layout-sm="column" layout-align="center center" layout-fill>\
                                 <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>\
                                 </div></p>';
@@ -285,18 +291,21 @@ app.
                         <th>4</th>\
                         <th>5</th>\
                         <th>6</th>\
+                        <th>7</th>\
+                        <th>8</th>\
+                        <th>9</th>\
+                        <th>10</th>\
                     </tr></thead>\
                     <tbody>";
 
-            for (var i = 0; i < 6; i++) {
+            for (var i = 0; i < 10; i++) {
 
-                try{
-
+                /*try{
 
                     if (data[i].risorsa == undefined){
                         x += "<td>&nbsp;</td>";
                     }else if (data[i].professore2 == null && data[i].professoreS == null){
-                        x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                        x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].risorsa + "<br>" + data[i].stanza + "</td>";
                     }else if (data[i].professoreS == null){
                         x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
                     }else if (data[i].professore1 == null && data[i].professore2 != null && data[i].professoreS != null){
@@ -305,7 +314,78 @@ app.
 
                 }catch(e){
                     x += "<td>&nbsp;</td>";
-                }
+                }*/
+ 
+                try{
+
+                    if (data[i].stanza != null && data[i].risorsa != null){
+
+                            if (data[i].professoreS == null && data[i].professore2 == null && data[i].professore1 != null){
+                                x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].risorsa + " " + data[i].stanza + "</td>";
+                                
+                            }else if (data[i].professoreS == null && data[i].professore2 != null && data[i].professore1 != null){    
+                                x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].risorsa + " " + data[i].stanza + "</td>";
+                                
+                            }else if (data[i].professoreS != null && data[i].professore2 != null && data[i].professore1 != null){
+                                x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].risorsa + " " + data[i].stanza + "</td>";
+                            
+                            }else if (data[i].professoreS != null && data[i].professore2 != null && data[i].professore1 == null){
+                                x += "<td><span class='nome'>"+ data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].risorsa + " " + data[i].stanza + "</td>";
+                            
+                            }else if (data[i].professoreS != null && data[i].professore2 == null && data[i].professore1 == null){
+                                x += "<td><span class='nome'>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].risorsa + " " + data[i].stanza + "</td>";
+                            
+                            }else if (data[i].professoreS != null && data[i].professore2 == null && data[i].professore1 != null){
+                                x += "<td><span class='nome'>"+ data[i].professore1.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].risorsa + " " + data[i].stanza + "</td>";
+                            }
+
+                        }else if (data[i].stanza != null && data[i].risorsa == null){
+
+                            if (data[i].professoreS == null && data[i].professore2 == null && data[i].professore1 != null){
+                                x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                                
+                            }else if (data[i].professoreS == null && data[i].professore2 != null && data[i].professore1 != null){    
+                                x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                                
+                            }else if (data[i].professoreS != null && data[i].professore2 != null && data[i].professore1 != null){
+                                x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                            
+                            }else if (data[i].professoreS != null && data[i].professore2 != null && data[i].professore1 == null){
+                                x += "<td><span class='nome'>"+ data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                            
+                            }else if (data[i].professoreS != null && data[i].professore2 == null && data[i].professore1 == null){
+                                x += "<td><span class='nome'>"+ data[i].professoreS.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                            
+                            }else if (data[i].professoreS != null && data[i].professore2 == null && data[i].professore1 != null){
+                                x += "<td><span class='nome'>"+ data[i].professore1.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                            }
+
+                        }else if (data[i].stanza == null && data[i].risorsa != null){
+
+                            if (data[i].professoreS == null && data[i].professore2 == null && data[i].professore1 != null){
+                                x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].risorsa + "</td>";
+                                
+                            }else if (data[i].professoreS == null && data[i].professore2 != null && data[i].professore1 != null){    
+                                x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].risorsa + "</td>";
+                                
+                            }else if (data[i].professoreS != null && data[i].professore2 != null && data[i].professore1 != null){
+                                x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].risorsa + "</td>";
+                            
+                            }else if (data[i].professoreS != null && data[i].professore2 != null && data[i].professore1 == null){
+                                x += "<td><span class='nome'>"+ data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].risorsa + "</td>";
+                            
+                            }else if (data[i].professoreS != null && data[i].professore2 == null && data[i].professore1 == null){
+                                x += "<td><span class='nome'>"+ data[i].professoreS.toLowerCase() + "</span><br>" + data[i].risorsa + "</td>";
+                            
+                            }else if (data[i].professoreS != null && data[i].professore2 == null && data[i].professore1 != null){
+                                x += "<td><span class='nome'>"+ data[i].professore1.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].risorsa + "</td>";
+                            }
+                        }    
+                
+                    }catch(e){
+                        
+                        x += "<td>&nbsp;</td>";
+                    }
 
             }
             x += "</tbody>";
