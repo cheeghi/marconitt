@@ -3,12 +3,10 @@ app
       
         $rootScope.logged = false;
         $rootScope.token;
-        $rootScope.inPrenotazione = false;
         $scope.logged = false;
         $scope.logged = $rootScope.logged;
         $scope.toggleLeft = buildDelayedToggler('left');
         $scope.mainHtml;
-        $scope.tool = 'Visualizza';
         $scope.logindata = {};
         $scope.customStyle = {}; 
         //$scope.token;
@@ -142,8 +140,7 @@ app
             $rootScope.token = undefined;
             $rootScope.logged = false;
             $scope.logged = false;
-            $scope.setInPrenotazione(false);
-            $scope.setView('calendariovisualizza', 'Visualizza');
+            $scope.setView('calendario/calendariovisualizza');
         }
 
 
@@ -157,20 +154,10 @@ app
 
 
         /**
-         * because 'Visualizza' and 'Prenota' share the same template (calendario.tpl.html) we need 
-         * to know which of them the user has selected
-         */
-        $scope.setInPrenotazione = function(inPrenotazione) {
-            $rootScope.inPrenotazione = inPrenotazione;
-        };
-
-
-        /**
          * sets the view (the middle content of the page)
          */
         $scope.setView = function(tplName, viewName) {
             $scope.cambiaSchermata = true;
-            $scope.tool = viewName;
            
             $http
                 .get('tpl/'+tplName+'.tpl.html')
@@ -218,6 +205,5 @@ app
 
 
         // on start
-        $scope.setView('calendariovisualizza', 'Visualizza');
-        $scope.setInPrenotazione(false);
+        $scope.setView('calendario/calendariovisualizza');
     });

@@ -235,7 +235,7 @@ app.
             $rootScope.prenotazioneString = stanza + ' ' + (ora) + '°ora';
             //$rootScope.sClass = $scope.sClass;
             $mdDialog.show({
-                    templateUrl: 'tpl/dialogconfermaprenotazione.tpl.html',
+                    templateUrl: 'tpl/daydialog/confermaprenotazione.tpl.html',
                     controller: 'ConfermaPrenotazioneCtrl',
                     clickOutsideToClose: true,
                     skipHide: true

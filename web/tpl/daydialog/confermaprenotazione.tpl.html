@@ -33,7 +33,10 @@
                                         </md-option>
                                         <md-option>
                                             Sportello
-                                        </md-option>                                      
+                                        </md-option>
+                                        <md-option>
+                                            Tutoraggio/Studio
+                                        </md-option>
                                         <md-option>
                                             Altro
                                         </md-option>
@@ -71,7 +74,8 @@
                                 <md-input-container>
                                     <div layout="row" layout-align="space-between center">
                                         <md-button class="md-raised md-primary" ng-disabled="
-                                        (sClass==undefined||sClass=='')&&(sProgetto==undefined)&&(sDescrizione==undefined||sDescrizione=='')&&(sTeacher==undefined)||disabled
+                                        (sClass==undefined||sClass=='')&&(sProgetto==undefined)&&(sDescrizione==undefined||sDescrizione=='')
+                                        &&(tipoPrenotazione!='Tutoraggio/Studio')&&(sTeacher==undefined)||disabled
                                         " ng-click="prenota()" class="md-block" flex >
                                             CONFERMA
                                         </md-button>

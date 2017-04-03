@@ -19,13 +19,13 @@
         </md-toolbar>
         <md-content>
             <md-list ng-cloak>
-                <md-list-item ng-style="customStyle.visualizza" ng-click="view('calendariovisualizza', 'Visualizza'); highlight(1); setInPrenotazione(false);" md-ink-ripple="#2196F3">
+                <md-list-item ng-style="customStyle.visualizza" ng-click="view('calendario/calendariovisualizza'); highlight(1);" md-ink-ripple="#2196F3">
                     <p ng-style="customStyle.visualizzaText">Visualizza</p>
                 </md-list-item>
-                <md-list-item ng-style="customStyle.prenota" ng-click="view('calendarioprenotazione', 'Prenota'); highlight(2); setInPrenotazione(true)" ng-show="logged" md-ink-ripple="#2196F3">
+                <md-list-item ng-style="customStyle.prenota" ng-click="view('calendario/calendarioprenotazione'); highlight(2);" ng-show="logged" md-ink-ripple="#2196F3">
                     <p ng-style="customStyle.prenotaText">Prenota</p>
                 </md-list-item>
-                <md-list-item ng-style="customStyle.lmp" ng-click="view('prenotazioniutente', 'Le mie prenotazioni'); highlight(3);" ng-show="logged" md-ink-ripple="#2196F3">
+                <md-list-item ng-style="customStyle.lmp" ng-click="view('prenotazioniutente'); highlight(3);" ng-show="logged" md-ink-ripple="#2196F3">
                     <p ng-style="customStyle.lmpText">Le mie prenotazioni</p>
                 </md-list-item>                
                 <!--<md-list-item ng-click="view('Cerca')">
@@ -49,7 +49,7 @@
                 <!-- <md-list-item ng-style="" ng-click="view('Inserisci');" ng-show="logged">
                     <p ng-style="">Inserisci</p> -->
                 </md-list-item>
-                <md-divider></md-divider>
+                <md-divider ng-show="logged"></md-divider>
                 <md-list-item ng-click="logout()" ng-show="logged">
                     <p>Logout</p>
                 </md-list-item>
@@ -69,14 +69,16 @@
     <script src="vendor/mdPickers.js"></script>
     <script src="app/app.js"></script>
     <script src="app/main.controller.js"></script>
-    <script src="app/calendario.controller.js"></script>
-    <script src="app/daydialog.controller.js"></script>
-    <script src="app/orario.controller.js"></script>
+    <script src="app/calendario/calendario.controller.js"></script>
+    <script src="app/calendario/calendarioprenotazione.controller.js"></script>
+    <script src="app/calendario/calendariovisualizza.controller.js"></script>
+    <script src="app/daydialog/daydialog.controller.js"></script>
+    <script src="app/daydialog/visualizza/orario.controller.js"></script>
+    <script src="app/daydialog/visualizza/event.controller.js"></script>
+    <script src="app/daydialog/prenotazione/prenotazione.controller.js"></script>
+    <script src="app/daydialog/prenotazione/confermaprenotazione.controller.js"></script>
     <script src="app/search.controller.js"></script>
     <script src="app/insert.controller.js"></script>
-    <script src="app/event.controller.js"></script>
-    <script src="app/prenotazione.controller.js"></script>
-    <script src="app/confermaprenotazione.controller.js"></script>
     <script src="app/ngenter.directive.js"></script>
     <script src="app/prenotazioniutente.controller.js"></script>
 </body>

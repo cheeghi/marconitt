@@ -61,6 +61,8 @@ app.
                     risorsa = "Sportello: " + $scope.sTeacher;
                 } else if ($scope.tipoPrenotazione == 'Altro') {
                     risorsa = $scope.sDescrizione;
+                } else if ($scope.tipoPrenotazione == 'Tutoraggio/Studio') {
+                    risorsa = $scope.tipoPrenotazione;
                 } else {
                     risorsa = $scope.tipoPrenotazione + ": " + $scope.sClass;
                 }

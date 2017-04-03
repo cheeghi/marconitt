@@ -79,30 +79,6 @@ app
         }
 
 
-        $scope.dayClick = function(date) {
-            if ($rootScope.inPrenotazione)
-                tplUrl = 'tpl/daydialogprenotazione.tpl.html';
-            else
-                tplUrl = 'tpl/daydialogvisualizza.tpl.html';
-                
-            $mdDialog.show({
-                    templateUrl: tplUrl,
-                    controller: 'DayDialogCtrl',
-                    clickOutsideToClose: true,
-                    locals: {
-                        day: date
-                    }
-                })
-                .then(function(answer) {
-                    getData();
-                    $scope.selectOptions();
-                }, function() {
-                    getData();
-                    $scope.selectOptions();
-                });
-        };
-
-
         $scope.openMenu = function($mdOpenMenu, ev) {
             originatorEv = ev;
             $mdOpenMenu(ev);
