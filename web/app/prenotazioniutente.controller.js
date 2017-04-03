@@ -6,7 +6,7 @@ app.
         $scope.eventiCreati;
         $scope.prenotazioniDaApprovare;
         $scope.disabled;
-
+        $scope.caricamentoPrenotazioni;
 
         /**
          * initialize method
@@ -21,15 +21,7 @@ app.
          */
         $scope.initializeHttpCalls = function() {
             $scope.disabled = false;  
-
-            $http.get('http://marconitt.altervista.org/timetable.php', {  
-                cache: false,
-                params: {
-                    prenotazioni: $rootScope.username
-                }
-            }).success(function(response) {
-                $scope.prenotazioni = response;
-            });      
+            $scope.caricamentoPrenotazioni = true;
 
             if ($scope.admin) {
                 $http.get('http://marconitt.altervista.org/timetable.php', {  
@@ -40,7 +32,17 @@ app.
                 }).success(function(response) {
                     $scope.prenotazioniDaApprovare = response;
                 });      
-            }
+            } 
+
+            $http.get('http://marconitt.altervista.org/timetable.php', {  
+                cache: false,
+                params: {
+                    prenotazioni: $rootScope.username
+                }
+            }).success(function(response) {
+                $scope.prenotazioni = response;
+                $scope.caricamentoPrenotazioni = false;
+            });           
         };
 
 
