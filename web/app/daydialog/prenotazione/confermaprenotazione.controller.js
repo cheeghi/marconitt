@@ -27,13 +27,10 @@ app.
          * makes http requests to populate classes, rooms, teachers, progetti arrays
          */
         $scope.initializeHttpCalls = function() {
-            $http.get('http://marconitt.altervista.org/progetti.php?progetti').success(function(response) {
-                $scope.progetti = response.progetti;
-            });
-
-            $http.get('http://88.149.220.222/orario/api.php').success(function(response) {
+            $http.get('http://marconitt.altervista.org/timetable.php').success(function(response) {
                 $scope.classes = response.classes;
                 $scope.teachers = response.teachers;
+                $scope.progetti = response.projects;
             });
         };
 
@@ -70,7 +67,7 @@ app.
                 risorsa = $scope.sClass;
                 isClasse = true;
             }
-
+            
             var data = "token="+$rootScope.token+"&stanza="+$rootScope.stanzaPrenotata+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoSelezionato
                     + "&risorsa="+ risorsa+ "&isclasse="+ isClasse+ "&user="+ $rootScope.username;
 

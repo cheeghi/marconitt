@@ -3,6 +3,8 @@ app.
 
         $scope.admin = $rootScope.admin; // is protocollo or not
         $scope.prenotazioni;
+        $scope.eventiCreati;
+        $scope.prenotazioniDaApprovare;
         $scope.disabled;
 
 
@@ -18,16 +20,27 @@ app.
          * makes http requests to populate 'prenotazioni' arrays
          */
         $scope.initializeHttpCalls = function() {
-            $scope.disabled = false;       
-            $http.get('http://marconitt.altervista.org/progetti.php', {  
+            $scope.disabled = false;  
+
+            $http.get('http://marconitt.altervista.org/timetable.php', {  
                 cache: false,
                 params: {
-                    prenotazioni: $rootScope.username,
-                    isprotocollo: $scope.admin
+                    prenotazioni: $rootScope.username
                 }
             }).success(function(response) {
                 $scope.prenotazioni = response;
-            });         
+            });      
+
+            if ($scope.admin) {
+                $http.get('http://marconitt.altervista.org/timetable.php', {  
+                    cache: false,
+                    params: {
+                        prenotazionidaapprovare: ""
+                    }
+                }).success(function(response) {
+                    $scope.prenotazioniDaApprovare = response;
+                });      
+            }
         };
 
 
@@ -54,11 +67,18 @@ app.
                 .success(function(data) {
                     $scope.prenotazioni = null;
                     $scope.initializeHttpCalls();
-
                 }).error(function(err) {
                     $mdToast.show($mdToast.simple().textContent('lol'));
                 });
 
+        };
+
+
+        /**
+         * approves a request of 'prenotazione'
+         */
+        $scope.approva = function() {
+            console.log("approvato");
         };
 
     });

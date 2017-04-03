@@ -637,7 +637,7 @@ function addPrenotazione(stanza, giorno, ora, risorsa, user, isClasse) {
 			var strbello2 = strbello.replace('"', '');			  
 			id = Number(strbello2);
 
-			sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", '" + user + "', " + isClasse + ");";
+			sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", '" + user + "', " + isClasse + ", false);";
             http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
                 //console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
             });

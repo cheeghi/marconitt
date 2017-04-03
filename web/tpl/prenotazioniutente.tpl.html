@@ -5,22 +5,72 @@
                 <i class="material-icons">menu</i>
             </md-button>
             <h2>
-			<span>Le mie prenotazioni</span>
+                <span>Le mie prenotazioni</span>
             </h2>
             <span flex=""></span>
         </div>
     </md-toolbar>
     <md-content>
-    <md-list>
-      <md-list-item ng-repeat="prenotazione in prenotazioni" class="md-3-line">
-        <div class="md-list-item-text">
-          <h3>{{prenotazione.giorno}}</h3>
-          <h4>{{prenotazione.stanza}} {{prenotazione.ora}}°ORA</h4>
-          <p>{{prenotazione.risorsa}}</p>
-        </div>
-        <md-button ng-disabled="disabled" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" style="color:#2196F3" class="md-raised md-secondary">Rimuovi</md-button>
-        <md-divider ng-if=""></md-divider>
-      </md-list-item>
-    </md-list>
-  </md-content>
+        <md-tabs md-dynamic-height md-stretch-tabs="always">
+            <md-tab label="LE MIE PRENOTAZIONI">
+                <md-list>
+                    <md-list-item ng-repeat="prenotazione in prenotazioni" class="md-3-line">
+                        <div class="md-list-item-text">
+                            <h3>{{prenotazione.giorno}}</h3>
+                            <h4>{{prenotazione.stanza}} {{prenotazione.ora}}°ORA</h4>
+                            <p>{{prenotazione.risorsa}}</p>
+                        </div>
+                        <i style="color: grey; margin-right: 2%; margin-top: 3%" ng-show="prenotazione.approvata==0&&!admin" class="material-icons">pan_tool</i>
+                        <i style="color:green; margin-right: 2%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!admin" class="material-icons">done</i>                        
+                        <a ng-disabled="disabled" style="color:red; margin-right: 2%; margin-top: 3%;cursor: pointer;" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)">
+                            <i class="material-icons">delete</i>
+                        </a>
+                        <!--<md-button ng-disabled="disabled" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)"
+                            style="color:#2196F3" class="md-raised md-secondary">Rimuovi</md-button>    -->
+                        <md-divider></md-divider>
+                    </md-list-item>
+                    <span> </span>
+                </md-list>
+            </md-tab>              
+            <md-tab ng-if="admin" label="DA APPROVARE">
+                <md-list>
+                    <md-list-item ng-repeat="prenotazione in prenotazioniDaApprovare" class="md-3-line">
+                        <div class="md-list-item-text">
+                            <h3>{{prenotazione.giorno}}</h3>
+                            <h4>{{prenotazione.stanza}} {{prenotazione.ora}}°ORA</h4>
+                            <p>{{prenotazione.risorsa}}</p>
+                            <p>Richiedente: {{prenotazione.who}}</p>
+                        </div>
+                        <a ng-disabled="disabled" style="color:green; margin-right: 2%; margin-top: 3%;cursor: pointer;" ng-click="approva();">
+                            <i class="material-icons">thumb_up</i>
+                        </a>
+                        <a ng-disabled="disabled" style="color:red; margin-right: 2%; margin-top: 3%;cursor: pointer;" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)">
+                            <i class="material-icons">thumb_down</i>   
+                        </a>
+                      
+                        <!--<md-button ng-disabled="disabled" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)"
+                            style="color:#2196F3" class="md-raised md-secondary">Rimuovi</md-button>-->
+                        <md-divider></md-divider>
+                    </md-list-item>
+                    <span> </span>
+                </md-list>
+            </md-tab>  
+            <md-tab ng-if="admin" label="EVENTI CREATI">
+                <!--
+                <md-list>
+                    <md-list-item ng-repeat="prenotazione in prenotazioni" class="md-3-line">
+                        <div class="md-list-item-text">
+                            <h3>{{prenotazione.giorno}}</h3>
+                            <h4>{{prenotazione.stanza}} {{prenotazione.ora}}°ORA</h4>
+                            <p>{{prenotazione.risorsa}}</p>
+                        </div>
+                        <md-button ng-disabled="disabled" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)"
+                            style="color:#2196F3" class="md-raised md-secondary">Rimuovi</md-button>
+                        <md-divider></md-divider>
+                    </md-list-item>
+                    <span> </span>
+                </md-list>-->
+            </md-tab>                    
+        </md-tabs>            
+    </md-content>
 </div>
