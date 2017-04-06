@@ -1,6 +1,6 @@
 var app = angular.module('MarconiTT', ['ngMaterial','materialCalendar','mdPickers']);
 
-app.config(function($mdThemingProvider, $mdDateLocaleProvider, $httpProvider, $mdIconProvider) {
+app.config(function($mdThemingProvider, $mdDateLocaleProvider, $httpProvider) {
     $mdThemingProvider.theme('default')
         .primaryPalette('blue', {
             'default': '500',
@@ -13,8 +13,6 @@ app.config(function($mdThemingProvider, $mdDateLocaleProvider, $httpProvider, $m
         .accentPalette('light-blue', {
             'default': '900' // use shade 200 for default, and keep all other shades the same
       });
-
-      //$mdIconProvider.fontSet('md', 'material-icons');
 
       $mdDateLocaleProvider.months = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
       $mdDateLocaleProvider.shortMonths = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];

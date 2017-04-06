@@ -3,8 +3,6 @@ app.
 
         $scope.admin = $rootScope.admin; // is protocollo or not
         $scope.prenotazioni;
-        $scope.eventiCreati;
-        $scope.prenotazioniDaApprovare;
         $scope.disabled;
         $scope.caricamentoPrenotazioni;
 
@@ -12,6 +10,7 @@ app.
          * initialize method
          */
         $scope.init = function() {
+            $scope.caricamentoPrenotazioni = true;
             $scope.initializeHttpCalls();
         };
 
@@ -37,12 +36,13 @@ app.
             $http.get('http://marconitt.altervista.org/timetable.php', {  
                 cache: false,
                 params: {
-                    prenotazioni: $rootScope.username
+                    prenotazioni: $rootScope.username,
+                    isprotocollo: $scope.admin
                 }
             }).success(function(response) {
                 $scope.prenotazioni = response;
                 $scope.caricamentoPrenotazioni = false;
-            });           
+            });         
         };
 
 
@@ -52,6 +52,8 @@ app.
         $scope.removePrenotazione = function(giorno, stanza, risorsa, ora) {
             //console.log(giorno, stanza, risorsa, ora, $rootScope.username);
             //$scope.disabled = true;
+            $scope.caricamentoPrenotazioni = true;
+
             var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
                     + "&risorsa="+ risorsa;
             console.log(ora);
@@ -69,8 +71,9 @@ app.
                 .success(function(data) {
                     $scope.prenotazioni = null;
                     $scope.initializeHttpCalls();
+                    $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                   
                 }).error(function(err) {
-                    $mdToast.show($mdToast.simple().textContent('lol'));
+                    $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
                 });
 
         };

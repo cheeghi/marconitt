@@ -43,12 +43,22 @@ app.
          * makes http requests to populate classes, rooms, teachers, labs and classrooms arrays
          */
         $scope.initializeHttpCalls = function() {
-            $http.get('http://marconitt.altervista.org/timetable.php').success(function(response) {
+            $http.get('http://88.149.220.222/orario/api.php', {  
+                params: {
+                    search: ""
+                }
+            }).success(function(response) {
                 $scope.classes = response.classes;
                 $scope.rooms = response.rooms;
                 $scope.teachers = response.teachers;
-                $scope.classrooms = response.classrooms;
-                $scope.labs = response.labs;
+            });
+
+            $http.get('http://marconitt.altervista.org/progetti.php?aule').success(function(response) {
+                $scope.classrooms = response.aule;
+            });
+
+            $http.get('http://marconitt.altervista.org/progetti.php?laboratori').success(function(response) {
+                $scope.labs = response.laboratori;
             });
         };
 

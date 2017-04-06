@@ -53,53 +53,54 @@
                         Visibile
                     </md-switch>
                 </div>
-                <div layout="row" flex>
-                    <md-datepicker ng-model="event.date" md-placeholder="Seleziona data.." md-open-on-focus flex></md-datepicker>
-                    <mdp-time-picker ng-model="event.hour_start" flex></mdp-time-picker>
-                    <mdp-time-picker ng-model="event.hour_end" flex></mdp-time-picker>
+                <div layout="row" layout-align="space-between center">
+                    <md-datepicker ng-model="event.date" md-placeholder="Seleziona data.." md-open-on-focus></md-datepicker>
+                    <mdp-time-picker ng-model="event.hour_start"></mdp-time-picker>
+                    <mdp-time-picker ng-model="event.hour_end"></mdp-time-picker>
                 </div>
-                <div layout="row" flex>
-                    <md-input-container flex="25">
+                <div layout="row" layout-align="space-between center">
+                    <md-input-container>
                         <label>Insegnanti</label>
-                        <md-select ng-model="event.whos.techers" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona insegnanti..">
-                            <md-select-header class="demo-select-header">
+                        <md-select ng-model="event.whos.teachers" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona insegnanti..">
+                            <!--<md-select-header class="demo-select-header">
                                 <input ng-model="searchTermT" type="search" placeholder="Cerca.." class="demo-header-searchbox _md-text">
-                            </md-select-header>
+                            </md-select-header>-->
                             <md-optgroup label="Insegnanti">
-                                <md-option ng-value="who" ng-repeat="who in whos | filter:{type:1, name:searchTermT} ">{{who.name}}</md-option>
+                                <md-option ng-repeat="teacher in teachers" value="{{teacher}}">
+                                            {{teacher}}
+                                </md-option>
                             </md-optgroup>
                         </md-select>
                     </md-input-container>
-                    <md-input-container flex="25">
+                    <md-input-container>
                         <label>Classi</label>
                         <md-select ng-model="event.whos.classes" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona classi..">
-                            <md-select-header class="demo-select-header">
-                                <input ng-model="searchTermC" type="search" placeholder="Cerca.." class="demo-header-searchbox _md-text">
-                            </md-select-header>
+                            <!--<md-select-header class="demo-select-header">
+                                <input ng-model="searchTermT" type="search" placeholder="Cerca.." class="demo-header-searchbox _md-text">
+                            </md-select-header>-->
                             <md-optgroup label="Classi">
-                                <md-option ng-value="who" ng-repeat="who in whos | filter:{type:2, name:searchTermC} ">{{who.name}}</md-option>
+                                <md-option ng-repeat="classe in classes" value="{{classe}}">
+                                            {{classe}}
+                                </md-option>
                             </md-optgroup>
                         </md-select>
                     </md-input-container>
-                    <md-input-container flex="25">
+                    <md-input-container>
                         <label>Aule</label>
                         <md-select ng-model="event.whos.rooms" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona aule..">
-                            <md-select-header class="demo-select-header">
-                                <input ng-model="searchTermR" type="search" placeholder="Cerca.." class="demo-header-searchbox _md-text">
-                            </md-select-header>
-                            <md-optgroup label="Whos">
-                                <md-option ng-value="who" ng-repeat="who in whos | filter:{type:3, name:searchTermR} ">{{who.name}}</md-option>
-                            </md-optgroup>
-                        </md-select>
-                    </md-input-container>
-                    <md-input-container flex="25">
-                        <label>Alunni</label>
-                        <md-select ng-model="event.whos.students" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona alunni..">
-                            <md-select-header class="demo-select-header">
-                                <input ng-model="searchTermS" type="search" placeholder="Cerca.." class="demo-header-searchbox _md-text">
-                            </md-select-header>
-                            <md-optgroup label="Whos">
-                                <md-option ng-value="who" ng-repeat="who in whos | filter:{type:4, name:searchTermS} ">{{who.name}}</md-option>
+                            <!--<md-select-header class="demo-select-header">
+                                <input ng-model="searchTermT" type="search" placeholder="Cerca.." class="demo-header-searchbox _md-text">
+                            </md-select-header>-->
+                            <md-optgroup label="Aule">
+                                <md-option>
+                                    Aula Magna
+                                </md-option>
+                                <md-option>
+                                    L042
+                                </md-option>
+                                <md-option>
+                                    A304
+                                </md-option>
                             </md-optgroup>
                         </md-select>
                     </md-input-container>
@@ -109,3 +110,8 @@
         </form>
     </md-content>
 </div>
+<!--aule speciali
+A304
+Aula magna
+L042
+-->
