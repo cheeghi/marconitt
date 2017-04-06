@@ -92,7 +92,7 @@ app.
             $scope.htmlTable = '<p><div layout="row" layout-sm="column" layout-align="center center" layout-fill>\
                                 <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>\
                                 </div></p>';
-            $scope.query = "select * from timetable where professore1 = '" + $scope.sTeacher + "' or professore2 = '" + $scope.sTeacher + "' and\
+            $scope.query = "select * from timetable where (professore1 = '" + $scope.sTeacher + "' or professore2 = '" + $scope.sTeacher + "' or professoreS = '" + $scope.sTeacher + "') and\
                             giorno = '" + $scope.giornoSelezionato + "' order by ora";
 
             $http.get('http://marconitt.altervista.org/timetable.php', {
