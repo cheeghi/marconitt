@@ -24,10 +24,16 @@ app.
          * initialize method
          */
         $scope.init = function(date) {
+            var today = new Date();
+            today.setHours(0);
+            today.setMinutes(0);
+            today.setSeconds(0);
+            today.setMilliseconds(0);
             $scope.day = new Date(date);
             var limitDay = new Date();
             limitDay.setDate(limitDay.getDate() + giorniLimite);
-            if ($scope.day > limitDay && !$rootScope.admin) {
+
+            if (($scope.day > limitDay && !$rootScope.admin) || ($scope.day < today  && !$rootScope.admin)) {
                 $scope.htmlTable = "Seleziona una data più vicina!";
             } else {
                 $scope.initializeHttpCalls();
@@ -50,23 +56,35 @@ app.
             });
         };
 
-
         /**
          * re-initialize method
          */
         $scope.reInit = function(date) {
-            $scope.htmlTable = '';
+            var today = new Date();
+            today.setHours(0);
+            today.setMinutes(0);
+            today.setSeconds(0);
+            today.setMilliseconds(0);
             $scope.day = new Date(date);
-            $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1)
-                + "-" + $scope.day.getDate();
-            $scope.isSunday = $scope.day.getDay() == 0;
-            
-            if ($scope.isSunday){
-                 $scope.htmlTable = "<p>Non c'è scuola di domenica</p>";
-            } else if($scope.sRoomType == undefined || $scope.loading) {
-                $scope.htmlTable = "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
+            var limitDay = new Date();
+            limitDay.setDate(limitDay.getDate() + giorniLimite);
+
+            if (($scope.day > limitDay && !$rootScope.admin) || ($scope.day < today  && !$rootScope.admin)){
+                $scope.htmlTable = "Seleziona una data più vicina!";
             } else {
-                $scope.getPrenotazioni();
+                $scope.htmlTable = '';
+                $scope.day = new Date(date);
+                $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1)
+                    + "-" + $scope.day.getDate();
+                $scope.isSunday = $scope.day.getDay() == 0;
+                
+                if ($scope.isSunday){
+                     $scope.htmlTable = "<p>Non c'è scuola di domenica</p>";
+                } else if($scope.sRoomType == undefined || $scope.loading) {
+                    $scope.htmlTable = "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
+                } else {
+                    $scope.getPrenotazioni();
+                }
             }
         }
 
