@@ -4,12 +4,13 @@ app.
         $scope.admin = $rootScope.admin; // is protocollo or not
         $scope.prenotazioni;
         $scope.disabled;
-
+        $scope.caricamentoPrenotazioni;
 
         /**
          * initialize method
          */
         $scope.init = function() {
+            $scope.caricamentoPrenotazioni = true;
             $scope.initializeHttpCalls();
         };
 
@@ -18,16 +19,29 @@ app.
          * makes http requests to populate 'prenotazioni' arrays
          */
         $scope.initializeHttpCalls = function() {
-            $scope.disabled = false;       
-            $http.get('http://marconitt.altervista.org/progetti.php', {  
+            //$scope.disabled = false;  
+            $scope.caricamentoPrenotazioni = true;
+
+            if ($scope.admin) {
+                $http.get('http://marconitt.altervista.org/timetable.php', {  
+                    cache: false,
+                    params: {
+                        prenotazionidaapprovare: ""
+                    }
+                }).success(function(response) {
+                    $scope.prenotazioniDaApprovare = response;
+                });      
+            } 
+
+            $http.get('http://marconitt.altervista.org/timetable.php', {  
                 cache: false,
                 params: {
                     prenotazioni: $rootScope.username,
                     isprotocollo: $scope.admin
                 }
             }).success(function(response) {
-                console.log("****");
                 $scope.prenotazioni = response;
+                $scope.caricamentoPrenotazioni = false;
             });         
         };
 
@@ -37,7 +51,9 @@ app.
          */
         $scope.removePrenotazione = function(giorno, stanza, risorsa, ora) {
             //console.log(giorno, stanza, risorsa, ora, $rootScope.username);
-            $scope.disabled = true;
+            //$scope.disabled = true;
+            $scope.caricamentoPrenotazioni = true;
+
             var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
                     + "&risorsa="+ risorsa;
             console.log(ora);
@@ -53,13 +69,31 @@ app.
 
             $http(req)
                 .success(function(data) {
+                    $scope.prenotazioni = null;
                     $scope.initializeHttpCalls();
-                    console.log("ciao");
-
+                    $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                   
                 }).error(function(err) {
-                    $mdToast.show($mdToast.simple().textContent('lol'));
+                    $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
                 });
 
+        };
+
+
+        /**
+         * approves a request of 'prenotazione'
+         */
+        $scope.approva = function() {
+            console.log("approvato");
+        };
+
+
+        /**
+         * approves a request of 'prenotazione'
+         */
+        $scope.nonApprova = function(giorno, stanza, risorsa, ora) {
+            //send email to...
+            
+            $scope.removePrenotazione(giorno, stanza, risorsa, ora);
         };
 
     });

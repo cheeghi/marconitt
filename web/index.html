@@ -46,8 +46,8 @@
                     </div>
                     <md-button class="md-accent md-raised" ng-click="login()">Entra</md-button>
                 </div>
-                <!-- <md-list-item ng-style="" ng-click="view('Inserisci');" ng-show="logged">
-                    <p ng-style="">Inserisci</p> -->
+                <md-list-item ng-style="customStyle.eventi" ng-click="view('Inserisci'); highlight(4);" ng-show="logged && admin">
+                    <p ng-style="customStyle.eventiText">Eventi</p>
                 </md-list-item>
                 <md-divider ng-show="logged"></md-divider>
                 <md-list-item ng-click="logout()" ng-show="logged">
