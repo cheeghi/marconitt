@@ -33,8 +33,13 @@ app
                 if (response.success) {
                     $rootScope.logged = true;
                     $rootScope.token = response.token;
-                    $rootScope.username = response.username;
                     $rootScope.admin = response.admin;
+
+                    if ($rootScope.admin)
+                        $rootScope.username = "admin";
+                    else
+                        $rootScope.username = response.username;
+
                     $scope.logged = true;
                     $scope.highlight(1);
                 }
@@ -114,6 +119,12 @@ app
                               $rootScope.token = data.data.token;
                               $rootScope.username = data.data.username;
                               $rootScope.admin = data.data.admin;
+
+                            if ($rootScope.admin)
+                                $rootScope.username = "admin";
+                            else
+                                $rootScope.username = response.username;
+
                               $rootScope.logged = true;
                               $scope.logged = true;
                               $mdToast.show($mdToast.simple().textContent('Login avvenuto con successo!'));

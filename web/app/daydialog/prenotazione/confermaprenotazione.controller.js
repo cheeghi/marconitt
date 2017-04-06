@@ -6,7 +6,7 @@ app.
         $scope.rooms;
         $scope.teachers;
         $scope.progetti;
-        $scope.admin = $rootScope.admin; // is protocollo or not
+        $scope.admin = $rootScope.admin; // is admin or not
         $scope.tipoPrenotazione; // tipo di prenotazione (ex. classe, consiglio di classe, progetto, ecc...)
         $scope.sProgetto; // progetto selezionato
         $scope.sClass; // selected class
@@ -69,7 +69,7 @@ app.
             }
 
             var data = "token="+$rootScope.token+"&stanza="+$rootScope.stanzaPrenotata+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoSelezionato
-                    + "&risorsa="+ risorsa+ "&isclasse="+ isClasse+ "&user="+ $rootScope.username;
+                    + "&risorsa="+ risorsa+ "&isclasse="+ isClasse+ "&user="+ $rootScope.username+ "&admin="+ $rootScope.admin;
 
             var req = {
                 method: 'POST',
@@ -79,6 +79,8 @@ app.
                 },
                 data: data
             };
+
+            console.log(req);
             
             $http(req)
                 .success(function(data) {
