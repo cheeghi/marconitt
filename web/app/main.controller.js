@@ -180,32 +180,32 @@ app
         $scope.highlight = function(type) {
             if ($scope.logged) {
                 if (type == 1) {
-                    $scope.customStyle.visualizza = {"background-color" : "#2196F3"};
-                    $scope.customStyle.visualizzaText = {"color" : "white"};
                     $scope.customStyle.prenota = {"background-color" : "white"};
                     $scope.customStyle.prenotaText = {"color" : "black"};
                     $scope.customStyle.lmp = {"background-color" : "white"};
                     $scope.customStyle.lmpText = {"color" : "black"};
                     $scope.customStyle.eventi = {"background-color" : "white"};
                     $scope.customStyle.eventiText = {"color" : "black"}; 
+                    $scope.customStyle.visualizza = {"background-color" : "#2196F3"};
+                    $scope.customStyle.visualizzaText = {"color" : "white"};                    
                 } else if (type == 2) {
                     $scope.customStyle.visualizza = {"background-color" : "white"};
                     $scope.customStyle.visualizzaText = {"color" : "black"};
-                    $scope.customStyle.prenota = {"background-color" : "#2196F3"};
-                    $scope.customStyle.prenotaText = {"color" : "white"};
                     $scope.customStyle.lmp = {"background-color" : "white"};
                     $scope.customStyle.lmpText = {"color" : "black"};
                     $scope.customStyle.eventi = {"background-color" : "white"};
-                    $scope.customStyle.eventiText = {"color" : "black"};            
+                    $scope.customStyle.eventiText = {"color" : "black"}; 
+                    $scope.customStyle.prenota = {"background-color" : "#2196F3"};
+                    $scope.customStyle.prenotaText = {"color" : "white"};                               
                 } else if (type == 3) {
                     $scope.customStyle.visualizza = {"background-color" : "white"};
                     $scope.customStyle.visualizzaText = {"color" : "black"};
                     $scope.customStyle.prenota = {"background-color" : "white"};
                     $scope.customStyle.prenotaText = {"color" : "black"};
-                    $scope.customStyle.lmp = {"background-color" : "#2196F3"};
-                    $scope.customStyle.lmpText = {"color" : "white"};
                     $scope.customStyle.eventi = {"background-color" : "white"};
                     $scope.customStyle.eventiText = {"color" : "black"};  
+                    $scope.customStyle.lmp = {"background-color" : "#2196F3"};
+                    $scope.customStyle.lmpText = {"color" : "white"};                    
                 } else if (type == 4) {
                     $scope.customStyle.visualizza = {"background-color" : "white"};
                     $scope.customStyle.visualizzaText = {"color" : "black"};
