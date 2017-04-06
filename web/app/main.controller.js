@@ -117,13 +117,12 @@ app
                       function(data) {
                           if (data.data.success) {
                               $rootScope.token = data.data.token;
-                              $rootScope.username = data.data.username;
                               $rootScope.admin = data.data.admin;
 
                             if ($rootScope.admin)
                                 $rootScope.username = "admin";
                             else
-                                $rootScope.username = response.username;
+                                $rootScope.username = data.data.username;
 
                               $rootScope.logged = true;
                               $scope.logged = true;
