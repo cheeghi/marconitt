@@ -23,13 +23,14 @@
                             <h4>{{prenotazione.stanza}} {{prenotazione.ora}}°ORA</h4>
                             <p>{{prenotazione.risorsa}}</p>
                         </div>
-                        <i style="color: grey; margin-right: 2%; margin-top: 3%" ng-show="prenotazione.approvata==0&&!admin" class="material-icons">pan_tool</i>
-                        <i style="color:green; margin-right: 2%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!admin" class="material-icons">done</i>                        
-                        <a ng-disabled="disabled" style="color:red; margin-right: 2%; margin-top: 3%;cursor: pointer;" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)">
+                        <i style="color: grey; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==0&&!admin" class="material-icons">pan_tool</i>
+                        <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!admin" class="material-icons">done</i>
+                        <md-button style="background-color: #2196F3; color:white; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" class="md-block">
+                            RIMUOVI
+                        </md-button>
+                        <!--<a ng-disabled="disabled" style="color:red; margin-right: 2%; margin-top: 3%;cursor: pointer;" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)">
                             <i class="material-icons">delete</i>
-                        </a>
-                        <!--<md-button ng-disabled="disabled" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)"
-                            style="color:#2196F3" class="md-raised md-secondary">Rimuovi</md-button>    -->
+                        </a>-->                        
                         <md-divider></md-divider>
                     </md-list-item>
                     <span> </span>
@@ -44,15 +45,12 @@
                             <p>{{prenotazione.risorsa}}</p>
                             <p>Richiedente: {{prenotazione.who}}</p>
                         </div>
-                        <a ng-disabled="disabled" style="color:green; margin-right: 2%; margin-top: 3%;cursor: pointer;" ng-click="approva();">
-                            <i class="material-icons">thumb_up</i>
-                        </a>
-                        <a ng-disabled="disabled" style="color:red; margin-right: 2%; margin-top: 3%;cursor: pointer;" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)">
-                            <i class="material-icons">thumb_down</i>   
-                        </a>
-                      
-                        <!--<md-button ng-disabled="disabled" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)"
-                            style="color:#2196F3" class="md-raised md-secondary">Rimuovi</md-button>-->
+                        <md-button style="background-color: #2196F3; color:white; margin-right: 1%; margin-top: 2.5%" class="md-raised" ng-click="approva()" class="md-block" >
+                            APPROVA
+                        </md-button>
+                        <md-button style="background-color: #2196F3; color:white; margin-right: 2%; margin-top: 2.5%" class="md-raised" ng-click="nonApprova(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" class="md-block" >
+                            NON APPROVA
+                        </md-button>
                         <md-divider></md-divider>
                     </md-list-item>
                     <span> </span>

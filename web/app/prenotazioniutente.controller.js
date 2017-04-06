@@ -20,7 +20,7 @@ app.
          * makes http requests to populate 'prenotazioni' arrays
          */
         $scope.initializeHttpCalls = function() {
-            $scope.disabled = false;  
+            //$scope.disabled = false;  
             $scope.caricamentoPrenotazioni = true;
 
             if ($scope.admin) {
@@ -51,7 +51,7 @@ app.
          */
         $scope.removePrenotazione = function(giorno, stanza, risorsa, ora) {
             //console.log(giorno, stanza, risorsa, ora, $rootScope.username);
-            $scope.disabled = true;
+            //$scope.disabled = true;
             var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
                     + "&risorsa="+ risorsa;
             console.log(ora);
@@ -81,6 +81,16 @@ app.
          */
         $scope.approva = function() {
             console.log("approvato");
+        };
+
+
+        /**
+         * approves a request of 'prenotazione'
+         */
+        $scope.nonApprova = function(giorno, stanza, risorsa, ora) {
+            //send email to...
+            
+            $scope.removePrenotazione(giorno, stanza, risorsa, ora);
         };
 
     });

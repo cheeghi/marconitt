@@ -8,7 +8,10 @@ app
         $scope.currentYear = new Date().getFullYear();
         $scope.events = {};
         $scope.calendar = '';
-
+        
+        d = new Date('2017-06-04');
+        MaterialCalendarData.setDayContent(new Date(), '<md-button class="md-fab md-mini md-tiny type">1</md-button>');
+        console.log("ecc: "+ d);
 
         var getData = function() {
             console.log("get data");
