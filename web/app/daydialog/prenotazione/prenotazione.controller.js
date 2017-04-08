@@ -17,6 +17,7 @@ app.
         $scope.sRoomType; // type of selected room (lab or classroom)
         $scope.sRoom; // selected room
         $scope.sHour; // selected hour
+        $scope.nonPrenotabile;
         giorniLimite = 14; // range in cui un prof può effettuare una prenotazione
 
 
@@ -24,6 +25,7 @@ app.
          * initialize method
          */
         $scope.init = function(date) {
+            $scope.nonPrenotabile = false;
             var today = new Date();
             today.setHours(0);
             today.setMinutes(0);
@@ -33,9 +35,20 @@ app.
             var limitDay = new Date();
             limitDay.setDate(limitDay.getDate() + giorniLimite);
 
-            if (($scope.day > limitDay && !$rootScope.admin) || ($scope.day < today  && !$rootScope.admin)) {
-                $scope.htmlTable = "Seleziona una data più vicina!";
-            } else {
+            if ($scope.day > limitDay && !$rootScope.admin) {
+                $mdToast.show($mdToast.simple().textContent('Seleziona una data più vicina!'));
+                 $scope.htmlTable = '';
+                 $scope.nonPrenotabile = true;
+            }
+            
+            else if($scope.day < today  && !$rootScope.admin) {
+                    $mdToast.show($mdToast.simple().textContent('Non puoi prenotare in una data passata'));
+                     $scope.htmlTable = '';
+                     $scope.nonPrenotabile = true;
+            }
+
+            else {
+                
                 $scope.initializeHttpCalls();
                 $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1)
                     + "-" + $scope.day.getDate();
@@ -60,6 +73,7 @@ app.
          * re-initialize method
          */
         $scope.reInit = function(date) {
+            $scope.nonPrenotabile = false;
             var today = new Date();
             today.setHours(0);
             today.setMinutes(0);
@@ -69,9 +83,21 @@ app.
             var limitDay = new Date();
             limitDay.setDate(limitDay.getDate() + giorniLimite);
 
-            if (($scope.day > limitDay && !$rootScope.admin) || ($scope.day < today  && !$rootScope.admin)){
-                $scope.htmlTable = "Seleziona una data più vicina!";
-            } else {
+            if ($scope.day > limitDay && !$rootScope.admin) {
+                $mdToast.show($mdToast.simple().textContent('Seleziona una data più vicina!'));
+                 $scope.htmlTable = '';
+                 $scope.nonPrenotabile = true;
+                 $rootScope.dataAvanti = true;
+            }
+            
+            else if($scope.day < today  && !$rootScope.admin) {
+                    $mdToast.show($mdToast.simple().textContent('Non puoi prenotare in una data passata'));
+                    $scope.htmlTable = '';
+                    $scope.nonPrenotabile = true;
+                    $rootScope.dataIndietro = true;
+            }
+            
+            else {
                 $scope.htmlTable = '';
                 $scope.day = new Date(date);
                 $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1)
