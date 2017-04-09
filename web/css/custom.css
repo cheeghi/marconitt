@@ -33,9 +33,9 @@
     -webkit-overflow-scrolling: auto !important;
 } 
 
-/*::-webkit-scrollbar {
+#mainHtml::-webkit-scrollbar {
     display: none;
-}*/
+}
 
 .type1 {
     background-color: red !important;
@@ -262,9 +262,9 @@ md-fab {
     background-color:red;
 }
 
-.scroll-container {
+/*.scroll-container {
   overflow-x: scroll;
-}
+}*/
 
 #footer {
     background-color: #0066ff;
