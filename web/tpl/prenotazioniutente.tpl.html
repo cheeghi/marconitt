@@ -13,7 +13,7 @@
           <div layout="row" layout-sm="column" layout-align="center center" ng-show="caricamentoPrenotazioni" layout-fill>
         <md-progress-circular md-mode="indeterminate" md-diameter="200"></md-progress-circular>
       </div>
-    <md-content>
+    <md-content ng-hide="caricamentoPrenotazioni">
         <md-tabs md-dynamic-height md-stretch-tabs="always">
             <md-tab label="LE MIE PRENOTAZIONI">
                 <md-list>

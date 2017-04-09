@@ -13,7 +13,7 @@
     <div layout="row" layout-sm="column" layout-align="center center" ng-show="isLoading" layout-fill>
         <md-progress-circular md-mode="indeterminate" md-diameter="200"></md-progress-circular>
     </div>
-    <md-content ng-controller="CalendarioPrenotazioneCtrl" layout="row" style="height: calc(100% - 64px) !important;">
+    <md-content ng-controller="CalendarioPrenotazioneCtrl" layout="row" style="height: calc(100% - 64px) !important;" ng-hide="isLoading"> 
         <calendar-md flex layout-fill calendar-direction="direction" on-prev-month="prevMonth" on-next-month="nextMonth" on-day-click="dayClick" title-format="'MMMM y'" ng-model='selectedDate' week-starts-on="1" day-format="dayFormat" day-label-format="'EEE'" day-label-tooltip-format="'EEEE'" day-tooltip-format="'fullDate'" day-content="" disable-future-selection="false" style="height: calc(100% - 46px) !important;"></calendar-md>
     </md-content>
     <div flex></div>
