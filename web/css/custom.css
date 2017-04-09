@@ -33,7 +33,7 @@
     -webkit-overflow-scrolling: auto !important;
 } 
 
-#gb::-webkit-scrollbar {
+#mainHtml::-webkit-scrollbar {
     display: none;
 }
 
