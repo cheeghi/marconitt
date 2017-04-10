@@ -27,7 +27,7 @@ app.
          * makes http requests to populate classes, rooms, teachers, progetti arrays
          */
         $scope.initializeHttpCalls = function() {
-            $http.get('http://marconitt.altervista.org/timetable.php').success(function(response) {
+            $http.get('http://localhost/timetable.php').success(function(response) {
                 $scope.classes = response.classes;
                 $scope.teachers = response.teachers;
                 $scope.progetti = response.projects;
@@ -87,7 +87,7 @@ app.
                     $scope.cancel();
                     $scope.refresh();
                     $mdToast.show($mdToast.simple().textContent('Prenotazione avvenuta con successo!'));
-
+                    console.log(data);
                 }).error(function(err) {
                     $mdToast.show($mdToast.simple().textContent('Errore'));
                 });

@@ -14,7 +14,7 @@ app.
         
 
         //$http.get('http://88.149.220.222/orario/api.php', {
-        $http.get('http://marconitt.altervista.org/timetable.php', {
+        $http.get('http://localhost/timetable.php', {
             params: {
                 search: ""
             }
@@ -67,7 +67,7 @@ app.
             $scope.query = "select * from timetable where stanza = '" + $scope.sRoom + "' and\
                             giorno = '" + $scope.giornoSelezionato + "' order by ora";
 
-            $http.get('http://marconitt.altervista.org/timetable.php', {
+            $http.get('http://localhost/timetable.php', {
                 cache: false,
                 params: {
                     doquery: $scope.query
@@ -95,7 +95,7 @@ app.
             $scope.query = "select * from timetable where (professore1 = '" + $scope.sTeacher + "' or professore2 = '" + $scope.sTeacher + "' or professoreS = '" + $scope.sTeacher + "') and\
                             giorno = '" + $scope.giornoSelezionato + "' order by ora";
 
-            $http.get('http://marconitt.altervista.org/timetable.php', {
+            $http.get('http://localhost/timetable.php', {
                 params: {
                     doquery: $scope.query
                 }
@@ -131,7 +131,7 @@ app.
                                 </div></p>';
             $scope.query = "select * from timetable where risorsa = '" + $scope.sClass + "' and giorno = '" + $scope.giornoSelezionato + "' order by ora";
             
-            $http.get('http://marconitt.altervista.org/timetable.php', {
+            $http.get('http://localhost/timetable.php', {
                 cache: false,
                 params: {
                     doquery: $scope.query

@@ -23,7 +23,7 @@ app.
             $scope.caricamentoPrenotazioni = true;
 
             if ($scope.admin) {
-                $http.get('http://marconitt.altervista.org/timetable.php', {  
+                $http.get('http://localhost/timetable.php', {  
                     cache: false,
                     params: {
                         prenotazionidaapprovare: ""
@@ -33,7 +33,7 @@ app.
                 });      
             } 
 
-            $http.get('http://marconitt.altervista.org/timetable.php', {  
+            $http.get('http://localhost/timetable.php', {  
                 cache: false,
                 params: {
                     prenotazioni: $rootScope.username,

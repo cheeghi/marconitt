@@ -28,7 +28,7 @@
                                 <div layout="row" ng-hide="isSunday">
                                     <md-input-container>
                                         <label>Seleziona</label>
-                                        <md-select ng-model="sRoomType" ng-change="getPrenotazioni();clearMdSelect()" size="20">
+                                        <md-select ng-model="sRoomType" ng-change="clearMdSelect();getPrenotazioni();" size="20">
                                             <md-option>
                                                 LABORATORIO
                                             </md-option>

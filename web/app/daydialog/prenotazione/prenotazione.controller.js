@@ -63,7 +63,7 @@ app.
          */
         $scope.initializeHttpCalls = function() {
 
-            $http.get('http://marconitt.altervista.org/timetable.php').success(function(response) {
+            $http.get('http://localhost/timetable.php').success(function(response) {
                 $scope.classrooms = response.classrooms;
                 $scope.labs = response.labs;
             });
@@ -122,7 +122,7 @@ app.
             $scope.htmlTable = '';
             $scope.loading = true;
             if ($scope.sRoomType == "LABORATORIO") {
-                $http.get('http://marconitt.altervista.org/timetable.php', {
+                $http.get('http://localhost/timetable.php', {
                     cache: false,
                     params: {
                         labroomsbydate: $rootScope.giornoSelezionato
@@ -134,7 +134,7 @@ app.
                 $scope.dim(); //for scrollbar
 
             } else if ($scope.sRoomType == "AULA") {
-                $http.get('http://marconitt.altervista.org/timetable.php', {
+                $http.get('http://localhost/timetable.php', {
                     cache: false,
                     params: {
                         classroomsbydate: $rootScope.giornoSelezionato

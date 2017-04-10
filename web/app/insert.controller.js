@@ -21,7 +21,7 @@ app
         }*/
 
         var init = function() {
-             $http.get('http://marconitt.altervista.org/timetable.php').success(function(response) {
+             $http.get('http://localhost/timetable.php').success(function(response) {
                 $scope.classes = response.classes;
                 $scope.teachers = response.teachers;
                 $scope.rooms = response.rooms;
