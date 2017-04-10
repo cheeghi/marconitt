@@ -24,6 +24,7 @@
     "core-util-is": "^1.0.2",
     "csv": "^1.1.0",
     "csvtojson": "^0.5.14",
+    "dateformat": "2.0.0",
     "debug": "^2.2.0",
     "depd": "^1.1.0",
     "destroy": "^1.0.4",
@@ -68,6 +69,7 @@
     "mquery": "^1.10.0",
     "ms": "^0.7.1",
     "muri": "^1.1.0",
+    "mysql": "2.13.0",
     "negotiator": "^0.5.3",
     "number-is-nan": "^1.0.0",
     "object-assign": "^1.0.0",
@@ -86,6 +88,7 @@
     "resolve-from": "^2.0.0",
     "semver": "^5.1.0",
     "send": "^0.13.1",
+    "sendmail": "^1.1.1",
     "serve-static": "^1.10.2",
     "sliced": "^1.0.1",
     "statuses": "^1.2.1",
@@ -95,9 +98,7 @@
     "unpipe": "^1.0.0",
     "utils-merge": "^1.0.0",
     "vary": "^1.0.1",
-    "xtend": "^4.0.1",
-    "mysql": "2.13.0",
-	"dateformat": "2.0.0"
+    "xtend": "^4.0.1"
   },
   "devDependencies": {},
   "scripts": {
