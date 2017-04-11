@@ -26,7 +26,7 @@
                         <md-content ng-controller="PrenotazioneCtrl" ng-init="init(day)">
                             <md-content layout-padding id="contentPrenotazione">
                                 <div layout="row" ng-hide="isSunday">
-                                    <md-input-container>
+                                    <md-input-container ng-hide="nonPrenotabile">
                                         <label>Seleziona</label>
                                         <md-select ng-model="sRoomType" ng-change="clearMdSelect();getPrenotazioni();" size="20">
                                             <md-option>
@@ -40,7 +40,7 @@
                                             </md-option>
                                         </md-select>
                                     </md-input-container>
-                                    <md-input-container ng-show="sRoomType=='AULA'">
+                                    <md-input-container ng-show="sRoomType=='AULA'&&!nonPrenotabile">
                                         <label>Aula</label>
                                         <md-select ng-model="sRoom" ng-change="getPrenotazioni()">
                                             <md-option>Qualsiasi</md-option>
@@ -49,7 +49,7 @@
                                             </md-option>
                                         </md-select>
                                     </md-input-container>                                    
-                                    <md-input-container ng-show="sRoomType=='LABORATORIO'">
+                                    <md-input-container ng-show="sRoomType=='LABORATORIO'&&!nonPrenotabile">
                                         <label>Lab</label>
                                         <md-select ng-model="sRoom" ng-change="getPrenotazioni()">
                                             <md-option>Qualsiasi</md-option>
@@ -58,7 +58,7 @@
                                             </md-option>
                                         </md-select>
                                     </md-input-container>                                    
-                                    <md-input-container>
+                                    <md-input-container ng-hide="nonPrenotabile">
                                         <label>Ora</label>
                                         <md-select ng-model="sHour" ng-show="sRoomType!=undefined" ng-change="getPrenotazioni()" size="20">
                                         <md-option>Qualsiasi</md-option>
