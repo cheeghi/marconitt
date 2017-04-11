@@ -16,6 +16,7 @@ var config = require('./config_default'); // get our config file
 var User = require('./app/models/user');
 var Day = require('./app/models/day');
 var Who = require('./app/models/who');
+var sendmail = require('sendmail')();
 
 
 // =======================
@@ -67,7 +68,6 @@ app.use(function(req, res, next) {
 app.get('/', function(req, res) {
     res.send('Hello! The API is at http://localhost:' + port + '/api');
 });
-
 
 // API ROUTES -------------------
 // we'll get to these in a second
@@ -153,6 +153,19 @@ app.get('/setup', function(req, res) {
     */
 });
 
+app.get('/sendMail',function(req,res){
+	sendmail({
+	  from: 'marconiTT@marconivr.com',
+	  to: 'fedrigo22@gmail.com',
+	  replyTo: 'giuseppe.tanello@gmail.com',
+	  subject: 'Email prova',
+	  html: 'Questa è di prova'
+	}, function (err, reply) {
+	  console.log(err && err.stack)
+	  console.dir(reply)
+	});
+	res.send("ok");
+});
 
 // API ROUTES -------------------
 
