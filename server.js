@@ -479,6 +479,27 @@ apiRoutes.post('/prenota', function(req, res) {
 });
 
 
+apiRoutes.post('/approva', function(req, res) {
+    var stanza = req.body.stanza;
+	var giorno = req.body.giorno;
+	var ora = req.body.ora;
+    var id;
+
+    selectId(giorno, stanza, ora, function(response) {
+        id = response;
+        var sql_stmt = "UPDATE prenotazioni SET approvata = True WHERE id = " + id;
+
+        connection.query(sql_stmt, function(err) {
+            if (!err) {
+                res.json(true);
+            } else {
+                res.json(false);
+            }
+        });
+    });
+});
+
+
 apiRoutes.post('/cancellaPrenotazione', function(req, res) {
     var stanza = req.body.stanza;
 	var giorno = req.body.giorno;
@@ -492,10 +513,8 @@ apiRoutes.post('/cancellaPrenotazione', function(req, res) {
         connection.query(sql_stmt, function(err, rows, fields) {
             if (!err) {
                 var isSOur = rows[0].isSchoolHour;
-                console.log("ejnfiwog", isSOur);
 
                 if(isSOur) {
-                    console.log("E' ora di scuola");
                     undoClasse(stanza, giorno, ora, risorsa, function(response2) {
                         if(response2) {
                             cancellaPrenotazione(stanza, giorno, ora, function(response1) {
@@ -506,13 +525,12 @@ apiRoutes.post('/cancellaPrenotazione', function(req, res) {
                         }
                     });
                 } else {
-                    console.log("Non è ora di scuola");
                     cancellaPrenotazione(stanza, giorno, ora, function(response3) {
                         res.json(response3);
                     })
                 }
             } else {
-                res(false);
+                res.json(false);
             }
         });
     });
@@ -588,7 +606,7 @@ function addPrenotazione(giorno, stanza, ora, risorsa, who, èOraScuola, res) {
     connection.query(sql_stmt, function(err) {
         if (!err) {
             selectId(giorno, stanza, ora, function(id) {
-                sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", '" + who + "', " + èOraScuola + ");";
+                sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", '" + who + "', " + èOraScuola + ", false);";
                 connection.query(sql_stmt, function(err) {
                      if (!err) {
                         res(true);
@@ -643,17 +661,34 @@ function isSchoolOur(giorno, stanza, ora, risorsa, res) {
 
                         connection.query(sql_stmt, function(err, rows, fields) {
                             if (!err) {
-                                var stanzaDaLib = rows[0].stanza;
+                                try {
+                                    var stanzaDaLib = rows[0].stanza;
 
-                                moveProfessori(stanza, stanzaDaLib, giorno, ora, function(resp) {
-                                    if(resp) {
-                                        liberaRisorse(stanzaDaLib, ora, giorno, function(response) {
-                                            res(response);
-                                        });
-                                    } else {
-                                        res(false);
-                                    }
-                                })
+                                    moveProfessori(stanza, stanzaDaLib, giorno, ora, function(resp) {
+                                        if(resp) {
+                                            liberaRisorse(stanzaDaLib, ora, giorno, function(response) {
+                                                res(response);
+                                            });
+                                        } else {
+                                            res(false);
+                                        }
+                                    })
+                                } catch(e) {
+                                    getProfFromOrario(stanza, giorno, ora, risorsa, function(resp) {
+                                        if(resp == false) {
+                                            res(false);
+                                        } else {
+                                            sql_stmt = resp;
+                                            connection.query(sql_stmt, function(err) {
+                                                if (!err) {
+                                                    res(true);
+                                                } else {
+                                                    res(false);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
                             } else {
                                 res(false);
                             }
@@ -760,6 +795,76 @@ function moveProfessori(stanza, stanzaDaLib, giorno, ora, res) {
 
 
 /*
+ * Funzione che ritorna un codice sql per inserire i professori, presi dall'orario, nella timetable
+ */
+function getProfFromOrario(stanza, giorno, ora, risorsa, res) {
+    var prof1;
+    var prof2;
+    console.log("A che sono finito qui");
+    var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
+        + giorno + "' AND ora = " + ora + ";";
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            var week_day = rows[0].giorno_settimana;
+
+            sql_stmt = "SELECT `Column 2` AS prof FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '" 
+                + ora + "' AND `Column 1` = '" + risorsa + "';";
+
+            connection.query(sql_stmt, function(err, rows1, fields) {
+                if (!err) {
+                    var p1 = rows1[0].prof;
+
+                    try {
+                        var p2 = rows1[1].prof;
+                        sql_stmt = "SELECT `Column 1` AS nomeCognome FROM GPU004 WHERE `Column 0` = '" + p2 + "'";
+
+                        connection.query(sql_stmt, function(err, rows, fields) {
+                            if (!err) {
+                                prof2 = rows[0].nomeCognome;
+                                sql_stmt = "SELECT `Column 1` AS nomeCognome FROM GPU004 WHERE `Column 0` = '" + p1 + "'";
+
+                                connection.query(sql_stmt, function(err, rows, fields) {
+                                    if (!err) {
+                                        prof1 = rows[0].nomeCognome;
+                                        sql_stmt = "UPDATE timetable SET professore1 = '" + prof1 + "', professore2 = '" + prof2 +
+                                            "' WHERE stanza = '" + stanza  + "' AND ora = " + ora + " AND giorno = '" + giorno + "'";
+                                        res(sql_stmt);
+                                    } else {
+                                        res(false);
+                                    }
+                                });
+                            } else {
+                                res(false);
+                            }
+                        });
+                    } catch(e) {
+                        var prof2 = "Null";
+                        sql_stmt = "SELECT `Column 1` AS nomeCognome FROM GPU004 WHERE `Column 0` = '" + p1 + "'";
+
+                        connection.query(sql_stmt, function(err, rows, fields) {
+                            if (!err) {
+                                prof1 = rows[0].nomeCognome;
+                                sql_stmt = "UPDATE timetable SET professore1 = '" + prof1 + "', professore2 = '" + prof2 +
+                                    "' WHERE stanza = '" + stanza  + "' AND ora = " + ora + " AND giorno = '" + giorno + "'";
+                                res(sql_stmt);
+                            } else {
+                                res(false);
+                            }
+                        });
+                    }
+                } else {
+                    res(false);
+                }
+            });
+        } else {
+            res(false);
+        }
+    });
+}
+
+
+/*
  * Funzione che controlla se una prenotazione per una classe dovrebbe annullarne un'altra.
  * In caso positivo, cancella la prenotazione da annullare.
  */
@@ -807,7 +912,17 @@ function cancellaPrenotazione(stanza, giorno, ora, res) {
 
     connection.query(sql_stmt, function(err) {
         if(!err) {
-            res(true);
+            selectId(giorno, stanza, ora, function(id) {
+                sql_stmt = "DELETE FROM prenotazioni WHERE id = " + id;
+
+                connection.query(sql_stmt, function(err) {
+                    if(!err) {
+                        res(true);
+                    } else {
+                        res(false);
+                    }
+                });
+            });
         } else {
             res(false);
         }
@@ -820,34 +935,47 @@ function cancellaPrenotazione(stanza, giorno, ora, res) {
  * Altrimenti BISOGNA DECIDERE COSA FARE
  */
 function undoClasse(stanza, giorno, ora, risorsa, res) {
-    sql_stmt = "SELECT `Column 4` AS stanzaOrario FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '" 
-        + ora + "' AND `Column 1` = '" + risorsa + "';";
+    var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
+        + giorno + "' AND ora = " + ora + ";";
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
-            var stanzaOrario = rows[0].stanzaOrario;
-            sql_stmt = "SELECT risorsa FROM timetable WHERE stanza = '" +
-                stanzaOrario + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
-            
+            var week_day = rows[0].giorno_settimana;
+
+            sql_stmt = "SELECT `Column 4` AS stanzaOrario FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '" 
+                + ora + "' AND `Column 1` = '" + risorsa + "';";
+
             connection.query(sql_stmt, function(err, rows, fields) {
                 if (!err) {
-                    try {
-                        classe = rows[0].risorsa;
-                        console.log("E' già occupata");
-                    } catch(e) {
-                        var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" +
-                            stanzaOrario + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+                    var stanzaOrario = rows[0].stanzaOrario;
+                    sql_stmt = "SELECT risorsa FROM timetable WHERE stanza = '" +
+                        stanzaOrario + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+                    
+                    connection.query(sql_stmt, function(err, rows, fields) {
+                        if (!err) {
+                            classe = rows[0].risorsa;
 
-                        connection.query(sql_stmt, function(err) {
-                            if (!err) {
-                                moveProfessori(stanza, stanzaOrario, giorno, ora, function(response) {
-                                    res(response);
-                                });
+                            if(classe != null) {
+                                console.log("E' già occupata");
+                                res(true);
                             } else {
-                                res(false);
+                                var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" +
+                                    stanzaOrario + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+
+                                connection.query(sql_stmt, function(err) {
+                                    if (!err) {
+                                        moveProfessori(stanzaOrario, stanza, giorno, ora, function(response) {
+                                            res(response);
+                                        });
+                                    } else {
+                                        res(false);
+                                    }
+                                });
                             }
-                        });
-                    }
+                        } else {
+                            res(false);
+                        }
+                    });
                 } else {
                     res(false);
                 }
