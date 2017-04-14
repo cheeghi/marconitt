@@ -87,7 +87,7 @@ app.
                     $scope.cancel();
                     $scope.refresh();
                     $mdToast.show($mdToast.simple().textContent('Prenotazione avvenuta con successo!'));
-                    console.log(data);
+                    console.log("eijqjfioq   ", data);
                 }).error(function(err) {
                     $mdToast.show($mdToast.simple().textContent('Errore'));
                 });
