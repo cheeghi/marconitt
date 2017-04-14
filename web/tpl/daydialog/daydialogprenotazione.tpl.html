@@ -2,7 +2,7 @@
     <form>
         <md-toolbar>
            <div class="md-toolbar-tools">
-                <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="cursor: pointer;" ng-click="previousDay()">
+                <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="cursor: pointer;" ng-click="previousDay(true)">
                     <svg version="1.1" x="0px" y="0px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fit="" height="100%" width="100%" preserveAspectRatio="xMidYMid meet" focusable="false">
                     <g><polygon points="15.4,7.4 14,6 8,12 14,18 15.4,16.6 10.8,12 "></polygon></g></svg>
                 </md-icon>
@@ -10,7 +10,7 @@
                 <h2 style="padding-left:0.5%;">{{ dayString }}</h2>
                 <span flex></span>
 
-                <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="transform: rotate(180deg); cursor: pointer;" ng-click="nextDay()">
+                <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="transform: rotate(180deg); cursor: pointer;" ng-click="nextDay(true)">
                     <svg version="1.1" x="0px" y="0px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fit="" height="100%" width="100%" preserveAspectRatio="xMidYMid meet" focusable="false">
                     <g><polygon points="15.4,7.4 14,6 8,12 14,18 15.4,16.6 10.8,12 "></polygon></g></svg>
                 </md-icon>
@@ -26,7 +26,7 @@
                         <md-content ng-controller="PrenotazioneCtrl" ng-init="init(day)">
                             <md-content layout-padding id="contentPrenotazione">
                                 <div layout="row" ng-hide="isSunday">
-                                    <md-input-container ng-hide="nonPrenotabile">
+                                    <md-input-container>
                                         <label>Seleziona</label>
                                         <md-select ng-model="sRoomType" ng-change="clearMdSelect();getPrenotazioni();" size="20">
                                             <md-option>
@@ -40,7 +40,7 @@
                                             </md-option>
                                         </md-select>
                                     </md-input-container>
-                                    <md-input-container ng-show="sRoomType=='AULA'&&!nonPrenotabile">
+                                    <md-input-container ng-show="sRoomType=='AULA'">
                                         <label>Aula</label>
                                         <md-select ng-model="sRoom" ng-change="getPrenotazioni()">
                                             <md-option>Qualsiasi</md-option>
@@ -49,7 +49,7 @@
                                             </md-option>
                                         </md-select>
                                     </md-input-container>                                    
-                                    <md-input-container ng-show="sRoomType=='LABORATORIO'&&!nonPrenotabile">
+                                    <md-input-container ng-show="sRoomType=='LABORATORIO'">
                                         <label>Lab</label>
                                         <md-select ng-model="sRoom" ng-change="getPrenotazioni()">
                                             <md-option>Qualsiasi</md-option>
@@ -58,7 +58,7 @@
                                             </md-option>
                                         </md-select>
                                     </md-input-container>                                    
-                                    <md-input-container ng-hide="nonPrenotabile">
+                                    <md-input-container>
                                         <label>Ora</label>
                                         <md-select ng-model="sHour" ng-show="sRoomType!=undefined" ng-change="getPrenotazioni()" size="20">
                                         <md-option>Qualsiasi</md-option>

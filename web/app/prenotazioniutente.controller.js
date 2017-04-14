@@ -3,6 +3,7 @@ app.
 
         $scope.admin = $rootScope.admin; // is protocollo or not
         $scope.prenotazioni;
+        $scope.prenotazioniDaApprovare;
         $scope.disabled;
         $scope.caricamentoPrenotazioni;
 
@@ -26,7 +27,7 @@ app.
                 $http.get('http://localhost/timetable.php', {  
                     cache: false,
                     params: {
-                        prenotazionidaapprovare: ""
+                        prenotazioniexceptadmin: ""
                     }
                 }).success(function(response) {
                     $scope.prenotazioniDaApprovare = response;
@@ -36,8 +37,7 @@ app.
             $http.get('http://localhost/timetable.php', {  
                 cache: false,
                 params: {
-                    prenotazioni: $rootScope.username,
-                    isprotocollo: $scope.admin
+                    prenotazioni: $rootScope.username
                 }
             }).success(function(response) {
                 $scope.prenotazioni = response;

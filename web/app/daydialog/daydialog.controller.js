@@ -8,19 +8,53 @@ app
         $scope.spaggiariEvents = new Array();
         $scope.data;
         $scope.events = new Array();
+        var giorniLimite = 14;
 
 
-        $scope.nextDay = function(){
-            day.setDate(day.getDate()+1);
-            $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();
-            $rootScope.$broadcast('reInit',{day:day});
-    }
+        $scope.nextDay = function(inPrenotazione) {
+            
+            day.setDate(day.getDate() + 1);
+            
+            if (inPrenotazione) {
+                var limitDay = new Date();
+                limitDay.setDate(limitDay.getDate() + giorniLimite);
 
-        $scope.previousDay = function(){
-            day.setDate(day.getDate()-1);
-            $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();
-            $rootScope.$broadcast('reInit',{day:day});
-    }
+                if (day > limitDay && !$rootScope.admin) {
+                    $mdToast.show($mdToast.simple().textContent('Seleziona una data più vicina'));
+                } else {
+                    $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
+                    $rootScope.$broadcast('reInit',{day:day});
+                }
+
+            } else {
+                    $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
+                    $rootScope.$broadcast('reInit',{day:day});
+            }
+        }
+
+        $scope.previousDay = function(inPrenotazione) {
+
+            day.setDate(day.getDate() - 1);
+
+            if (inPrenotazione) {
+                var today = new Date();
+                today.setHours(0); // we need to do these sets, otherwise the comparison doesnt work
+                today.setMinutes(0);
+                today.setSeconds(0);
+                today.setMilliseconds(0);
+
+                if (day < today  && !$rootScope.admin) {
+                    $mdToast.show($mdToast.simple().textContent('Non puoi prenotare in una data passata'));
+                } else {
+                    $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
+                    $rootScope.$broadcast('reInit',{day:day});
+                }
+
+            } else {
+                $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
+                $rootScope.$broadcast('reInit',{day:day});
+            }
+        }
 
 
         getData = function() {
