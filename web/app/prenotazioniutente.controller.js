@@ -1,7 +1,7 @@
 app.
     controller("PrenotazioniUtenteCtrl", function($scope, $http, CONFIG, $mdDialog, $mdToast, $rootScope) {
 
-        $scope.admin = $rootScope.admin; // is protocollo or not
+        $scope.admin = $rootScope.admin; // is admin or not
         $scope.prenotazioni;
         $scope.prenotazioniDaApprovare;
         $scope.disabled;
@@ -20,8 +20,9 @@ app.
          * makes http requests to populate 'prenotazioni' arrays
          */
         $scope.initializeHttpCalls = function() {
-            //$scope.disabled = false;  
-            $scope.caricamentoPrenotazioni = true;
+            $scope.caricamentoPrenotazioni = true;            
+            var months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+            var weekdays = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
 
             if ($scope.admin) {
                 $http.get('http://localhost/timetable.php', {  
@@ -31,6 +32,11 @@ app.
                     }
                 }).success(function(response) {
                     $scope.prenotazioniDaApprovare = response;
+                    $scope.prenotazioniDaApprovare.forEach(function(prenotazione) {
+                        var giorno = new Date(prenotazione.giorno);
+                        var fgiorno = weekdays[giorno.getDay()] + " " + giorno.getDate() + " " + months[giorno.getMonth()] + " " + giorno.getFullYear();
+                        prenotazione.fgiorno = fgiorno;
+                    });
                 });      
             } 
 
@@ -41,6 +47,12 @@ app.
                 }
             }).success(function(response) {
                 $scope.prenotazioni = response;
+                $scope.prenotazioni.forEach(function(prenotazione) {
+                    var giorno = new Date(prenotazione.giorno);
+                    var fgiorno = weekdays[giorno.getDay()] + " " + giorno.getDate() + " " + months[giorno.getMonth()] + " " + giorno.getFullYear();
+                    prenotazione.fgiorno = fgiorno;
+                });
+
                 $scope.caricamentoPrenotazioni = false;
             });         
         };

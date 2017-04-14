@@ -19,8 +19,8 @@
                 <md-list>
                     <md-list-item ng-repeat="prenotazione in prenotazioni" class="md-3-line">
                         <div class="md-list-item-text">
-                            <h3>{{prenotazione.giorno}}</h3>
-                            <h4>{{prenotazione.stanza}} {{prenotazione.ora}}°ORA</h4>
+                            <h3>{{prenotazione.fgiorno}}</h3>
+                            <h4>{{prenotazione.stanza}} - {{prenotazione.ora}}°ORA</h4>
                             <p>{{prenotazione.risorsa}}</p>
                         </div>
                         <i style="color: grey; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==0&&!admin" class="material-icons">pan_tool</i>
@@ -40,8 +40,8 @@
                 <md-list>
                     <md-list-item ng-repeat="prenotazione in prenotazioniDaApprovare" class="md-3-line">
                         <div class="md-list-item-text">
-                            <h3>{{prenotazione.giorno}}</h3>
-                            <h4>{{prenotazione.stanza}} {{prenotazione.ora}}°ORA</h4>
+                            <h3>{{prenotazione.fgiorno}}</h3>
+                            <h4>{{prenotazione.stanza}} - {{prenotazione.ora}}°ORA</h4>
                             <p>{{prenotazione.risorsa}}</p>
                             <p>Richiedente: {{prenotazione.who}}</p>
                         </div>
