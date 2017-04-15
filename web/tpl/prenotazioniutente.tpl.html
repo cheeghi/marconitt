@@ -23,9 +23,9 @@
                             <h4>{{prenotazione.stanza}} - {{prenotazione.ora}}°ORA</h4>
                             <p>{{prenotazione.risorsa}}</p>
                         </div>
-                        <i style="color: grey; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==0&&!admin" class="material-icons">pan_tool</i>
-                        <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!admin" class="material-icons">done</i>
-                        <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" class="md-block">
+                        <i style="color: grey; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==0&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">pan_tool</i>
+                        <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">done</i>
+                        <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" ng-disabled="isPassed(prenotazione.giorno)&&!admin" class="md-block">
                             RIMUOVI
                         </md-button>
                         <!--<a ng-disabled="disabled" style="color:red; margin-right: 2%; margin-top: 3%;cursor: pointer;" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)">
@@ -45,7 +45,7 @@
                             <p>{{prenotazione.risorsa}}</p>
                             <p>Richiedente: {{prenotazione.who}}</p>
                         </div>
-                        <md-button ng-disabled='prenotazione.approvata==1' style="color:#2196F3; margin-right: 1%; margin-top: 2.5%" class="md-raised" ng-click="approva()" class="md-block" >
+                        <md-button ng-disabled='prenotazione.approvata==1' style="color:#2196F3; margin-right: 1%; margin-top: 2.5%" class="md-raised" ng-click="approva(prenotazione.giorno, prenotazione.stanza, prenotazione.ora)" class="md-block" >
                             APPROVA
                         </md-button>
                         <md-button style=" color:#2196F3; margin-right: 2%; margin-top: 2.5%" class="md-raised" ng-click="nonApprova(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" class="md-block" >

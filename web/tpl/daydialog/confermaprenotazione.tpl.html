@@ -84,16 +84,24 @@
                             </div>
                             <div layout="row" ng-hide="admin">
                                 <md-input-container class="md-block" flex>
-                                    <label>Classe</label>
-                                    <md-select ng-model="sClass">
+                                    <label>Le mie classi</label>
+                                    <md-select ng-model="sTeacherClass" ng-change="sClass=undefined">
+                                        <md-option ng-repeat="class in teacherClasses" value="{{class}}">
+                                            {{class}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>  
+                                <md-input-container class="md-block" flex>
+                                    <label>Tutte le classi</label>
+                                    <md-select ng-model="sClass" ng-change="sTeacherClass=undefined">
                                         <md-option ng-repeat="class in classes" value="{{class}}">
                                             {{class}}
                                         </md-option>
                                     </md-select>
-                                </md-input-container>                                
+                                </md-input-container>                                                                 
                                 <md-input-container>
                                     <div layout="row" layout-align="space-between center">
-                                        <md-button class="md-raised md-primary" ng-disabled="sClass==undefined||sClass==''||disabled" ng-click="prenota()" class="md-block" flex >
+                                        <md-button class="md-raised md-primary" ng-disabled="(sClass==undefined&&sTeacherClass==undefined)||disabled" ng-click="prenota()" class="md-block" flex >
                                             CONFERMA
                                         </md-button>
                                     </div>

@@ -44,7 +44,7 @@ app
                 today.setMilliseconds(0);
 
                 if (day < today  && !$rootScope.admin) {
-                    $mdToast.show($mdToast.simple().textContent('Non puoi prenotare in una data passata'));
+                    $mdToast.show($mdToast.simple().textContent('Non puoi prenotare per un giorno passato'));
                 } else {
                     $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
                     $rootScope.$broadcast('reInit',{day:day});

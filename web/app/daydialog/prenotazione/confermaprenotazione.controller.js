@@ -13,6 +13,8 @@ app.
         $scope.sTeacher; // selected teacher
         $scope.sDescrizione; // descrizione inserita
         $scope.disabled; // boolean for confirm button disabling
+        $scope.teacherClasses; // list of logged teacher's classes
+        $scope.sTeacherClass; // selected teacher class
 
 
         /**
@@ -32,6 +34,14 @@ app.
                 $scope.teachers = response.teachers;
                 $scope.progetti = response.projects;
             });
+
+            $http.get('http://localhost/timetable.php', {
+                params: {
+                    classesbyteacher: 'gbellini'
+                }
+            }).success(function(response) {
+                $scope.teacherClasses = response;
+            });
         };
 
 
@@ -47,10 +57,11 @@ app.
             $scope.disabled = true;
             var risorsa;
             var isClasse = false;
-
+            var classe = $scope.sClass == undefined ? $scope.sTeacherClass : $scope.sClass;
+            
             if ($scope.admin) {
                 if ($scope.tipoPrenotazione == 'Classe') {
-                    risorsa = $scope.sClass;
+                    risorsa = classe;
                     isClasse = true;
                 } else if ($scope.tipoPrenotazione == 'Progetto') {
                     risorsa = $scope.sProgetto;
@@ -61,10 +72,10 @@ app.
                 } else if ($scope.tipoPrenotazione == 'Tutoraggio/Studio') {
                     risorsa = $scope.tipoPrenotazione;
                 } else {
-                    risorsa = $scope.tipoPrenotazione + ": " + $scope.sClass;
+                    risorsa = $scope.tipoPrenotazione + ": " + classe;
                 }
             } else {
-                risorsa = $scope.sClass;
+                risorsa = classe;
                 isClasse = true;
             }
 

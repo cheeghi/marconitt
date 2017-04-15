@@ -1,5 +1,5 @@
 app.
-    controller("PrenotazioniUtenteCtrl", function($scope, $http, CONFIG, $mdDialog, $mdToast, $rootScope) {
+    controller("PrenotazioniUtenteCtrl", function($scope, $http, CONFIG, $mdDialog, $mdToast, $rootScope, $mdDateLocale) {
 
         $scope.admin = $rootScope.admin; // is admin or not
         $scope.prenotazioni;
@@ -21,8 +21,6 @@ app.
          */
         $scope.initializeHttpCalls = function() {
             $scope.caricamentoPrenotazioni = true;            
-            var months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
-            var weekdays = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
 
             if ($scope.admin) {
                 $http.get('http://localhost/timetable.php', {  
@@ -34,7 +32,7 @@ app.
                     $scope.prenotazioniDaApprovare = response;
                     $scope.prenotazioniDaApprovare.forEach(function(prenotazione) {
                         var giorno = new Date(prenotazione.giorno);
-                        var fgiorno = weekdays[giorno.getDay()] + " " + giorno.getDate() + " " + months[giorno.getMonth()] + " " + giorno.getFullYear();
+                        var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
                         prenotazione.fgiorno = fgiorno;
                     });
                 });      
@@ -49,7 +47,7 @@ app.
                 $scope.prenotazioni = response;
                 $scope.prenotazioni.forEach(function(prenotazione) {
                     var giorno = new Date(prenotazione.giorno);
-                    var fgiorno = weekdays[giorno.getDay()] + " " + giorno.getDate() + " " + months[giorno.getMonth()] + " " + giorno.getFullYear();
+                    var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
                     prenotazione.fgiorno = fgiorno;
                 });
 
@@ -94,18 +92,54 @@ app.
         /**
          * approves a request of 'prenotazione'
          */
-        $scope.approva = function() {
+        $scope.approva = function(giorno, stanza, ora) {
             console.log("approvato");
+
+            var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno;
+            
+            var req = {
+                method: 'POST',
+                url: 'http://'+CONFIG.HOST+':8080/api/approva',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                data: data
+            };
+
+
+            $http(req)
+                .success(function(data) {
+                    $scope.prenotazioni = null;
+                    $scope.initializeHttpCalls();
+                    $mdToast.show($mdToast.simple().textContent('Prenotazione approvata con successo'));                   
+                }).error(function(err) {
+                    $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
+                });            
         };
 
 
         /**
-         * approves a request of 'prenotazione'
+         * denies a request of 'prenotazione'
          */
         $scope.nonApprova = function(giorno, stanza, risorsa, ora) {
             //send email to...
             
             $scope.removePrenotazione(giorno, stanza, risorsa, ora);
+        };
+
+
+        /**
+            returns true if the given day is passed
+        */
+        $scope.isPassed = function(giorno) {
+            var today = new Date();
+            today.setHours(0); // we need to do these sets, otherwise the comparison doesnt work
+            today.setMinutes(0);
+            today.setSeconds(0);
+            today.setMilliseconds(0);
+
+            if (today > new Date(giorno))
+                return true;            
         };
 
     });
