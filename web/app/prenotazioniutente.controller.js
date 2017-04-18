@@ -1,5 +1,5 @@
 app.
-    controller("PrenotazioniUtenteCtrl", function($scope, $http, CONFIG, $mdDialog, $mdToast, $rootScope, $mdDateLocale) {
+    controller("PrenotazioniUtenteCtrl", function($scope, $http, CONFIG, $mdDialog, $mdToast, $rootScope, $mdDateLocale, $mdDialog) {
 
         $scope.admin = $rootScope.admin; // is admin or not
         $scope.prenotazioni;
@@ -23,7 +23,7 @@ app.
             $scope.caricamentoPrenotazioni = true;            
 
             if ($scope.admin) {
-                $http.get('http://localhost/timetable.php', {  
+                $http.get('http://localhost/timetable.php', {
                     cache: false,
                     params: {
                         prenotazioniexceptadmin: ""
@@ -62,30 +62,41 @@ app.
         $scope.removePrenotazione = function(giorno, stanza, risorsa, ora) {
             //console.log(giorno, stanza, risorsa, ora, $rootScope.username);
             //$scope.disabled = true;
-            $scope.caricamentoPrenotazioni = true;
 
-            var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
-                    + "&risorsa="+ risorsa;
-            console.log(ora);
-            var req = {
-                method: 'POST',
-                url: 'http://'+CONFIG.HOST+':8080/api/cancellaPrenotazione',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                data: data
-            };
+            var giornoDate = new Date(giorno);
+
+            var confirm = $mdDialog.confirm()
+              .textContent('La prenotazione verrà rimossa per sempre. Continuare?')
+              .ok('CONFERMA')
+              .cancel('ANNULLA');
+
+            $mdDialog.show(confirm).then(function() {
+                  
+                $scope.caricamentoPrenotazioni = true;
+
+                var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
+                        + "&risorsa="+ risorsa;
+                console.log(ora);
+                var req = {
+                    method: 'POST',
+                    url: 'http://'+CONFIG.HOST+':8080/api/cancellaPrenotazione',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    data: data
+                };
 
 
-            $http(req)
-                .success(function(data) {
-                    $scope.prenotazioni = null;
-                    $scope.initializeHttpCalls();
-                    $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                   
-                }).error(function(err) {
-                    $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
-                });
-
+                $http(req)
+                    .success(function(data) {
+                        $scope.prenotazioni = null;
+                        $scope.initializeHttpCalls();
+                        $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                   
+                    }).error(function(err) {
+                        $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
+                    });
+                    
+            });
         };
 
 
