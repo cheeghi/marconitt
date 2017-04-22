@@ -158,16 +158,16 @@ app
         /**
          * closes side bar and calls setView method
          */
-        $scope.view = function(tplName, viewName) {
+        $scope.view = function(tplName) {
             $mdSidenav('left').close();
-            $scope.setView(tplName, viewName);
+            $scope.setView(tplName);
         }
 
 
         /**
          * sets the view (the middle content of the page)
          */
-        $scope.setView = function(tplName, viewName) {
+        $scope.setView = function(tplName) {
             $scope.cambiaSchermata = true;
            
             $http

@@ -22,15 +22,7 @@
                 <md-list-item ng-style="customStyle.visualizza" ng-click="view('calendario/calendariovisualizza'); highlight(1);" md-ink-ripple="#2196F3">
                     <p ng-style="customStyle.visualizzaText">Visualizza</p>
                 </md-list-item>
-                <md-list-item ng-style="customStyle.prenota" ng-click="view('calendario/calendarioprenotazione'); highlight(2);" ng-show="logged" md-ink-ripple="#2196F3">
-                    <p ng-style="customStyle.prenotaText">Prenota</p>
-                </md-list-item>
-                <md-list-item ng-style="customStyle.lmp" ng-click="view('prenotazioniutente'); highlight(3);" ng-show="logged" md-ink-ripple="#2196F3">
-                    <p ng-style="customStyle.lmpText">Le mie prenotazioni</p>
-                </md-list-item>                
-                <!--<md-list-item ng-click="view('Cerca')">
-                    <p>Cerca</p>
-                </md-list-item>-->
+
                 <md-divider ng-hide="logged"></md-divider>
                 <md-subheader class="md-no-sticky" ng-hide="logged">Effettua il login per poter prenotare</md-subheader>
                 <div layout="column" layout-padding ng-hide="logged">
@@ -45,10 +37,20 @@
                         </md-input-container>
                     </div>
                     <md-button class="md-accent md-raised" ng-click="login()">Entra</md-button>
-                </div>
-                <md-list-item ng-style="customStyle.eventi" ng-click="view('Inserisci'); highlight(4);" ng-show="logged && admin">
-                    <p ng-style="customStyle.eventiText">Eventi</p>
+                </div>   
+                             
+                <md-list-item ng-style="customStyle.prenota" ng-click="view('calendario/calendarioprenotazione'); highlight(2);" ng-show="logged" md-ink-ripple="#2196F3">
+                    <p ng-style="customStyle.prenotaText">Prenota</p>
                 </md-list-item>
+                <md-list-item ng-style="customStyle.eventi" ng-click="view('inserisci'); highlight(4);" ng-show="logged && admin">
+                    <p ng-style="customStyle.eventiText">Inserisci evento</p>
+                </md-list-item>                
+                <md-list-item ng-style="customStyle.lmp" ng-click="view('prenotazioniutente'); highlight(3);" ng-show="logged" md-ink-ripple="#2196F3">
+                    <p ng-style="customStyle.lmpText"><span ng-show="!admin">Le mie prenotazioni</span><span ng-show="admin">Tutte le prenotazioni</span></p>
+                </md-list-item>                
+                <!--<md-list-item ng-click="view('Cerca')">
+                    <p>Cerca</p>
+                </md-list-item>-->
                 <md-divider ng-show="logged"></md-divider>
                 <md-divider ng-show="logged"></md-divider>
                 <md-divider ng-show="logged"></md-divider>
