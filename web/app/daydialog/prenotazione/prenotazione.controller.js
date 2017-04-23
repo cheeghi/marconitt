@@ -131,7 +131,7 @@ app.
                         <th>9°</th>\
                         <th>10°</th>\ ";
             } else {
-                x += "<th>" + $scope.sHour + "</th>";
+                x += "<th>" + $scope.sHour + "°</th>";
             }
 
             x += "</tr></thead>";

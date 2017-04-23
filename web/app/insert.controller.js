@@ -1,25 +1,20 @@
 app
     .controller('InsertCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, $q, $mdToast, $element, $rootScope, $httpParamSerializerJQLike, CONFIG) {
 
-        $scope.whos = []
-        $scope.searchTerm;
-        $scope.msg = 'Clicca per testare';
-        $scope.event;
         $scope.teachers;
         $scope.classes;
+        $scope.event = {};
+        $scope.event.description = '';
+        $scope.event.day = new Date();
+        $scope.event.hourStart = new Date();
+        $scope.event.hourEnd = new Date();
+        $scope.event.classes = [];
+        $scope.event.rooms = [];
 
-        $scope.noSunday = function(date) {
-            var day = date.getDay();
-            return day !== 0;
-        };
 
-
-           /* $http.get('http://88.149.220.222/orario/api.php').success(function(response) {
-                $scope.classes = response.classes;
-                $scope.teachers = response.teachers;
-            });
-        }*/
-
+        /**
+         * Initialization method
+         */
         var init = function() {
              $http.get('http://localhost/timetable.php').success(function(response) {
                 $scope.classes = response.classes;
@@ -30,48 +25,30 @@ app
         };
 
 
-        $scope.clearSearchTerm = function() {
-            $scope.searchTerm = '';
-        };
+        /**
+         * sends event information to server
+         */
+        $scope.insert = function () {
+            var desc = $scope.event.description;
+            var day = $scope.event.day.getFullYear() + "-" + ($scope.event.day.getMonth()+1) + "-" + $scope.event.day.getDate();
+            var hStart = $scope.event.hourStart.getHours() + ":" + $scope.event.hourStart.getMinutes();
+            var hEnd = $scope.event.hourEnd.getHours() + ":" + $scope.event.hourEnd.getMinutes();
+            var sClassesToString = $scope.event.classes.toString().replace(/,(?=[^\s])/g, ", ");
+            var sRoomsToString = $scope.event.rooms.toString().replace(/,(?=[^\s])/g, ", ");
+            var data = "descrizione="+desc+"&day="+day+"&oraInizio="+hStart+"&oraFine="+hEnd+"&classi="
+                +sClassesToString+"&stanze="+sRoomsToString+"&token="+$rootScope.token;
 
-
-        var numFmt = function(num) {
-            num = num.toString();
-            if (num.length < 2) {
-                num = "0" + num;
-            }
-            return num;
-        };
-
-
-        $scope.insert = function() {
-          if ($rootScope.logged) {
-            who = [];
-            for (var k in $scope.event.whos) {
-                if ($scope.event.whos.hasOwnProperty(k)) {
-                    $scope.event.whos[k].forEach(function(w) {
-                      who.push(w._id);
-                    });
-                }
-            }
             var req = {
                 method: 'POST',
-                url: 'http://'+CONFIG.HOST+':8080/api/events/' + $scope.event.date.getFullYear() + "/" + $scope.event.date.getMonth() + "/" + $scope.event.date.getDate(),
-                data: $httpParamSerializerJQLike({
-                    hour_start: numFmt($scope.event.hour_start.getHours()) + "." + numFmt($scope.event.hour_start.getMinutes()),
-                    hour_end: numFmt($scope.event.hour_end.getHours()) + "." + numFmt($scope.event.hour_end.getMinutes()),
-                    description: $scope.event.description,
-                    who: who.join(","),
-                    visible: $scope.event.visible,
-                    token: $rootScope.token
-                }),
-               headers: {
-                 'Content-Type': 'application/x-www-form-urlencoded'
-               }
-            }
+                //url: 'http://'+CONFIG.HOST+':8080/api/events/' + $scope.event.date.getFullYear() + "/" + $scope.event.date.getMonth() + "/" + $scope.event.date.getDate(),
+                data: data,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            };
+            console.log(req.data);
 
-            console.log(req);
-
+            /*
             $http(req)
                 .then(
                     function(data) {
@@ -82,18 +59,16 @@ app
                         $mdToast.show($mdToast.simple().textContent("Errore di rete: "+ err));
                     }
                 );
-              } else {
-                $mdToast.show($mdToast.simple().textContent("Non risulti loggato nel sistema"));
-              }
+            */
+
         }
 
-        // The md-select directive eats keydown events for some quick select
-        // logic. Since we have a search input here, we don't need that logic.
-        $element.find('input').on('keydown', function(ev) {
-            ev.stopPropagation();
-        });
+
+        $scope.noSunday = function(date) {
+            var day = date.getDay();
+            return day !== 0;
+        };
 
 
         init();
-
     });
