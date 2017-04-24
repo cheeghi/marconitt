@@ -1,9 +1,38 @@
 app
     .controller('CalendarioPrenotazioneCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, MaterialCalendarData, $q, $mdToast, $mdDialog, CONFIG, $rootScope) {
-        
-        var giorniLimite = 14;
+
+        $scope.direction = "horizontal";
+        $scope.selectedDate;
+        $scope.isLoading = true; // used for isLoading circle
+        $scope.calendar = '';
+        $scope.currentMonth = new Date().getMonth() + 1;
+        $scope.currentYear = new Date().getFullYear();
+        var giorniLimite = 14; // range di prenotazione per un professore
 
 
+        /**
+         * initialization method
+         */
+        $scope.init = function () {
+            $scope.resetCalendar(); // i need to clear the calendar because 'visualizza' and 'prenotazione' share the same calendar data
+            $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
+        };
+
+
+        /**
+         * clears the calendar content
+         */
+        $scope.resetCalendar = function () {
+            for (i = 1; i <= 31; i++) {
+                MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + $scope.currentMonth + '-' + i), ' ');
+            }
+        };
+
+
+        /**
+         * opens the dialog at click
+         * @param date
+         */
         $scope.dayClick = function(date) {
             var tplUrl = 'tpl/daydialog/daydialogprenotazione.tpl.html';
             $scope.day = new Date(date);
@@ -27,15 +56,28 @@ app
                     locals: {
                         day: date
                     }
-                })
-                .then(function(answer) {
-                    getData();
-                    $scope.selectOptions();
-                }, function() {
-                    getData();
-                    $scope.selectOptions();
                 });
             }
         };
+
+
+        /**
+         * decreases the month
+         * @param date
+         */
+        $scope.prevMonth = function(date) {
+            $scope.currentMonth = date.month;
+            $scope.currentYear = date.year;
+        }
+
+
+        /**
+         * increases the month
+         * @param date
+         */
+        $scope.nextMonth = function(date) {
+            $scope.currentMonth = date.month;
+            $scope.currentYear = date.year;
+        }
 
     });

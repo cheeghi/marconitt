@@ -1,17 +1,21 @@
 app.
-    controller("PrenotazioniUtenteCtrl", function($scope, $http, CONFIG, $mdDialog, $mdToast, $rootScope, $mdDateLocale, $mdDialog) {
+    controller("PrenotazioniUtenteCtrl", function($scope, $http, CONFIG, $mdDialog, $mdToast, $rootScope, $mdDateLocale, $timeout) {
 
         $scope.admin = $rootScope.admin; // is admin or not
-        $scope.prenotazioni;
-        $scope.prenotazioniDaApprovare;
+        $scope.miePrenotazioni; // array that contains logged user's reservations
+        $scope.altrePrenotazioni; // array that contains every user's reservations
         $scope.disabled;
-        $scope.caricamentoPrenotazioni;
+        $scope.isLoading; // used for loading circle
+        $scope.fMiePrenotazioni = []; // filtered array of $scope.miePrenotazioni
+        $scope.fAltrePrenotazioni = []; // filtered array of $scope.altrePrenotazioni
+        $scope.passedMiePrenotazioni = false; // toggle for showing / not showing passed reservations
+        $scope.passedAltrePrenotazioni = false; // toggle for showing / not showing passed reservations
 
         /**
          * initialize method
          */
         $scope.init = function() {
-            $scope.caricamentoPrenotazioni = true;
+            $scope.isLoading = true;
             $scope.initializeHttpCalls();
         };
 
@@ -20,7 +24,7 @@ app.
          * makes http requests to populate 'prenotazioni' arrays
          */
         $scope.initializeHttpCalls = function() {
-            $scope.caricamentoPrenotazioni = true;            
+            $scope.isLoading = true;
 
             if ($scope.admin) {
                 $http.get('http://localhost/timetable.php', {
@@ -29,12 +33,13 @@ app.
                         prenotazioniexceptadmin: ""
                     }
                 }).success(function(response) {
-                    $scope.prenotazioniDaApprovare = response;
-                    $scope.prenotazioniDaApprovare.forEach(function(prenotazione) {
+                    $scope.altrePrenotazioni = response;
+                    $scope.altrePrenotazioni.forEach(function(prenotazione) {
                         var giorno = new Date(prenotazione.giorno);
                         var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
                         prenotazione.fgiorno = fgiorno;
                     });
+                    $scope.fillsAltrePrenotazioni();
                 });      
             } 
 
@@ -44,15 +49,60 @@ app.
                     prenotazioni: $rootScope.username
                 }
             }).success(function(response) {
-                $scope.prenotazioni = response;
-                $scope.prenotazioni.forEach(function(prenotazione) {
+                $scope.miePrenotazioni = response;
+                $scope.miePrenotazioni.forEach(function(prenotazione) {
                     var giorno = new Date(prenotazione.giorno);
                     var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
                     prenotazione.fgiorno = fgiorno;
                 });
+                $scope.fillsMiePrenotazioni();
+                $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
+            });
+        };
 
-                $scope.caricamentoPrenotazioni = false;
-            });         
+
+        /**
+        * populates the fMiePrenotazioni with filtered values
+        */
+        $scope.fillsMiePrenotazioni = function () {
+            if ($scope.passedMiePrenotazioni)
+                $scope.fMiePrenotazioni = $scope.miePrenotazioni;
+            else {
+                $scope.fMiePrenotazioni = [];
+                $scope.miePrenotazioni.forEach(function(entry) {
+                    if (!$scope.isPassed(entry.giorno))
+                        $scope.fMiePrenotazioni.push(entry);
+                }, this);
+            }
+        };
+
+
+        /**
+         * populates the fAltrePrenotazioni with filtered values
+         */
+        $scope.fillsAltrePrenotazioni = function () {
+            if ($scope.passedAltrePrenotazioni)
+                $scope.fAltrePrenotazioni = $scope.altrePrenotazioni;
+            else {
+                $scope.fAltrePrenotazioni = [];
+                $scope.altrePrenotazioni.forEach(function(entry) {
+                    if (!$scope.isPassed(entry.giorno))
+                        $scope.fAltrePrenotazioni.push(entry);
+                }, this);
+            }
+        };
+
+
+        /**
+         * toggle to show or not passed reservations
+         * @param type
+         */
+        $scope.toggle = function (type) {
+            if (type == 1)
+                $scope.passedMiePrenotazioni = $scope.passedMiePrenotazioni ? true : false;
+            else if (type == 2)
+                $scope.passedAltrePrenotazioni = $scope.passedAltrePrenotazioni ? false : true;
+            console.log($scope.passedAltrePrenotazioni);
         };
 
 
@@ -72,7 +122,7 @@ app.
 
             $mdDialog.show(confirm).then(function() {
                   
-                $scope.caricamentoPrenotazioni = true;
+                $scope.isLoading = true;
 
                 var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
                         + "&risorsa="+ risorsa;

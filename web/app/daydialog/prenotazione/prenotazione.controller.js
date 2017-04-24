@@ -8,7 +8,7 @@ app.
         $scope.htmlTable = ""; // 'prenotazioni' table html code
         $scope.all = false;
         $scope.admin = $rootScope.admin; // is protocollo or not
-        $scope.loading; // boolean for showing loading circle
+        $scope.isLoading; // boolean for showing isLoading circle
         $scope.classes; // list of classes
         $scope.teachers; // list of teachers
         $scope.rooms; // list of rooms
@@ -54,7 +54,7 @@ app.
             
             if ($scope.isSunday){
                  $scope.htmlTable = "<p>Non c'è scuola di domenica</p>";
-            } else if($scope.sRoomType == undefined || $scope.loading) {
+            } else if($scope.sRoomType == undefined || $scope.isLoading) {
                 $scope.htmlTable = "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
             } else {
                 $scope.getPrenotazioni();
@@ -67,7 +67,7 @@ app.
          */
         $scope.getPrenotazioni = function() {
             $scope.htmlTable = '';
-            $scope.loading = true;
+            $scope.isLoading = true;
             if ($scope.sRoomType == "LABORATORIO") {
                 $http.get('http://localhost/timetable.php', {
                     cache: false,
@@ -76,7 +76,7 @@ app.
                     }
                 }).success(function(response) {
                     $scope.genTable(response.rooms);
-                    $scope.loading = false;
+                    $scope.isLoading = false;
                 });
                 $scope.dim(); //for scrollbar
 
@@ -88,7 +88,7 @@ app.
                     }
                 }).success(function(response) {
                     $scope.genTable(response.rooms);
-                    $scope.loading = false;
+                    $scope.isLoading = false;
                     $scope.dim(); //for scrollbar (leo)
                 });
                     

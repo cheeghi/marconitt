@@ -37,6 +37,9 @@
             </h2>
         </div>
     </md-toolbar>
+    <div layout="row" layout-sm="column" layout-align="center center" ng-show="isLoading" layout-fill>
+        <md-progress-circular md-mode="indeterminate" md-diameter="200"></md-progress-circular>
+    </div>
     <md-content layout="row" layout-align="center center" style="height: calc(100% - 64px) !important;">
         <form name="insertForm" flex="80">
             <div layout="column">
@@ -48,7 +51,7 @@
                     <md-datepicker ng-model="event.day" md-placeholder="Seleziona data.." md-open-on-focus></md-datepicker>
                 </div>
                 <div layout="row" layout-align="space-between center">
-                    <mdp-time-picker style="color:blue" ng-model="event.hourStart"><span style="color:#1a75ff;">Ora inizio</span></mdp-time-picker>
+                    <mdp-time-picker ng-model="event.hourStart"><span style="color:#1a75ff;">Ora inizio</span></mdp-time-picker>
                     <mdp-time-picker ng-model="event.hourEnd"><span style="color:#1a75ff">Ora fine</span></mdp-time-picker>
                     <md-input-container>
                         <label>Classi</label>

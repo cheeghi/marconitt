@@ -11,23 +11,19 @@
             <span flex=""></span>
         </div>
     </md-toolbar>
-          <div layout="row" layout-sm="column" layout-align="center center" ng-show="caricamentoPrenotazioni" layout-fill>
+          <div layout="row" layout-sm="column" layout-align="center center" ng-show="isLoading" layout-fill>
         <md-progress-circular md-mode="indeterminate" md-diameter="200"></md-progress-circular>
       </div>
-    <md-content ng-hide="caricamentoPrenotazioni">
-        <md-tabs md-dynamic-height md-stretch-tabs="always">
+    <md-content ng-hide="isLoading">
+        <md-tabs md-dynamic-height md-stretch-tabs="always" >
             <md-tab label="LE MIE PRENOTAZIONI">
-                <div ng-show="prenotazioni.length === 0" style="text-align: center;">
-                    <br><br>
-                    <span>Nessuna prenotazione effettuata!</span>
-                </div>
                 <div style="">
                     <div style="margin-left: auto;margin-right: 2%;width: 6em">
-                        <md-switch ng-model="passate" aria-label="Switch 1">Passate</md-switch>
+                        <md-switch ng-model="passedMiePrenotazioni" ng-change="toggle(1);fillsMiePrenotazioni();" aria-label="Switch 1">Passate</md-switch>
                     </div>
                 </div>
-                <md-list>
-                    <md-list-item ng-repeat="prenotazione in prenotazioni" class="md-3-line">
+                <md-list style="overflow-y:auto;height: 450px">
+                    <md-list-item ng-repeat="prenotazione in fMiePrenotazioni" class="md-3-line">
                         <div class="md-list-item-text">
                             <h3>{{prenotazione.fgiorno}}</h3>
                             <h4>{{prenotazione.stanza}} - {{prenotazione.ora}}°ORA</h4>
@@ -35,7 +31,7 @@
                         </div>
                         <i style="color: grey; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==0&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">pan_tool</i>
                         <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">done</i>
-                        <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" ng-disabled="isPassed(prenotazione.giorno)&&!admin" class="md-block">
+                        <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" ng-hide="isPassed(prenotazione.giorno)" class="md-block">
                             RIMUOVI
                         </md-button>
                         <!--<a ng-disabled="disabled" style="color:red; margin-right: 2%; margin-top: 3%;cursor: pointer;" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)">
@@ -47,29 +43,24 @@
                 </md-list>
             </md-tab>              
             <md-tab ng-if="admin" label="ALTRE PRENOTAZIONI">
-                <div ng-show="prenotazioniDaApprovare.length === 0" style="text-align: center;">
-                    <br><br>
-                    <span>Nessuna prenotazione di altri utenti</span>
-                </div>
                 <div style="">
                     <div style="margin-left: auto;margin-right: 2%;width: 6em">
-                        <md-switch ng-model="passate" aria-label="Switch 1">Passate</md-switch>
+                        <md-switch ng-model="passedAltrePrenotazioni" ng-change="toggle(2);fillsAltrePrenotazioni()" aria-label="Switch 1">Passate</md-switch>
                     </div>
                 </div>
-                <md-list>
-                <md-list>
-                    <md-list-item ng-repeat="prenotazione in prenotazioniDaApprovare" class="md-3-line">
+                <md-list style="overflow-y:auto;height: 450px">
+                    <md-list-item ng-repeat="prenotazione in fAltrePrenotazioni" class="md-3-line">
                         <div class="md-list-item-text">
                             <h3>{{prenotazione.fgiorno}}</h3>
                             <h4>{{prenotazione.stanza}} - {{prenotazione.ora}}°ORA</h4>
                             <p>{{prenotazione.risorsa}}</p>
                             <p>Richiedente: {{prenotazione.who}}</p>
                         </div>
-                        <md-button ng-hide='prenotazione.approvata==1' style="color:#2196F3; margin-right: 1%; margin-top: 2.5%" class="md-raised" ng-click="approva(prenotazione.giorno, prenotazione.stanza, prenotazione.ora)" class="md-block" >
+                        <md-button ng-disabled="isPassed(prenotazione.giorno)"  ng-hide='prenotazione.approvata==1||isPassed(prenotazione.giorno)' style="color:#2196F3; margin-right: 1%; margin-top: 2.5%" class="md-raised" ng-click="approva(prenotazione.giorno, prenotazione.stanza, prenotazione.ora)" class="md-block" >
                             APPROVA
                         </md-button>
-                        <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1" class="material-icons">done</i>
-                        <md-button style=" color:#2196F3; margin-right: 2%; margin-top: 2.5%" class="md-raised" ng-click="nonApprova(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" class="md-block" >
+                        <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!isPassed(prenotazione.giorno)" class="material-icons">done</i>
+                        <md-button ng-hide="isPassed(prenotazione.giorno)" style=" color:#2196F3; margin-right: 2%; margin-top: 2.5%" class="md-raised" ng-click="nonApprova(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" class="md-block" >
                             NON APPROVA
                         </md-button>
                         <md-divider></md-divider>

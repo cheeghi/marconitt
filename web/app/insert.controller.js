@@ -10,6 +10,7 @@ app
         $scope.event.hourEnd = new Date();
         $scope.event.classes = [];
         $scope.event.rooms = [];
+        $scope.isLoading = true; // used for loading circle
 
 
         /**
@@ -21,6 +22,7 @@ app
                 $scope.teachers = response.teachers;
                 $scope.rooms = response.rooms;
                 console.log($scope.teachers + "---------" + $scope.classes);
+                 $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
             });
         };
 
@@ -47,7 +49,12 @@ app
                 }
             };
             console.log(req.data);
-
+            $scope.event = {};
+            $scope.event.day = new Date();
+            $scope.event.hourStart = new Date();
+            $scope.event.hourEnd = new Date();
+            $scope.event.classes = [];
+            $scope.event.rooms = [];
             /*
             $http(req)
                 .then(
@@ -64,11 +71,17 @@ app
         }
 
 
+        /**
+         * says if a day is sunday or not
+         * @param date
+         * @returns {boolean}
+         */
         $scope.noSunday = function(date) {
             var day = date.getDay();
             return day !== 0;
         };
 
 
+        // on start
         init();
     });
