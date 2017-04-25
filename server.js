@@ -537,6 +537,19 @@ apiRoutes.post('/cancellaPrenotazione', function(req, res) {
 });
 
 
+apiRoutes.post('/creaEvento', function(req, res) {
+    var giorno = req.body.giorno;
+    var classi = req.body.classi;
+    var stanze = req.body.stanze;
+
+    //aggiungo nella tabella eventi.
+    //seleziono l'id dell'evento.
+    //ci collego i prof(vettore di professori).
+    // VADO O NO A MODIFICARE LA TIMETABLE?? Metto un campo 'occupata' in risorsa.
+    //Quando per il VISUALIZZA si trova 'occupata', va a prendere da tabella eventi.
+});
+
+
 apiRoutes.post('/events/:year/:month/:day', function(req, res) {
     console.log(req.body);
     var day = new Day({
