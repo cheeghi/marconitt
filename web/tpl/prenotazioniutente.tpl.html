@@ -1,4 +1,4 @@
-<div ng-controller="PrenotazioniUtenteCtrl" ng-init="init()" layout-fill style="height: 100% !important;">
+<div ng-controller="PrenotazioniUtenteCtrl" ng-init="init()" layout-fill style="height: 100% !important;overflow-y: scroll">
     <md-toolbar>
         <div class="md-toolbar-tools">
             <md-button class="md-icon-button" aria-label="Open sidenav" ng-click="toggleLeft()" hide-gt-md>
@@ -22,7 +22,7 @@
                         <md-switch ng-model="passedMiePrenotazioni" ng-change="toggle(1);fillsMiePrenotazioni();" aria-label="Switch 1">Passate</md-switch>
                     </div>
                 </div>
-                <md-list style="overflow-y:auto;height: 450px">
+                <md-list style="">
                     <md-list-item ng-repeat="prenotazione in fMiePrenotazioni" class="md-3-line">
                         <div class="md-list-item-text">
                             <h3>{{prenotazione.fgiorno}}</h3>
@@ -31,7 +31,7 @@
                         </div>
                         <i style="color: grey; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==0&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">pan_tool</i>
                         <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">done</i>
-                        <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" ng-hide="isPassed(prenotazione.giorno)" class="md-block">
+                        <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" ng-hide="isPassed(prenotazione.giorno)&&!admin" class="md-block">
                             RIMUOVI
                         </md-button>
                         <!--<a ng-disabled="disabled" style="color:red; margin-right: 2%; margin-top: 3%;cursor: pointer;" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)">
@@ -48,7 +48,7 @@
                         <md-switch ng-model="passedAltrePrenotazioni" ng-change="toggle(2);fillsAltrePrenotazioni()" aria-label="Switch 1">Passate</md-switch>
                     </div>
                 </div>
-                <md-list style="overflow-y:auto;height: 450px">
+                <md-list style="">
                     <md-list-item ng-repeat="prenotazione in fAltrePrenotazioni" class="md-3-line">
                         <div class="md-list-item-text">
                             <h3>{{prenotazione.fgiorno}}</h3>
