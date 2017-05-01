@@ -538,15 +538,105 @@ apiRoutes.post('/cancellaPrenotazione', function(req, res) {
 
 
 apiRoutes.post('/creaEvento', function(req, res) {
-    var giorno = req.body.giorno;
+    var am = false;
+    var _304 = false;
+    var _042 = false;
+    var oraInizio = 1;
+    var oraFine = 1;
+    var professori = "";
+
+    var descrizione = req.body.descrizione;
+    var giorno = req.body.day;
+    var start = req.body.oraInizio;
+    var end = req.body.oraFine;
     var classi = req.body.classi;
     var stanze = req.body.stanze;
 
-    //aggiungo nella tabella eventi.
-    //seleziono l'id dell'evento.
-    //ci collego i prof(vettore di professori).
-    // VADO O NO A MODIFICARE LA TIMETABLE?? Metto un campo 'occupata' in risorsa.
-    //Quando per il VISUALIZZA si trova 'occupata', va a prendere da tabella eventi.
+    //sistemo le Aule per inserimento su Database
+    var vett = stanze.split(",");
+
+    for(var cont in vett) {
+        if(vett[cont] == "Aula Magna") {
+            am = true;
+        } else if (vett[cont] == "L042") {
+            _304 = true;
+        } else if (vett[cont] == "A304") {
+            _042 = true;
+        }
+    }
+
+    //sistemo le ore
+    if(start >= "8:00" && start < "9:00") {
+        oraInizio = 1;
+    } else if(start >= "9:00" && start < "10:00") {
+        oraInizio = 2;
+    } else if(start >= "10:00" && start < "11:00") {
+        oraInizio = 3;
+    } else if(start >= "11:00" && start < "12:00") {
+        oraInizio = 4;
+    } else if(start >= "12:00" && start < "13:00") {
+        oraInizio = 5;
+    } else if(start >= "13:00" && start < "14:30") {
+        oraInizio = 6;
+    } else if(start >= "14:30" && start < "15:30") {
+        oraInizio = 7;
+    } else if(start >= "15:30" && start < "16:30") {
+        oraInizio = 8;
+    } else if(start >= "16:30" && start < "17:30") {
+        oraInizio = 9;
+    } else if(start >= "17:30" && start < "18:30") {
+        oraInizio = 10;
+    }
+
+    if(end >= "8:00" && end < "9:00") {
+        oraFine = 1;
+    } else if(end >= "9:00" && end < "10:00") {
+        oraFine = 2;
+    } else if(end >= "10:00" && end < "11:00") {
+        oraFine = 3;
+    } else if(end >= "11:00" && end < "12:00") {
+        oraFine = 4;
+    } else if(end >= "12:00" && end < "13:00") {
+        oraFine = 5;
+    } else if(end >= "13:00" && end < "14:30") {
+        oraFine = 6;
+    } else if(end >= "14:30" && end < "15:30") {
+        oraFine = 7;
+    } else if(end >= "15:30" && end < "16:30") {
+        oraFine = 8;
+    } else if(end >= "16:30" && end < "17:30") {
+        oraFine = 9;
+    } else if(end >= "17:30" && end < "18:30") {
+        oraFine = 10;
+    }
+
+    var ore = "";
+    cont = oraInizio;
+
+    while(cont < oraFine) {
+        ore += cont  + ",";
+        cont++;
+    }
+    ore += oraFine;
+    vett = classi.split(",");
+    vett2 = ore.split(",");
+
+    profInEventi(vett, vett2, giorno, function(response) {
+        var appo = response;
+        appo = appo.replace(/null, /g, "");
+        professori = appo.substring(0, appo.length - 2);
+        sql_stmt = "INSERT INTO eventi(giorno, oraInizio, oraFine, ore, AM, _304, _042, classi, professori) VALUES ('" + 
+            giorno + "', '" + start + "', '" + end + "', '" + ore + "', " + am + ", " + _304 + ", " + _042 + ", '" 
+            + classi + "', '" + professori + "')";
+
+        connection.query(sql_stmt, function(err) {
+            if (!err) {
+                res.json(true);
+            } else {
+                res.json(false);
+            }
+        });
+    });
 });
 
 
@@ -997,4 +1087,51 @@ function undoClasse(stanza, giorno, ora, risorsa, res) {
             res(false);
         }
     });
+}
+
+
+function profInEventi(vett, vett2, giorno, res) {
+    var professori = "";
+    var tot = (vett.length) * (vett2.length) * 2;
+    var appo;
+
+    for(i in vett) {
+        for(j in vett2) {
+            var sql_stmt = "SELECT professore1, professore2 FROM timetable WHERE giorno = '" + giorno +
+                "' AND ora = " + vett2[j] + " AND risorsa = '" + vett[i] + "';"
+
+            connection.query(sql_stmt, function(err, rows, fields) {
+                if(!err) {
+                    try {
+                        professori += rows[0].professore1 + ", ";
+                        appo = professori.split(",").length;
+
+                        if(appo == tot) {
+                            res(professori);
+                        }
+                        professori += rows[0].professore2 + ", ";
+                        appo = professori.split(",").length;
+
+                        if(appo == tot) {
+                            res(professori);
+                        }
+                    } catch(e) {
+                        professori += "null, ";
+                        appo = professori.split(",").length;
+
+                        if(appo == tot) {
+                            res(professori);
+                        }
+                    }
+                } else {
+                    professori += "null, ";
+                    appo = professori.split(",").length;
+
+                    if(appo == tot) {
+                        res(professori);
+                    }
+                }
+            });
+        }
+    }
 }
