@@ -27,7 +27,7 @@ app
 
             } else {
                     $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
-                    $rootScope.$broadcast('reInit',{day:day});
+                    $rootScope.$broadcast('reInitVisualizza',{day:day});
             }
         }
 
@@ -56,7 +56,7 @@ app
 
             } else {
                 $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
-                $rootScope.$broadcast('reInit',{day:day});
+                $rootScope.$broadcast('reInitVisualizza',{day:day});
             }
         }
 

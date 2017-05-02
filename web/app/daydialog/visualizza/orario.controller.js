@@ -37,6 +37,23 @@ app.
         }
 
 
+        /**
+         * called by other controllers in order to re-initialize the controller
+         */
+        $scope.$on("reInitVisualizza", function (event, args) {
+            $scope.init(args.day);
+            if(! $scope.isSunday){
+                if ($scope.sClass != undefined){
+                    $scope.getOrarioClass($scope.sClass);
+                }else if($scope.sTeacher != undefined){
+                    $scope.getOrarioTeacher($scope.sTeacher);
+                }else if($scope.sRoom != undefined){
+                     $scope.getOrarioRoom($scope.sRoom);
+                }
+            }
+        });
+
+
         /*$scope.getOrarioRoom = function() {
             //alert($scope.giornoSelezionato);
             $scope.sTeacher = undefined;

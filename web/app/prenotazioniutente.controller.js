@@ -10,6 +10,9 @@ app.
         $scope.fAltrePrenotazioni = []; // filtered array of $scope.altrePrenotazioni
         $scope.passedMiePrenotazioni = false; // toggle for showing / not showing passed reservations
         $scope.passedAltrePrenotazioni = false; // toggle for showing / not showing passed reservations
+        $scope.passedEventi = false; // toggle for showing / not showing passed reservations
+        $scope.events;
+        $scope.fEvents;
 
         /**
          * initialize method
@@ -40,7 +43,22 @@ app.
                         prenotazione.fgiorno = fgiorno;
                     });
                     $scope.fillsAltrePrenotazioni();
-                });      
+                });    
+
+                $http.get('http://localhost/timetable.php', {
+                    cache: false,
+                    params: {
+                        events: "" 
+                    }
+                }).success(function(response) {
+                    $scope.events = response;
+                    $scope.events.forEach(function(prenotazione) {
+                        var giorno = new Date(prenotazione.giorno);
+                        var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
+                        prenotazione.fgiorno = fgiorno;
+                    });
+                    $scope.fillsEventi();
+                });  
             } 
 
             $http.get('http://localhost/timetable.php', {  
@@ -94,6 +112,22 @@ app.
 
 
         /**
+         * populates the fAltrePrenotazioni with filtered values
+         */
+        $scope.fillsEventi = function () {
+            if ($scope.passedEventi)
+                $scope.fEvents = $scope.events;
+            else {
+                $scope.fEvents = [];
+                $scope.events.forEach(function(entry) {
+                    if (!$scope.isPassed(entry.giorno))
+                        $scope.fEvents.push(entry);
+                }, this);
+            }
+        };
+
+
+        /**
          * toggle to show or not passed reservations
          * @param type
          */
@@ -102,7 +136,10 @@ app.
                 $scope.passedMiePrenotazioni = $scope.passedMiePrenotazioni ? true : false;
             else if (type == 2)
                 $scope.passedAltrePrenotazioni = $scope.passedAltrePrenotazioni ? false : true;
-            console.log($scope.passedAltrePrenotazioni);
+            else if (type == 3)
+                $scope.passedEventi = $scope.passedEventi ? false : true;            
+
+            console.log($scope.passedEventi);
         };
 
 
@@ -186,6 +223,44 @@ app.
             //send email to...
             
             $scope.removePrenotazione(giorno, stanza, risorsa, ora);
+        };
+
+
+        $scope.removeEvento = function(id) {
+
+            var confirm = $mdDialog.confirm()
+              .textContent("L'evento verrà rimosso per sempre. Continuare?")
+              .ok('CONFERMA')
+              .cancel('ANNULLA');
+
+            $mdDialog.show(confirm).then(function() {
+                  /*
+                $scope.isLoading = true;
+
+                var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
+                        + "&risorsa="+ risorsa;
+                console.log(ora);
+                var req = {
+                    method: 'POST',
+                    url: 'http://'+CONFIG.HOST+':8080/api/cancellaPrenotazione',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    data: data
+                };
+
+
+                $http(req)
+                    .success(function(data) {
+                        $scope.prenotazioni = null;
+                        $scope.initializeHttpCalls();
+                        $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                   
+                    }).error(function(err) {
+                        $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
+                    });*/
+                console.log(id);
+                    
+            });
         };
 
 

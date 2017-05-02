@@ -31,7 +31,7 @@
                         </div>
                         <i style="color: grey; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==0&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">pan_tool</i>
                         <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">done</i>
-                        <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" ng-hide="isPassed(prenotazione.giorno)&&!admin" class="md-block">
+                        <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" ng-hide="isPassed(prenotazione.giorno)" class="md-block">
                             RIMUOVI
                         </md-button>
                         <!--<a ng-disabled="disabled" style="color:red; margin-right: 2%; margin-top: 3%;cursor: pointer;" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)">
@@ -69,20 +69,27 @@
                 </md-list>
             </md-tab>  
             <md-tab ng-if="admin" label="EVENTI">
-                <!--
-                <md-list>
-                    <md-list-item ng-repeat="prenotazione in prenotazioni" class="md-3-line">
+                <div style="">
+                    <div style="margin-left: auto;margin-right: 2%;width: 6em">
+                        <md-switch ng-model="passedAltrePrenotazioni" ng-change="toggle(3);fillsEventi()" aria-label="Switch 1">Passati</md-switch>
+                    </div>
+                </div>
+                <md-list style="">
+                    <md-list-item ng-repeat="prenotazione in fEvents" class="md-3-line">
                         <div class="md-list-item-text">
-                            <h3>{{prenotazione.giorno}}</h3>
-                            <h4>{{prenotazione.stanza}} {{prenotazione.ora}}°ORA</h4>
-                            <p>{{prenotazione.risorsa}}</p>
+                            <h3>{{prenotazione.fgiorno}}</h3>
+                            <h4>Orario: {{prenotazione.oraInizio}} - {{prenotazione.oraFine}}</h4>
+                            <p>Descrizione: {{prenotazione.aule}}</p>
+                            <p>Classi: {{prenotazione.classi}}</p>
+                            <p>Aule: {{prenotazione.aule}}</p>
                         </div>
-                        <md-button ng-disabled="disabled" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)"
-                            style="color:#2196F3" class="md-raised md-secondary">Rimuovi</md-button>
+                        <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removeEvento(prenotazione.id)" ng-hide="isPassed(prenotazione.giorno)" class="md-block">
+                            RIMUOVI
+                        </md-button>
                         <md-divider></md-divider>
                     </md-list-item>
                     <span> </span>
-                </md-list>-->
+                </md-list>
             </md-tab>                    
         </md-tabs>            
     </md-content>

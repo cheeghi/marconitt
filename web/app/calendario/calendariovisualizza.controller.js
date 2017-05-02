@@ -13,8 +13,8 @@ app
          * retrieves events data and fills the calendar
          */
         $scope.getData = function () {
-            $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
-            /*
+            //$timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
+            
             var req = {
                 method: 'GET',
                 url: 'http://localhost/timetable.php?numberofeventsbymonth='+ ($scope.currentMonth)
@@ -30,7 +30,7 @@ app
                     $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
                 }, function(err) {
                     $mdToast.show($mdToast.simple().textContent("Errore nel recuperare gli eventi: " + (err.data || "il server non risponde")));
-                });*/
+                });
         };
 
 
