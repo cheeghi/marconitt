@@ -23,8 +23,10 @@ app
          * clears the calendar content
          */
         $scope.resetCalendar = function () {
-            for (i = 1; i <= 31; i++) {
-                MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + $scope.currentMonth + '-' + i), ' ');
+            for (j = 1; j <= 12; j++) {
+                for (i = 1; i <= 31; i++) {
+                    MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + j + '-' + i), ' ');
+                }    
             }
         };
 

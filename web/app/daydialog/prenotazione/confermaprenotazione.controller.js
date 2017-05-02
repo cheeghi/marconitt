@@ -64,7 +64,7 @@ app.
                     risorsa = classe;
                     isClasse = true;
                 } else if ($scope.tipoPrenotazione == 'Progetto') {
-                    risorsa = $scope.sProgetto;
+                    risorsa = 'Progetto: ' + $scope.sProgetto;
                 } else if ($scope.tipoPrenotazione == 'Sportello') {
                     risorsa = "Sportello: " + $scope.sTeacher;
                 } else if ($scope.tipoPrenotazione == 'Altro') {
