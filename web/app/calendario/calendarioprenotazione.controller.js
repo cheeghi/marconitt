@@ -20,13 +20,18 @@ app
 
 
         /**
-         * clears the calendar content
+         * clears calendar content
          */
         $scope.resetCalendar = function () {
-            for (j = 1; j <= 12; j++) {
-                for (i = 1; i <= 31; i++) {
-                    MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + j + '-' + i), ' ');
-                }    
+            // we need to do clear the current, the previous and the next month 
+            for (i = 1; i <= 31; i++) {
+                MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + ($scope.currentMonth) + '-' + i), ' ');
+            }  
+            for (i = 1; i <= 31; i++) {
+                MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + ($scope.currentMonth+1) + '-' + i), ' ');
+            }    
+            for (i = 1; i <= 31; i++) {
+                MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + ($scope.currentMonth-1) + '-' + i), ' ');
             }
         };
 
@@ -53,7 +58,7 @@ app
             } else {
                 $mdDialog.show({
                     templateUrl: tplUrl,
-                    controller: 'DayDialogCtrl',
+                    controller: 'DayDialogPrenotazioneCtrl',
                     clickOutsideToClose: true,
                     locals: {
                         day: date
@@ -70,6 +75,7 @@ app
         $scope.prevMonth = function(date) {
             $scope.currentMonth = date.month;
             $scope.currentYear = date.year;
+            $scope.resetCalendar();
         }
 
 
@@ -80,6 +86,7 @@ app
         $scope.nextMonth = function(date) {
             $scope.currentMonth = date.month;
             $scope.currentYear = date.year;
+            $scope.resetCalendar();
         }
 
     });

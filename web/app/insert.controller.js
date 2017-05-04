@@ -4,7 +4,7 @@ app
         $scope.teachers;
         $scope.classes;
         $scope.event = {};
-        $scope.event.description = '';
+        $scope.event.description;
         $scope.event.day = new Date();
         $scope.event.hourStart = new Date();
         $scope.event.hourEnd = new Date();
