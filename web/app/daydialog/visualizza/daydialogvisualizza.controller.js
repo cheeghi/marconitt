@@ -1,5 +1,5 @@
 app
-    .controller('DayDialogCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, MaterialCalendarData, $q, $mdToast, $mdDialog, $mdDateLocale, $rootScope, $httpParamSerializerJQLike, CONFIG, day) {
+    .controller('DayDialogVisualizzaCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, MaterialCalendarData, $q, $mdToast, $mdDialog, $mdDateLocale, $rootScope, $httpParamSerializerJQLike, CONFIG, day) {
 
         $scope.day = day;
         $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();
@@ -10,25 +10,11 @@ app
          * increases the day
          * @param inPrenotazione
          */
-        $scope.nextDay = function(inPrenotazione) {
-            
-            day.setDate(day.getDate() + 1);
-            
-            if (inPrenotazione) {
-                var limitDay = new Date();
-                limitDay.setDate(limitDay.getDate() + giorniLimite);
-
-                if (day > limitDay && !$rootScope.admin) {
-                    $mdToast.show($mdToast.simple().textContent('Seleziona una data più vicina'));
-                } else {
-                    $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
-                    $rootScope.$broadcast('reInit',{day:day});
-                }
-
-            } else {
-                    $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
-                    $rootScope.$broadcast('reInitVisualizza',{day:day});
-            }
+        $scope.nextDay = function() {
+            day.setDate(day.getDate() + 1);    
+    
+            $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
+            $rootScope.$broadcast('reInitVisualizza',{day:day});
         }
 
 
@@ -36,28 +22,11 @@ app
          * decreases the day
          * @param inPrenotazione
          */
-        $scope.previousDay = function(inPrenotazione) {
-
+        $scope.previousDay = function() {
             day.setDate(day.getDate() - 1);
-
-            if (inPrenotazione) {
-                var today = new Date();
-                today.setHours(0); // we need to do these sets, otherwise the comparison doesnt work
-                today.setMinutes(0);
-                today.setSeconds(0);
-                today.setMilliseconds(0);
-
-                if (day < today  && !$rootScope.admin) {
-                    $mdToast.show($mdToast.simple().textContent('Non puoi prenotare per un giorno passato'));
-                } else {
-                    $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
-                    $rootScope.$broadcast('reInit',{day:day});
-                }
-
-            } else {
-                $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
-                $rootScope.$broadcast('reInitVisualizza',{day:day});
-            }
+            
+            $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
+            $rootScope.$broadcast('reInitVisualizza',{day:day});
         }
 
 
@@ -98,25 +67,25 @@ app
          *
          */
         $scope.dimension = function() {
-			var boolD = false;
+            var boolD = false;
 
-			//fix table dimension
+            //fix table dimension
             var table = document.getElementById("orario");
             var tableHeight = table.clientHeight;
             var tableWidth = table.clientWidth;
             if (boolD) {
-				console.log("fix table dimension height: " + tableHeight);
-				console.log("fix table dimension width: " + tableWidth);
-			}
+                console.log("fix table dimension height: " + tableHeight);
+                console.log("fix table dimension width: " + tableWidth);
+            }
 
-			//page dimension
-			var page = document.getElementById("contentPrenotazione");
-			var pageWidth = page.clientWidth;
+            //page dimension
+            var page = document.getElementById("contentPrenotazione");
+            var pageWidth = page.clientWidth;
             var pageHeight = page.clientHeight;
-			if (boolD) {
-				console.log("page dimension width: " + pageWidth);
+            if (boolD) {
+                console.log("page dimension width: " + pageWidth);
                 console.log("page dimension height: " + pageHeight);
-			}
+            }
 
             if (tableWidth > pageWidth && tableHeight > pageHeight) {
                 console.log("inserire scroll verticale");
@@ -131,13 +100,13 @@ app
                 //add vertical and orizzontal scroll
             } else if (tableWidth > pageWidth) {
                 console.log("inserire scroll orizzontale");
-				if (boolD) {
-					console.log("width fix table: " + tableWidth);
-					console.log("width page: " + pageWidth);
-					console.log("inserire scroll orizzontale");
-				}
+                if (boolD) {
+                    console.log("width fix table: " + tableWidth);
+                    console.log("width page: " + pageWidth);
+                    console.log("inserire scroll orizzontale");
+                }
                 //add orizzontal scroll
-			} else if (tableHeight > pageHeight) {
+            } else if (tableHeight > pageHeight) {
                 console.log("inserire scroll verticale");
                 if (boolD) {
                     console.log("height fix table: " + tableHeight);

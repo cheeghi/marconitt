@@ -2,7 +2,7 @@
     <form>
         <md-toolbar>
            <div class="md-toolbar-tools">
-                <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="cursor: pointer;" ng-click="previousDay(true)">
+                <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="cursor: pointer;" ng-click="previousDay()">
                     <svg version="1.1" x="0px" y="0px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fit="" height="100%" width="100%" preserveAspectRatio="xMidYMid meet" focusable="false">
                     <g><polygon points="15.4,7.4 14,6 8,12 14,18 15.4,16.6 10.8,12 "></polygon></g></svg>
                 </md-icon>
@@ -10,7 +10,7 @@
                 <h2 style="padding-left: 2.3%; text-align: center; width: 100%">{{ dayString }}</h2>
                 <span flex></span>
 
-                <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="transform: rotate(180deg); cursor: pointer;" ng-click="nextDay(true)">
+                <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="transform: rotate(180deg); cursor: pointer;" ng-click="nextDay()">
                     <svg version="1.1" x="0px" y="0px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fit="" height="100%" width="100%" preserveAspectRatio="xMidYMid meet" focusable="false">
                     <g><polygon points="15.4,7.4 14,6 8,12 14,18 15.4,16.6 10.8,12 "></polygon></g></svg>
                 </md-icon>
@@ -59,16 +59,16 @@
                                         <label>Ora</label>
                                         <md-select ng-model="sHour" ng-show="sRoomType!=undefined" ng-change="getPrenotazioni()" size="20">
                                         <md-option>Qualsiasi</md-option>
-                                        <md-option>1</md-option>
-                                        <md-option>2</md-option>
-                                        <md-option>3</md-option>
-                                        <md-option>4</md-option>
-                                        <md-option>5</md-option>
-                                        <md-option>6</md-option>
-                                        <md-option>7</md-option>
-                                        <md-option>8</md-option>
-                                        <md-option>9</md-option>
-                                        <md-option>10</md-option>
+                                        <md-option value=1>1°</md-option>
+                                        <md-option value=2>2°</md-option>
+                                        <md-option value=3>3°</md-option>
+                                        <md-option value=4>4°</md-option>
+                                        <md-option value=5>5°</md-option>
+                                        <md-option value=6>6°</md-option>
+                                        <md-option value=7>7°</md-option>
+                                        <md-option value=8>8°</md-option>
+                                        <md-option value=9>9°</md-option>
+                                        <md-option value=10>10°</md-option>
                                         </md-select>
                                     </md-input-container>
                                 </div>

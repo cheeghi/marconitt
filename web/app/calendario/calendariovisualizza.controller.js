@@ -43,7 +43,7 @@ app
                 
             $mdDialog.show({
                     templateUrl: tplUrl,
-                    controller: 'DayDialogCtrl',
+                    controller: 'DayDialogVisualizzaCtrl',
                     clickOutsideToClose: true,
                     locals: {
                         day: date
