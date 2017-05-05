@@ -538,13 +538,12 @@ apiRoutes.post('/cancellaPrenotazione', function(req, res) {
 
 
 apiRoutes.post('/creaEvento', function(req, res) {
-    var am = false;
-    var _304 = false;
-    var _042 = false;
     var oraInizio = 1;
-    var oraFine = 1;
+    var oraFine = 0;
     var professori = "";
+    var id;
 
+    //Prendo le variabili dal form
     var descrizione = req.body.descrizione;
     var giorno = req.body.day;
     var start = req.body.oraInizio;
@@ -552,90 +551,69 @@ apiRoutes.post('/creaEvento', function(req, res) {
     var classi = req.body.classi;
     var stanze = req.body.stanze;
 
-    //sistemo le Aule per inserimento su Database
-    var vett = stanze.split(",");
-
-    for(var cont in vett) {
-        if(vett[cont] == "Aula Magna") {
-            am = true;
-        } else if (vett[cont] == "L042") {
-            _304 = true;
-        } else if (vett[cont] == "A304") {
-            _042 = true;
-        }
-    }
-
     //sistemo le ore
-    if(start >= "8:00" && start < "9:00") {
-        oraInizio = 1;
-    } else if(start >= "9:00" && start < "10:00") {
-        oraInizio = 2;
-    } else if(start >= "10:00" && start < "11:00") {
-        oraInizio = 3;
-    } else if(start >= "11:00" && start < "12:00") {
-        oraInizio = 4;
-    } else if(start >= "12:00" && start < "13:00") {
-        oraInizio = 5;
-    } else if(start >= "13:00" && start < "14:30") {
-        oraInizio = 6;
-    } else if(start >= "14:30" && start < "15:30") {
-        oraInizio = 7;
-    } else if(start >= "15:30" && start < "16:30") {
-        oraInizio = 8;
-    } else if(start >= "16:30" && start < "17:30") {
-        oraInizio = 9;
-    } else if(start >= "17:30" && start < "18:30") {
-        oraInizio = 10;
-    }
+    hourToStartHour(giorno, start, function(res1) {
+        oraInizio = res1;
 
-    if(end >= "8:00" && end < "9:00") {
-        oraFine = 1;
-    } else if(end >= "9:00" && end < "10:00") {
-        oraFine = 2;
-    } else if(end >= "10:00" && end < "11:00") {
-        oraFine = 3;
-    } else if(end >= "11:00" && end < "12:00") {
-        oraFine = 4;
-    } else if(end >= "12:00" && end < "13:00") {
-        oraFine = 5;
-    } else if(end >= "13:00" && end < "14:30") {
-        oraFine = 6;
-    } else if(end >= "14:30" && end < "15:30") {
-        oraFine = 7;
-    } else if(end >= "15:30" && end < "16:30") {
-        oraFine = 8;
-    } else if(end >= "16:30" && end < "17:30") {
-        oraFine = 9;
-    } else if(end >= "17:30" && end < "18:30") {
-        oraFine = 10;
-    }
+        hourToEndHour(giorno, end, function(res1) {
+            oraFine = res1;
 
-    var ore = "";
-    cont = oraInizio;
+            //inserisco l'evento
+            var sql_stmt = "INSERT INTO eventi(giorno, descrizione, oraInizio, oraFine, classi, stanze) VALUES('" + giorno + "', '" + 
+                descrizione + "', '" + start + "', '" + end + "', '" + classi + "', '" + stanze + "')";
+            
+            connection.query(sql_stmt, function(err) {
+                if(!err) {
+                    res.json(true);
+                    //seleziono l'id dell'evento inserito
+                    sql_stmt = "SELECT id FROM eventi WHERE giorno = '" + giorno + "' AND descrizione = '" + descrizione 
+                        + "' AND oraInizio = '" + start + "' AND oraFine = '" + end + "'";
 
-    while(cont < oraFine) {
-        ore += cont  + ",";
-        cont++;
-    }
-    ore += oraFine;
-    vett = classi.split(",");
-    vett2 = ore.split(",");
+                    connection.query(sql_stmt, function(err, rows, fields) {
+                        if (!err) {
+                            id = rows[0].id;
+                            cont = oraInizio;
+                            var vett = [];
 
-    profInEventi(vett, vett2, giorno, function(response) {
-        var appo = response;
-        appo = appo.replace(/null, /g, "");
-        professori = appo.substring(0, appo.length - 2);
-        sql_stmt = "INSERT INTO eventi(giorno, oraInizio, oraFine, ore, AM, _304, _042, classi, professori) VALUES ('" + 
-            giorno + "', '" + start + "', '" + end + "', '" + ore + "', " + am + ", " + _304 + ", " + _042 + ", '" 
-            + classi + "', '" + professori + "')";
+                            while(cont <= oraFine) {
+                                vett.push(cont);
+                                cont++;
+                            }
+                            cont = 0;
+                            for(ora in vett) {
+                                profInEventi(classi, id, giorno, vett[ora]);
+                            }
+                        } else {
+                            res.json(false);
+                        }
+                    });
+                } else {
+                    res.json(false);
+                }
+            });
+        })
+    })
+});
 
-        connection.query(sql_stmt, function(err) {
-            if (!err) {
-                res.json(true);
-            } else {
-                res.json(false);
-            }
-        });
+
+apiRoutes.post('/cancellaEvento', function(req, res) {
+    var id = req.body.id;
+    var sql_stmt = "DELETE FROM prof_eventi WHERE id = " + id;
+
+    connection.query(sql_stmt, function(err) {
+        if (!err) {
+            sql_stmt = "DELETE FROM eventi WHERE id = " + id;
+
+            connection.query(sql_stmt, function(err) {
+                if (!err) {
+                    res.json(true);
+                } else {
+                    res.json(false);
+                }
+            });
+        } else {
+            res.json(false);
+        }
     });
 });
 
@@ -878,16 +856,30 @@ function moveProfessori(stanza, stanzaDaLib, giorno, ora, res) {
 
             connection.query(sql_stmt, function(err) {
                 if (!err) {
-                    var sql_stmt = "UPDATE timetable SET professore2 = '" + prof2 + "' WHERE ora = " + ora +
-                        " AND stanza = '" + stanza + "' AND giorno = '" + giorno + "';";
+                    try {
+                        var appo = prof2.split(" ")[0];
+                        var sql_stmt = "UPDATE timetable SET professore2 = '" + prof2 + "' WHERE ora = " + ora +
+                            " AND stanza = '" + stanza + "' AND giorno = '" + giorno + "';";
 
-                    connection.query(sql_stmt, function(err) {
-                        if (!err) {
-                            res(true);
-                        } else {
-                            res(false);
-                        }
-                    });
+                        connection.query(sql_stmt, function(err) {
+                            if (!err) {
+                                res(true);
+                            } else {
+                                res(false);
+                            }
+                        });
+                    } catch(e) {
+                        var sql_stmt = "UPDATE timetable SET professore2 = Null WHERE ora = " + ora +
+                            " AND stanza = '" + stanza + "' AND giorno = '" + giorno + "';";
+
+                        connection.query(sql_stmt, function(err) {
+                            if (!err) {
+                                res(true);
+                            } else {
+                                res(false);
+                            }
+                        });
+                    }
                 } else {
                     res(false);
                 }
@@ -1090,48 +1082,130 @@ function undoClasse(stanza, giorno, ora, risorsa, res) {
 }
 
 
-function profInEventi(vett, vett2, giorno, res) {
+function profInEventi(classi, id, giorno, ora, res) {
+    var vett = classi.split(",");
+    var sql_stmt = "";
     var professori = "";
-    var tot = (vett.length) * (vett2.length) * 2;
-    var appo;
+    var prof1, prof2 = "";
+    var tot = vett.length * 2;
+    var cont = 0;
+    var ret = 0;
 
     for(i in vett) {
-        for(j in vett2) {
-            var sql_stmt = "SELECT professore1, professore2 FROM timetable WHERE giorno = '" + giorno +
-                "' AND ora = " + vett2[j] + " AND risorsa = '" + vett[i] + "';"
+        sql_stmt = "SELECT professore1, professore2 FROM timetable WHERE risorsa = '" + vett[i] +
+            "' AND ora = " + ora + " AND giorno = '" + giorno + "'";
 
-            connection.query(sql_stmt, function(err, rows, fields) {
-                if(!err) {
-                    try {
-                        professori += rows[0].professore1 + ", ";
-                        appo = professori.split(",").length;
+        connection.query(sql_stmt, function(err, rows, fields) {
+            if (!err) {
+                try {
+                    professori += rows[0].professore1 + ", ";
+                    cont = cont + 1;
+                    professori += rows[0].professore2 + ", ";
+                    cont = cont + 1;
 
-                        if(appo == tot) {
-                            res(professori);
-                        }
-                        professori += rows[0].professore2 + ", ";
-                        appo = professori.split(",").length;
-
-                        if(appo == tot) {
-                            res(professori);
-                        }
-                    } catch(e) {
-                        professori += "null, ";
-                        appo = professori.split(",").length;
-
-                        if(appo == tot) {
-                            res(professori);
-                        }
+                    if(cont == tot) {
+                        professori = professori.replace("null, ", "");
+                        var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
+                        connection.query(sql_stmt);;
                     }
-                } else {
-                    professori += "null, ";
-                    appo = professori.split(",").length;
+                } catch(e) {
+                    cont = cont + 1;
 
-                    if(appo == tot) {
-                        res(professori);
+                    if(cont == tot) {
+                        professori = professori.replace("null, ", "");
+                        var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
+                        connection.query(sql_stmt);
                     }
                 }
-            });
-        }
+            } else {
+                cont = cont + 2;
+
+                if(cont == tot) {
+                    professori = professori.replace("null, ", "");
+                    var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
+                    connection.query(sql_stmt);
+                }
+            }
+        });
     }
+}
+
+
+function hourToEndHour(giorno, data, res) {
+    var schoolOur = 0;
+
+    var vett = giorno.split("-");
+    var year = vett[0];
+    var month = vett[1];
+    var day = vett[2];
+
+    vett = data.split(":");
+    var hour = vett[0];
+    var minute = vett[1];
+
+    var dt = new Date(year, month, day, hour, minute, 0);
+
+    if(dt >= new Date(year, month, day, "8", "00") && dt <= new Date(year, month, day, "9", "00")) {
+        schoolOur = 1;
+    } else if(dt > new Date(year, month, day, "9", "00") && dt <= new Date(year, month, day, "10", "00")) {
+        schoolOur = 2;
+    } else if(dt > new Date(year, month, day, "10", "00") && dt <= new Date(year, month, day, "11", "00")) {
+        schoolOur = 3;
+    } else if(dt > new Date(year, month, day, "11", "00") && dt <= new Date(year, month, day, "12", "00")) {
+        schoolOur = 4;
+    } else if(dt > new Date(year, month, day, "12", "00") && dt <= new Date(year, month, day, "13", "00")) {
+        schoolOur = 5;
+    } else if(dt > new Date(year, month, day, "13", "00") && dt <= new Date(year, month, day, "14", "30")) {
+        schoolOur = 6;
+    } else if(dt > new Date(year, month, day, "14", "30") && dt <= new Date(year, month, day, "15", "30")) {
+        schoolOur = 7;
+    } else if(dt > new Date(year, month, day, "15", "30") && dt <= new Date(year, month, day, "16", "30")) {
+        schoolOur = 8;
+    } else if(dt > new Date(year, month, day, "16", "30") && dt <= new Date(year, month, day, "17", "30")) {
+        schoolOur = 9;
+    } else if(dt > new Date(year, month, day, "17", "30") && dt <= new Date(year, month, day, "18", "30")) {
+        schoolOur = 10;
+    }
+
+    res(schoolOur);
+}
+
+
+function hourToStartHour(giorno, data, res) {
+    var schoolOur = 0;
+
+    var vett = giorno.split("-");
+    var year = vett[0];
+    var month = vett[1];
+    var day = vett[2];
+
+    vett = data.split(":");
+    var hour = vett[0];
+    var minute = vett[1];
+
+    var dt = new Date(year, month, day, hour, minute, 0);
+
+    if(dt >= new Date(year, month, day, "8", "00") && dt < new Date(year, month, day, "9", "00")) {
+        schoolOur = 1;
+    } else if(dt >= new Date(year, month, day, "9", "00") && dt < new Date(year, month, day, "10", "00")) {
+        schoolOur = 2;
+    } else if(dt >= new Date(year, month, day, "10", "00") && dt < new Date(year, month, day, "11", "00")) {
+        schoolOur = 3;
+    } else if(dt >= new Date(year, month, day, "11", "00") && dt < new Date(year, month, day, "12", "00")) {
+        schoolOur = 4;
+    } else if(dt >= new Date(year, month, day, "12", "00") && dt < new Date(year, month, day, "13", "00")) {
+        schoolOur = 5;
+    } else if(dt >= new Date(year, month, day, "13", "00") && dt < new Date(year, month, day, "14", "30")) {
+        schoolOur = 6;
+    } else if(dt >= new Date(year, month, day, "14", "30") && dt < new Date(year, month, day, "15", "30")) {
+        schoolOur = 7;
+    } else if(dt >= new Date(year, month, day, "15", "30") && dt < new Date(year, month, day, "16", "30")) {
+        schoolOur = 8;
+    } else if(dt >= new Date(year, month, day, "16", "30") && dt < new Date(year, month, day, "17", "30")) {
+        schoolOur = 9;
+    } else if(dt >= new Date(year, month, day, "17", "30") && dt < new Date(year, month, day, "18", "30")) {
+        schoolOur = 10;
+    }
+
+    res(schoolOur);
 }
