@@ -75,15 +75,15 @@
                     </div>
                 </div>
                 <md-list style="">
-                    <md-list-item ng-repeat="prenotazione in fEvents" class="md-3-line">
+                    <md-list-item ng-repeat="evento in fEvents" class="md-3-line">
                         <div class="md-list-item-text">
-                            <h3>{{prenotazione.fgiorno}}</h3>
-                            <h4>Orario: {{prenotazione.oraInizio}} - {{prenotazione.oraFine}}</h4>
-                            <p>Descrizione: {{prenotazione.aule}}</p>
-                            <p>Classi: {{prenotazione.classi}}</p>
-                            <p>Aule: {{prenotazione.aule}}</p>
+                            <h3>{{evento.fgiorno}}</h3>
+                            <h4>Orario: {{evento.oraInizio}} - {{evento.oraFine}}</h4>
+                            <p>Descrizione: {{evento.descrizione}}</p>
+                            <p>Classi: {{evento.classi}}</p>
+                            <p>Aule: {{evento.stanze}}</p>
                         </div>
-                        <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removeEvento(prenotazione.id)" ng-hide="isPassed(prenotazione.giorno)" class="md-block">
+                        <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removeEvento(evento.id)" ng-hide="isPassed(evento.giorno)" class="md-block">
                             RIMUOVI
                         </md-button>
                         <md-divider></md-divider>

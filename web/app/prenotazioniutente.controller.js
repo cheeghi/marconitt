@@ -51,6 +51,7 @@ app.
                         events: "" 
                     }
                 }).success(function(response) {
+                    console.log("eventi", response);
                     $scope.events = response;
                     $scope.events.forEach(function(prenotazione) {
                         var giorno = new Date(prenotazione.giorno);
@@ -176,7 +177,6 @@ app.
 
                 $http(req)
                     .success(function(data) {
-                        $scope.prenotazioni = null;
                         $scope.initializeHttpCalls();
                         $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                   
                     }).error(function(err) {
@@ -207,7 +207,6 @@ app.
 
             $http(req)
                 .success(function(data) {
-                    $scope.prenotazioni = null;
                     $scope.initializeHttpCalls();
                     $mdToast.show($mdToast.simple().textContent('Prenotazione approvata con successo'));                   
                 }).error(function(err) {
@@ -234,15 +233,13 @@ app.
               .cancel('ANNULLA');
 
             $mdDialog.show(confirm).then(function() {
-                  /*
+                
                 $scope.isLoading = true;
 
-                var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
-                        + "&risorsa="+ risorsa;
-                console.log(ora);
+                var data = "token="+$rootScope.token+"&id="+id;
                 var req = {
                     method: 'POST',
-                    url: 'http://'+CONFIG.HOST+':8080/api/cancellaPrenotazione',
+                    url: 'http://'+CONFIG.HOST+':8080/api/cancellaEvento',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
@@ -252,14 +249,11 @@ app.
 
                 $http(req)
                     .success(function(data) {
-                        $scope.prenotazioni = null;
                         $scope.initializeHttpCalls();
                         $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                   
                     }).error(function(err) {
                         $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
-                    });*/
-                console.log(id);
-                    
+                    });
             });
         };
 
