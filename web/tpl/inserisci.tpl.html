@@ -53,6 +53,7 @@
                 <div layout="row" layout-align="space-between center">
 
                     <mdp-time-picker ng-model="event.hourStart"><span style="color:#15629E;">Ora inizio</span></mdp-time-picker>
+
                     <mdp-time-picker ng-model="event.hourEnd"><span style="color:#15629E">Ora fine</span></mdp-time-picker>
                     <md-input-container>
                         <label>Classi</label>
@@ -68,13 +69,13 @@
                         <label>Aule</label>
                         <md-select ng-model="event.rooms" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona aule..">
                             <md-optgroup label="Aule">
-                                <md-option>
+                                <md-option value="aula magna">
                                     Aula Magna
                                 </md-option>
-                                <md-option>
+                                <md-option value="L042">
                                     L042
                                 </md-option>
-                                <md-option>
+                                <md-option value="A304">
                                     A304
                                 </md-option>
                             </md-optgroup>

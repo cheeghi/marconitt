@@ -21,8 +21,7 @@ app
                 $scope.classes = response.classes;
                 $scope.teachers = response.teachers;
                 $scope.rooms = response.rooms;
-                console.log($scope.teachers + "---------" + $scope.classes);
-                 $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
+                $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
             });
         };
 
