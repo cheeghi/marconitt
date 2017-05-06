@@ -68,10 +68,10 @@
                             <md-list-item ng-repeat="evento in eventsArray" class="md-3-line">
                                 <div class="md-list-item-text">
                                     <h3>{{evento.descrizione}}</h3>
-                                    <h4 style="color: grey">{{evento.orainizio}} - {{evento.orafine}} &nbsp; {{evento.stanze}}</h4>
-                                    <h4 style="color: grey"> {{evento.classi}}</h4>
-                                    
-                                </div>                                                   
+                                    <h4>Orario: {{evento.orainizio}} - {{evento.orafine}}</h4>
+                                    <p>Classi: {{evento.classi}}</p>
+                                    <p>Aule: {{evento.stanze}}</p>
+                                </div>                                                  
                                 <md-divider></md-divider>
                             </md-list-item>
                             <span> </span>
