@@ -22,7 +22,6 @@
         </md-toolbar>
         <md-dialog-content>
             <md-tabs md-dynamic-height md-stretch-tabs="always">
- 
                 <md-tab label="situazione del giorno">
                     <md-content ng-controller="OrarioCtrl" ng-init="init(day)">
                         <md-content layout-padding>
@@ -58,30 +57,23 @@
                         </md-content>
                     </md-content>
                 </md-tab>
-                
                 <md-tab label="eventi" >
-                    <md-content class="md-padding" ng-controller="EventCtrl" ng-init="init()">   <!--inizializza alla scelta del giorno-->
-                    <h4 ng-show="isEmpty" style="text-align: center; width: 100%; padding-top: 5%">Nessun evento in programma per oggi!</h4>
-
-                        <md-list style="">
-                            
-                            <md-list-item ng-repeat="evento in eventsArray" class="md-3-line">
-                                <div class="md-list-item-text">
-                                    <h3>{{evento.descrizione}}</h3>
-                                    <h4>Orario: {{evento.orainizio}} - {{evento.orafine}}</h4>
-                                    <p>Classi: {{evento.classi}}</p>
-                                    <p>Aule: {{evento.stanze}}</p>
-                                </div>                                                  
-                                <md-divider></md-divider>
-                            </md-list-item>
-                            <span> </span>
-                        </md-list>
-
-
-
+                    <md-content class="md-padding" ng-controller="EventCtrl" ng-init="init()">     <!--inizializza alla scelta del giorno-->
+                        <h4 ng-show="isEmpty" style="text-align: center; width: 100%; padding-top: 5%">Nessun evento in programma per oggi!</h4>
+                            <md-list style="">                    
+                                <md-list-item ng-repeat="evento in eventsArray" class="md-3-line">
+                                    <div class="md-list-item-text">
+                                        <h3>{{evento.descrizione}}</h3>
+                                        <h4>Orario: {{evento.orainizio}} - {{evento.orafine}}</h4>
+                                        <p>Classi: {{evento.classi}}</p>
+                                        <p>Aule: {{evento.stanze}}</p>
+                                    </div>                                                  
+                                    <md-divider></md-divider>
+                                </md-list-item>
+                                <span> </span>
+                            </md-list>
                     </md-content>
                 </md-tab>
-
             </md-tabs>
         </md-dialog-content>
     </form>
