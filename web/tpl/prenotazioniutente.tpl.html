@@ -6,7 +6,7 @@
             </md-button>
             <h2>
 			<span ng-show="!admin">Le mie prenotazioni</span>
-            <span ng-show="admin">Tutte le prenotazioni</span>
+            <span ng-show="admin">Prenotazioni / Eventi</span>
             </h2>
             <span flex=""></span>
         </div>
@@ -29,8 +29,8 @@
                             <h4>{{prenotazione.stanza}} - {{prenotazione.ora}}°ORA</h4>
                             <p>{{prenotazione.risorsa}}</p>
                         </div>
-                        <i style="color: grey; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==0&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">pan_tool</i>
-                        <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">done</i>
+                        <i style="color: grey; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==0&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">pan_tool<md-tooltip md-direction='bottom'>In attesa di approvazione</md-tooltip></i>
+                        <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">done<md-tooltip md-direction='bottom'>Approvato</md-tooltip></i>
                         <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" ng-hide="isPassed(prenotazione.giorno)" class="md-block">
                             RIMUOVI
                         </md-button>
@@ -42,7 +42,7 @@
                     <span> </span>
                 </md-list>
             </md-tab>              
-            <md-tab ng-if="admin" label="ALTRE PRENOTAZIONI">
+            <md-tab ng-if="admin" label="PRENOTAZIONI PROFESSORI">
                 <div style="">
                     <div style="margin-left: auto;margin-right: 2%;width: 6em">
                         <md-switch ng-model="passedAltrePrenotazioni" ng-change="toggle(2);fillsAltrePrenotazioni()" aria-label="Switch 1">Passate</md-switch>

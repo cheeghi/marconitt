@@ -45,9 +45,12 @@
                 </md-list-item>
                 <md-list-item ng-style="customStyle.eventi" ng-click="view('inserisci'); highlight(4);" ng-show="logged && admin">
                     <p ng-style="customStyle.eventiText">Inserisci evento</p>
-                </md-list-item>                
+                </md-list-item>
+                <md-list-item ng-style="customStyle.liberarisorse" ng-click="view('liberarisorse'); highlight(5);" ng-show="logged && admin">
+                    <p ng-style="customStyle.liberarisorseText">Libera risorse</p>
+                </md-list-item>
                 <md-list-item ng-style="customStyle.lmp" ng-click="view('prenotazioniutente'); highlight(3);" ng-show="logged" md-ink-ripple="#2196F3">
-                    <p ng-style="customStyle.lmpText"><span ng-show="!admin">Le mie prenotazioni</span><span ng-show="admin">Tutte le prenotazioni</span></p>
+                    <p ng-style="customStyle.lmpText"><span ng-show="!admin">Le mie prenotazioni</span><span ng-show="admin">Prenotazioni / Eventi</span></p>
                 </md-list-item>                
                 <!--<md-list-item ng-click="view('Cerca')">
                     <p>Cerca</p>
@@ -100,6 +103,7 @@
     <script src="app/daydialog/prenotazione/daydialogprenotazione.controller.js"></script>
     <script src="app/search.controller.js"></script>
     <script src="app/insert.controller.js"></script>
+    <script src="app/liberarisorse.controller.js"></script>    
     <script src="app/ngenter.directive.js"></script>
     <script src="app/prenotazioniutente.controller.js"></script>
 </body>

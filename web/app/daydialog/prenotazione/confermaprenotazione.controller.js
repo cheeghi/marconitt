@@ -60,20 +60,28 @@ app.
             var classe = $scope.sClass == undefined ? $scope.sTeacherClass : $scope.sClass;
             
             if ($scope.admin) {
-                if ($scope.tipoPrenotazione == 'Classe') {
-                    risorsa = classe;
-                    isClasse = true;
-                } else if ($scope.tipoPrenotazione == 'Progetto') {
-                    risorsa = 'Progetto: ' + $scope.sProgetto;
-                } else if ($scope.tipoPrenotazione == 'Sportello') {
-                    risorsa = "Sportello: " + $scope.sTeacher;
-                } else if ($scope.tipoPrenotazione == 'Altro') {
-                    risorsa = $scope.sDescrizione;
-                } else if ($scope.tipoPrenotazione == 'Tutoraggio/Studio') {
-                    risorsa = $scope.tipoPrenotazione;
-                } else {
-                    risorsa = $scope.tipoPrenotazione + ": " + classe;
+                
+                switch ($scope.tipoPrenotazione) {
+                    case "Classe":
+                        risorsa = classe;
+                        isClasse = true;
+                        break;
+                    case "Progetto":
+                        risorsa = 'Progetto: ' + $scope.sProgetto;    
+                        break;
+                    case "Sportello":
+                        risorsa = "Sportello: " + $scope.sTeacher;
+                        break;
+                    case "Altro":
+                        risorsa = $scope.sDescrizione;
+                        break;
+                    case "Tutoraggio/Studio":
+                        risorsa = $scope.tipoPrenotazione;
+                        break;
+                    default:
+                        risorsa = $scope.tipoPrenotazione + ": " + classe;
                 }
+
             } else {
                 risorsa = classe;
                 isClasse = true;

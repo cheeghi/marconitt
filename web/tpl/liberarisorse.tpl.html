@@ -1,4 +1,4 @@
-<div ng-controller="InsertCtrl" style="height: 100% !important;" layout-fill>
+<div ng-controller="LiberaRisorseCtrl" style="height: 100% !important;" layout-fill>
     <style type="text/css">
     .selectdemoSelectHeader {
         /* Please note: All these selectors are only applied to children of elements with the 'selectdemoSelectHeader' class */
@@ -33,7 +33,7 @@
                 <i class="material-icons">menu</i>
             </md-button>
             <h2>
-              <span>Inserisci evento</span>
+              <span>Libera risorse</span>
             </h2>
         </div>
     </md-toolbar>
@@ -46,15 +46,29 @@
                 <div layout="row">
                     <md-input-container flex>
                         <label style="color:#15629E;">Descrizione</label>
-                        <textarea ng-model="event.description" placeholder="Descrizione dell'evento"></textarea>
+                        <textarea ng-model="event.description" placeholder="Es. Gita, Entrata posticipata, Uscita anticipata"></textarea>
                     </md-input-container>
-                    <md-datepicker ng-model="event.day" md-placeholder="Seleziona data.." md-open-on-focus ></md-datepicker>
                 </div>
                 <div layout="row" layout-align="space-between center">
 
-                    <mdp-time-picker ng-model="event.hourStart"><span style="color:#15629E;">Ora inizio</span></mdp-time-picker>
-
-                    <mdp-time-picker ng-model="event.hourEnd"><span style="color:#15629E">Ora fine</span></mdp-time-picker>
+                    <md-datepicker ng-model="event.day" md-placeholder="Seleziona data.." md-open-on-focus ></md-datepicker>
+                    <md-input-container>
+                        <label>Ore</label>
+                        <md-select ng-model="event.ore" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona ore..">
+                            <md-optgroup label="Ore">
+                                <md-option value="1">1°</md-option>
+                                <md-option value="2">2°</md-option>
+                                <md-option value="3">3°</md-option>
+                                <md-option value="4">4°</md-option>
+                                <md-option value="5">5°</md-option>
+                                <md-option value="6">6°</md-option>
+                                <md-option value="7">7°</md-option>
+                                <md-option value="8">8°</md-option>
+                                <md-option value="9">9°</md-option>
+                                <md-option value="10">10°</md-option>
+                            </md-optgroup>
+                        </md-select>
+                    </md-input-container>                    
                     <md-input-container>
                         <label>Classi</label>
                         <md-select ng-model="event.classes" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona classi..">
@@ -65,24 +79,8 @@
                             </md-optgroup>
                         </md-select>
                     </md-input-container>
-                    <md-input-container>
-                        <label>Aule</label>
-                        <md-select ng-model="event.rooms" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona aule..">
-                            <md-optgroup label="Aule">
-                                <md-option value="AULA MAGNA">
-                                    AULA MAGNA
-                                </md-option>
-                                <md-option value="L042">
-                                    L042
-                                </md-option>
-                                <md-option value="A304">
-                                    A304
-                                </md-option>
-                            </md-optgroup>
-                        </md-select>
-                    </md-input-container>
                 </div>
-                <md-button class="md-raised md-primary" ng-click="insert()" ng-disabled="event.description==undefined||event.description==''||event.rooms.length==0">Inserisci</md-button>
+                <md-button class="md-raised md-primary" ng-click="insert()" ng-disabled="event.description==undefined||event.description==''||event.ore.length==0||event.ore.length==0">Libera</md-button>
             </div>
         </form>
     </md-content>

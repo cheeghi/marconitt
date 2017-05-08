@@ -17,7 +17,8 @@ app
             
             var req = {
                 method: 'GET',
-                url: 'http://localhost/timetable.php?eventscountbymonth='+ ($scope.currentMonth)
+                url: 'http://localhost/timetable.php?eventscountbymonth='+ ($scope.currentMonth),
+                cache: false
             }
             $http(req)
                 .then(function (data) {
@@ -29,7 +30,7 @@ app
                     }, this);
                     $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
                 }, function(err) {
-                    $mdToast.show($mdToast.simple().textContent("Errore nel recuperare gli eventi: " + (err.data || "il server non risponde")));
+                    $mdToast.show($mdToast.simple().textContent("Errore nel recuperare gli eventi"));
                 });
         };
 
