@@ -76,7 +76,7 @@ app.
                 console.log("response: " + response);
 
 
-                $scope.genTest(response, 'aula');
+                $scope.genTable(response, 'aula');
                 
             });
         }
@@ -101,11 +101,11 @@ app.
                     doquery: $scope.query
                 }
             }).success(function(response) {
-                $scope.genTest(response, 'prof');
+                $scope.genTable(response, 'prof');
             })
         }
 
-        /*$scope.getOrarioClass = function() {
+        $scope.getOrarioClass = function() {
 
             $scope.selected = true;
             $scope.sTeacher = undefined;
@@ -126,15 +126,16 @@ app.
                 //console.log("giorno: " +$scope.giornoSelezionato);
                 //console.log("response: " + response);
                 response.forEach (function (risposta){
-                console.log("sssssss");
-                    orarioClass[risposta.ora] = risposta.risorsa + "," + risposta.professore1 + "," + risposta.professore2 + "," + risposta.professoreS;
+                    orarioClass[risposta.ora] = risposta;
                 });
-                console.log(orarioClass);
-                $scope.genTest(response, 'classe');
-            })
-        }*/
+                //console.log(orarioClass);
+                //$scope.genTable(response, 'classe');
+                $scope.genTest(orarioClass, 'classe');
 
-        $scope.getOrarioClass = function() {
+            })
+        }
+
+        /*$scope.getOrarioClass = function() {
 
             $scope.selected = true;
             $scope.sTeacher = undefined;
@@ -153,12 +154,55 @@ app.
                 console.log("classe: " +$scope.sClass);
                 console.log("giorno: " +$scope.giornoSelezionato);
                 console.log("response: " + response);
-                $scope.genTest(response, 'classe');
+                $scope.genTable(response, 'classe');
             })
-        }
-
+        }*/
 
         $scope.genTest = function(data, tipo) {
+            var days = $mdDateLocale.days;
+
+            if (tipo == 'classe'){
+
+            var x = "<table class=\"table\">\
+                    <thead><tr>\
+                        <th>1</th>\
+                        <th>2</th>\
+                        <th>3</th>\
+                        <th>4</th>\
+                        <th>5</th>\
+                        <th>6</th>\
+                        <th>7</th>\
+                        <th>8</th>\
+                        <th>9</th>\
+                        <th>10</th>\
+                    </tr></thead>\
+                    <tbody>";
+
+            for (var i = 1; i <= 10; i++) {
+
+                console.log(data[i]);
+                try{
+                    
+                    //x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                    x += "<td>" + data[i].stanza + "</td>";
+
+                }catch(e){
+
+                    x += "<td>&nbsp;</td>";
+
+                }
+
+            }               
+            
+            x += "</tbody>";
+            x += "</table>";
+            $scope.htmlTable = x;
+        }
+    }
+
+        
+
+        $scope.genTable = function(data, tipo) {
             var days = $mdDateLocale.days;
 
             if (tipo == 'aula'){
@@ -280,7 +324,6 @@ app.
                      x += "<td>&nbsp;</td>";
                 }
 
-
 /*
                 try{
 
@@ -352,7 +395,6 @@ app.
                         
                         x += "<td>&nbsp;</td>";
                 }*/
-
             }
             x += "</tbody>";
             x += "</table>";
