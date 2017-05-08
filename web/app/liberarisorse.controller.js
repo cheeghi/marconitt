@@ -6,7 +6,7 @@ app
         $scope.event = {};
         $scope.event.description;
         $scope.event.day = new Date();
-        $scope.event.classes = [];
+        $scope.event.class;
         $scope.event.ore = [];
         $scope.isLoading = true; // used for loading circle
 
@@ -41,14 +41,14 @@ app
 
             var desc = $scope.event.description;
             var day = $scope.event.day.getFullYear() + "-" + ($scope.event.day.getMonth()+1) + "-" + $scope.event.day.getDate();
-            var sClasses = $scope.event.classes; //$scope.event.classes.toString().replace(/,(?=[^\s])/g, ", ");
+            var sClass = $scope.event.class; //$scope.event.class.toString().replace(/,(?=[^\s])/g, ", ");
             var sOre = $scope.event.ore; //$scope.event.ore.toString().replace(/,(?=[^\s])/g, ", ");
-            var data = "descrizione="+desc+"&day="+day+"&classi="
-                +sClasses+"&ore="+sOre+"&token="+$rootScope.token;
+            var data = "descrizione="+desc+"&day="+day+"&classe="
+                +sClass+"&ore="+sOre+"&token="+$rootScope.token;
 
             var req = {
                 method: 'POST',
-                url: 'http://'+CONFIG.HOST+':8080/api/creaEvento',
+                url: 'http://'+CONFIG.HOST+':8080/api/liberaRisorsa',
                 data: data,
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -57,19 +57,18 @@ app
 
             console.log(req.data);
             
-            /*$http(req)
+            $http(req)
                 .then(
                     function(data) {
                         $mdToast.show($mdToast.simple().textContent("Liberazione avvenuta con successo correttamente"));
                         $scope.event = {};
                         $scope.event.day = new Date();
-                        $scope.event.classes = [];
                         $scope.event.ore = [];
                     },
                     function(err) {
                         $mdToast.show($mdToast.simple().textContent("Errore di rete: "+ err));
                     }
-                );*/
+                );
         }
 
 

@@ -70,17 +70,15 @@
                         </md-select>
                     </md-input-container>                    
                     <md-input-container>
-                        <label>Classi</label>
-                        <md-select ng-model="event.classes" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona classi..">
-                            <md-optgroup label="Classi">
-                                <md-option ng-repeat="classe in classes" value="{{classe}}">
-                                            {{classe}}
-                                </md-option>
-                            </md-optgroup>
+                        <label>Classe</label>
+                        <md-select ng-model="event.class">
+                            <md-option ng-repeat="classe in classes" value="{{classe}}">
+                                        {{classe}}
+                            </md-option>
                         </md-select>
                     </md-input-container>
                 </div>
-                <md-button class="md-raised md-primary" ng-click="insert()" ng-disabled="event.description==undefined||event.description==''||event.ore.length==0||event.ore.length==0">Libera</md-button>
+                <md-button class="md-raised md-primary" ng-click="insert()" ng-disabled="event.description==undefined||event.description==''||event.ore.length==0||event.class==undefined">Libera</md-button>
             </div>
         </form>
     </md-content>
