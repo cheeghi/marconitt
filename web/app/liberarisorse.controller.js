@@ -66,7 +66,7 @@ app
                         $mdToast.show($mdToast.simple().textContent("Errore di rete: "+ err));
                 var req = {
                     method: 'POST',
-                    url: 'http://'+CONFIG.HOST+':8080/api/liberaRisorsa',
+                    url: 'http://'+CONFIG.HOST+':8080/api/liberaRisorse',
                     data: data,
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
