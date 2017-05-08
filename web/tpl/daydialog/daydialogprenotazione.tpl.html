@@ -7,7 +7,7 @@
                     <g><polygon points="15.4,7.4 14,6 8,12 14,18 15.4,16.6 10.8,12 "></polygon></g></svg>
                 </md-icon>
 
-                <h2 style="padding-left:0.5%;">{{ dayString }}</h2>
+                <h2 style="padding-left: 2.3%; text-align: center; width: 100%">{{ dayString }}</h2>
                 <span flex></span>
 
                 <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="transform: rotate(180deg); cursor: pointer;" ng-click="nextDay()">
@@ -28,15 +28,12 @@
                                 <div layout="row" ng-hide="isSunday">
                                     <md-input-container>
                                         <label>Seleziona</label>
-                                        <md-select ng-model="sRoomType" ng-change="getPrenotazioni();clearMdSelect()" size="20">
+                                        <md-select ng-model="sRoomType" ng-change="clearMdSelect();getPrenotazioni();" size="20">
                                             <md-option>
                                                 LABORATORIO
                                             </md-option>
                                             <md-option>
                                                 AULA
-                                            </md-option>
-                                            <md-option ng-show="admin">
-                                                AULA MAGNA
                                             </md-option>
                                         </md-select>
                                     </md-input-container>
@@ -62,25 +59,25 @@
                                         <label>Ora</label>
                                         <md-select ng-model="sHour" ng-show="sRoomType!=undefined" ng-change="getPrenotazioni()" size="20">
                                         <md-option>Qualsiasi</md-option>
-                                        <md-option>1</md-option>
-                                        <md-option>2</md-option>
-                                        <md-option>3</md-option>
-                                        <md-option>4</md-option>
-                                        <md-option>5</md-option>
-                                        <md-option>6</md-option>
-                                        <md-option>7</md-option>
-                                        <md-option>8</md-option>
-                                        <md-option>9</md-option>
-                                        <md-option>10</md-option>
+                                        <md-option value=1>1°</md-option>
+                                        <md-option value=2>2°</md-option>
+                                        <md-option value=3>3°</md-option>
+                                        <md-option value=4>4°</md-option>
+                                        <md-option value=5>5°</md-option>
+                                        <md-option value=6>6°</md-option>
+                                        <md-option value=7>7°</md-option>
+                                        <md-option value=8>8°</md-option>
+                                        <md-option value=9>9°</md-option>
+                                        <md-option value=10>10°</md-option>
                                         </md-select>
                                     </md-input-container>
                                 </div>
 
-                                <div layout="row" layout-sm="column" layout-align="center center" ng-show="loading" layout-fill>
+                                <div layout="row" layout-sm="column" layout-align="center center" ng-show="isLoading" layout-fill>
                                     <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>
                                 </div>
                                     <div layout="row" layout-align="center">
-                                        <div compile="htmlTable" id="orario"></div>
+                                        <div compile="htmlTable" id="orario" class="scroll-container" style="overflow: auto;"></div>
                                     </div>
                             </md-content>
                         </md-content>

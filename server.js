@@ -16,6 +16,8 @@ var config = require('./config_default'); // get our config file
 var User = require('./app/models/user');
 var Day = require('./app/models/day');
 var Who = require('./app/models/who');
+var sendmail = require('sendmail')();
+
 
 // =======================
 // configuration =========
@@ -24,10 +26,12 @@ var port = process.env.PORT || 8080; // used to create, sign, and verify tokens
 mongoose.connect(config.database); // connect to database
 app.set('secret', config.secret); // secret variable
 
+
 // use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/web'));
+
 
 //connection to mysql database
 var connection = mysql.createConnection({
@@ -36,6 +40,8 @@ var connection = mysql.createConnection({
     password: '',
     database : 'marconitt'
 });
+connection.connect();
+
 
 // session management setup
 app.use(session({
@@ -43,6 +49,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
+
 
 // use morgan to log requests to the console
 app.use(morgan('dev'));
@@ -52,6 +59,7 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
+
 
 // =======================
 // routes ================
@@ -63,9 +71,7 @@ app.get('/', function(req, res) {
 
 // API ROUTES -------------------
 // we'll get to these in a second
-
 app.get('/setup', function(req, res) {
-
     User.remove({},function(a) {});
 
     // create a sample user
@@ -147,10 +153,25 @@ app.get('/setup', function(req, res) {
     */
 });
 
+app.get('/sendMail',function(req,res){
+	sendmail({
+	  from: 'marconiTT@marconivr.com',
+	  to: 'fedrigo22@gmail.com',
+	  replyTo: 'giuseppe.tanello@gmail.com',
+	  subject: 'Email prova',
+	  html: 'Questa è di prova'
+	}, function (err, reply) {
+	  console.log(err && err.stack)
+	  console.dir(reply)
+	});
+	res.send("ok");
+});
+
 // API ROUTES -------------------
 
 // get an instance of the router for api routes
 var apiRoutes = express.Router();
+
 
 // route to authenticate a user (POST http://localhost:8080/api/authenticate)
 apiRoutes.post('/authenticate', function(req, res) {
@@ -247,12 +268,12 @@ apiRoutes.get('/events/:year/:month/:day', function(req, res) {
         .exec(function(err, events) {
             res.json(events);
         })
-
 });
 
 
 apiRoutes.get('/who/insert', function(req, res) {
 Who.remove({},function(a){});
+
 
 var converter = new Converter({});
 converter.fromFile("./alunni.csv",function(err,result){
@@ -266,6 +287,7 @@ converter.fromFile("./alunni.csv",function(err,result){
     });
   })
 });
+
 
 String.prototype.capitalize = function() {
     return this.replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
@@ -315,6 +337,7 @@ String.prototype.capitalize = function() {
   })
 
 });
+
 
 var salva = function(req,res,day) {
   console.log(day);
@@ -428,7 +451,7 @@ apiRoutes.use(function(req, res, next) {
 });
 
 
-apiRoutes.post('/prenota', function(req, res1) {
+apiRoutes.post('/prenota', function(req, res) {
 	var stanza = req.body.stanza;
 	var giorno = req.body.giorno;
 	var ora = req.body.ora;
@@ -436,16 +459,44 @@ apiRoutes.post('/prenota', function(req, res1) {
 	var isClasse = (req.body.isclasse == "true");
     var user = req.body.user;
 
-    if(isClasse == true) {
-        var appo = liberaRisorse(stanza, giorno, ora, risorsa, user, res1);
+    if(isClasse) {
+        isSchoolOur(giorno, stanza, ora, risorsa, function(response) {
+            if(response) {
+                addPrenotazione(giorno, stanza, ora, risorsa, user, true, function(response1) {
+                    res.json(response1);
+                });
+            } else {
+                addPrenotazione(giorno, stanza, ora, risorsa, user, false, function(response1) {
+                    res.json(response1);
+                });
+            }
+        });
     } else {
-        addPrenotazione(stanza, giorno, ora, risorsa, user, false);
-        var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" + stanza +
-	        "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
-        http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
-            res1.json(true);
+        addPrenotazione(giorno, stanza, ora, risorsa, user, false, function(response) {
+            res.json(response);
         });
     }
+});
+
+
+apiRoutes.post('/approva', function(req, res) {
+    var stanza = req.body.stanza;
+	var giorno = req.body.giorno;
+	var ora = req.body.ora;
+    var id;
+
+    selectId(giorno, stanza, ora, function(response) {
+        id = response;
+        var sql_stmt = "UPDATE prenotazioni SET approvata = True WHERE id = " + id;
+
+        connection.query(sql_stmt, function(err) {
+            if (!err) {
+                res.json(true);
+            } else {
+                res.json(false);
+            }
+        });
+    });
 });
 
 
@@ -454,13 +505,115 @@ apiRoutes.post('/cancellaPrenotazione', function(req, res) {
 	var giorno = req.body.giorno;
 	var ora = req.body.ora;
     var risorsa = req.body.risorsa;
-    //console.log(risorsa);
 
-    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null WHERE stanza = '" 
-    + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+    selectId(giorno, stanza, ora, function(response) {
+        var id = response;
+        sql_stmt = "SELECT isSchoolHour FROM prenotazioni WHERE id = " + id;
 
-    http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
-        isSchoolOur(stanza, giorno, ora, risorsa, res);
+        connection.query(sql_stmt, function(err, rows, fields) {
+            if (!err) {
+                var isSOur = rows[0].isSchoolHour;
+
+                if(isSOur) {
+                    undoClasse(stanza, giorno, ora, risorsa, function(response2) {
+                        if(response2) {
+                            cancellaPrenotazione(stanza, giorno, ora, function(response1) {
+                                res.json(response1);
+                            })
+                        } else {
+                            res.json(false);
+                        }
+                    });
+                } else {
+                    cancellaPrenotazione(stanza, giorno, ora, function(response3) {
+                        res.json(response3);
+                    })
+                }
+            } else {
+                res.json(false);
+            }
+        });
+    });
+});
+
+
+apiRoutes.post('/creaEvento', function(req, res) {
+    var oraInizio = 1;
+    var oraFine = 0;
+    var professori = "";
+    var id;
+
+    //Prendo le variabili dal form
+    var descrizione = req.body.descrizione;
+    var giorno = req.body.day;
+    var start = req.body.oraInizio;
+    var end = req.body.oraFine;
+    var classi = req.body.classi;
+    var stanze = req.body.stanze;
+
+    //sistemo le ore
+    hourToStartHour(giorno, start, function(res1) {
+        oraInizio = res1;
+
+        hourToEndHour(giorno, end, function(res1) {
+            oraFine = res1;
+
+            //inserisco l'evento
+            var sql_stmt = "INSERT INTO eventi(giorno, descrizione, oraInizio, oraFine, classi, stanze) VALUES('" + giorno + "', '" + 
+                descrizione + "', '" + start + "', '" + end + "', '" + classi + "', '" + stanze + "')";
+            
+            connection.query(sql_stmt, function(err) {
+                if(!err) {
+                    res.json(true);
+                    //seleziono l'id dell'evento inserito
+                    sql_stmt = "SELECT id FROM eventi WHERE giorno = '" + giorno + "' AND descrizione = '" + descrizione 
+                        + "' AND oraInizio = '" + start + "' AND oraFine = '" + end + "'";
+
+                    connection.query(sql_stmt, function(err, rows, fields) {
+                        if (!err) {
+                            id = rows[0].id;
+                            cont = oraInizio;
+                            var vett = [];
+
+                            while(cont <= oraFine) {
+                                vett.push(cont);
+                                cont++;
+                            }
+                            cont = 0;
+                            for(ora in vett) {
+                                profInEventi(classi, id, giorno, vett[ora]);
+                            }
+                        } else {
+                            res.json(false);
+                        }
+                    });
+                } else {
+                    res.json(false);
+                }
+            });
+        })
+    })
+});
+
+
+apiRoutes.post('/cancellaEvento', function(req, res) {
+    var id = req.body.id;
+    var sql_stmt = "DELETE FROM prof_eventi WHERE id = " + id;
+
+    connection.query(sql_stmt, function(err) {
+        if (!err) {
+            sql_stmt = "DELETE FROM eventi WHERE id = " + id;
+
+            connection.query(sql_stmt, function(err) {
+                if (!err) {
+                    res.json(true);
+                } else {
+                    res.json(false);
+                }
+            });
+        } else {
+            res.json(false);
+        }
     });
 });
 
@@ -508,308 +661,6 @@ apiRoutes.post('/events/visibility/:id', function(req, res) {
 });
 
 
-// =======================
-// functions =============
-// =======================
-
-
-//Release resources that are not in use
-function liberaRisorse(stanza, giorno, ora, risorsa, user, res1) {
-    var id;
-    var sql_stmt;
-    var stanzaLib;
-    var professore1;
-    var professore2;
-
-	addPrenotazione(stanza, giorno, ora, risorsa, user, true);
-    sql_stmt = "SELECT stanza FROM timetable WHERE risorsa = '" + risorsa + "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
-    http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
-        //console.log('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt);
-        var str = '';
-
-        res.on('data', function (chunk) {
-            str += chunk;
-            stanzaLib = str;
-        });
-
-        res.on('end', function () {
-            sql_stmt = "UPDATE timetable SET risorsa = Null WHERE stanza = " + stanzaLib + 
-                " AND ora = " + ora + " AND giorno ='" + giorno + "';";
-            controllaPrenotazione(stanzaLib, giorno, ora);
-            http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
-            //console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
-            var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" + stanza +
-                "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
-                                
-            var a = http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function(res) {
-                //console.log('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt);
-                var str = '';
-
-                res.on('data', function (chunk) {
-                    str += chunk; 
-                });
-
-                res.on('end', function () {
-                    getProf1(stanza, giorno, ora, stanzaLib, function() {
-                        console.log("Fatto il prof 1");
-                    });
-                    getProf2(stanza, giorno, ora, stanzaLib, res1, function() {
-                        console.log("Fatto il prof 2");
-                    });
-                });
-            });
-		});
-    });
-}
-
-
-//Select the professore1 field from the timetable
-function getProf1(stanza, giorno, ora, stanzaDaLiberare) {
-    var sql_stmt = "SELECT professore1 FROM timetable WHERE stanza = " + stanzaDaLiberare + " AND giorno = '" + giorno + "' AND ora = " + ora + ";";
-    //console.log('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt);
-    http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
-		var str = '';
-
-		res.on('data', function (chunk) {
-			str += chunk; 
-		});
-
-		res.on('end', function () {
-            //console.log(typeof str, str);
-            sql_stmt = "UPDATE timetable SET professore1 = " + str + " WHERE stanza = '" 
-                + stanza + "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
-            
-            http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
-                //console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
-                sql_stmt = "UPDATE timetable SET professore1 = Null WHERE stanza = " 
-                    + stanzaDaLiberare + " AND giorno = '" + giorno + "' AND ora = " + ora + ";";
-                http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
-                //console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
-            });
-        });
-    });
-}
-
-
-//Select the professore2 field from the timetable
-function getProf2(stanza, giorno, ora, stanzaDaLiberare, res1) {
-    var sql_stmt = "SELECT professore2 FROM timetable WHERE stanza = " + stanzaDaLiberare + " AND giorno = '" 
-        + giorno + "' AND ora = " + ora + ";";
-    //console.log('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt);
-    http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
-		var str = '';
-
-		res.on('data', function (chunk) {
-			str += chunk; 
-		});
-
-		res.on('end', function () {
-            sql_stmt = "UPDATE timetable SET professore2 = " + str + " WHERE stanza = '" 
-                + stanza + "' AND giorno = '" + giorno + "' AND ora = " + ora;
-
-            http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
-                //console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
-                sql_stmt = "UPDATE timetable SET professore2 = Null WHERE stanza = " 
-                    + stanzaDaLiberare + " AND giorno = '" + giorno + "' AND ora = " + ora;
-
-                http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
-                    console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
-                    res1.json(true);
-                });
-            });
-        });
-    });
-}
-
-//Add the reservation into the prenotazioni table
-function addPrenotazione(stanza, giorno, ora, risorsa, user, isClasse) {
-    sql_stmt = "SELECT id FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
-	http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
-        //console.log('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt);
-		var str = '';
-
-		res.on('data', function (chunk) {
-			str += chunk; 
-		});
-
-		res.on('end', function () {
-			var strbello = str.replace('"', '');
-			var strbello2 = strbello.replace('"', '');			  
-			id = Number(strbello2);
-
-			sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", '" + user + "', " + isClasse + ", false);";
-            http.get("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt, function() {
-                //console.log("http://marconitt.altervista.org/timetable.php?dochange=" + sql_stmt);
-            });
-        });
-    });
-}
-
-
-function controllaPrenotazione(stanza, giorno, ora) {
-    sql_stmt = "SELECT id FROM timetable WHERE stanza = " + stanza + " AND giorno = '" + giorno + "' AND ora = " + ora + ";";
-    http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
-        var str = '';
-
-		res.on('data', function (chunk) {
-			str += chunk; 
-		});
-
-        res.on('end', function () {
-            var strbello = str.replace('"', '');
-			var strbello2 = strbello.replace('"', '');			  
-			id = Number(strbello2);
-            sql_stmt = "SELECT id FROM prenotazioni WHERE id = " + id;
-            http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
-                var str = '';
-
-                res.on('data', function (chunk) {
-                    str += chunk; 
-                });
-
-                res.on('end', function () {
-                    id = Number(str)
-
-                    if(id != 0) {
-                        sql_stmt = "DELETE FROM prenotazioni WHERE id = " + str;
-                        http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function() {
-                        });
-                    }
-                });
-            });
-        });
-    });
-}
-
-
-function isSchoolOur(stanza, giorno, ora, risorsa, res1) {
-    var sql_stmt = "SELECT id FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
-    var id;
-
-    http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
-        var str = '';
-
-		res.on('data', function (chunk) {
-			str += chunk; 
-		});
-
-        res.on('end', function () {
-            var strbello = str.replace('"', '');
-			var strbello2 = strbello.replace('"', '');			  
-			id = Number(strbello2);
-            sql_stmt = "SELECT isSchoolHour FROM prenotazioni WHERE id = " + id;
-
-            http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
-                var str = '';
-
-                res.on('data', function (chunk) {
-                    str += chunk; 
-                });
-
-                res.on('end', function () {
-                    var strbello = str.replace('"', '');
-			        var strbello2 = strbello.replace('"', '');
-                    var n = Number(strbello2);
-
-                    if(n == 1) {
-                        sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
-
-                        http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
-                            var str = '';
-
-                            res.on('data', function (chunk) {
-                                str += chunk;
-                            });
-
-                            res.on('end', function () {
-                                var strbello = str.replace('"', '');
-                                var strbello2 = strbello.replace('"', '');
-                                var week_day = str;
-
-                                sql_stmt = "SELECT `Column 4` FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '" 
-                                    + ora + "' AND `Column 1` = '" + risorsa + "';";
-
-                                http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function(res) {
-                                    //console.log('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt);
-                                    var str = '';
-
-                                    res.on('data', function (chunk) {
-                                        str += chunk;
-                                    });
-
-                                    res.on('end', function () {
-                                        //console.log(str);
-
-                                        sql_stmt = "SELECT `Column 2` FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '" 
-                                            + ora + "' AND `Column 1` = '" + risorsa + "';";
-                                        //console.log('http://marconitt.altervista.org/timetable.php?doquery=' + sql_stmt);
-
-                                        http.get('http://marconitt.altervista.org/timetable.php?doquery=' + sql_stmt, function(res) {
-                                            str = '';
-
-                                            res.on('data', function (chunk) {
-                                                str += chunk;
-                                            });
-
-                                            res.on('end', function () {
-                                                try {
-                                                    var orarioStanza = str;
-                                                    var appo = str.replace("[", "");
-                                                    var appo1 = appo.replace("]", "");
-                                                    var vett = appo1.split(",")
-                                                    var obj1 = JSON.parse(vett[0] + ", " + vett[1]);
-                                                    var professore1 = obj1["Column 2"];
-                                                    var professore2 = "Null";
-
-                                                    if(vett.length > 2) {
-                                                        var obj2 = JSON.parse(vett[2] + ", " + vett[3]);
-                                                        professore2 = obj2["Column 2"];
-                                                    }
-                                                } catch(err) {
-                                                    //console.log("Non scolastico");
-                                                    cancellaP(id, res1);
-                                                    return;
-                                                }
-
-                                                sql_stmt = "UPDATE timetable SET professore1 = '" + professore1 + "', professore2 = '" + professore2 
-                                                    + "' WHERE giorno = '" + giorno + "' AND ora = " + ora + " AND stanza = " + orarioStanza;
-                                                http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function() {
-                                                    sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE giorno = '" + giorno + "' AND ora = " 
-                                                        + ora + " AND stanza = " + orarioStanza;
-                                                    http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function() {
-                                                        //console.log("E' orario scolastico");
-                                                        cancellaP(id, res1);
-                                                    });
-                                                });
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    } else {
-                        cancellaP(id, res1);
-                    }
-                });
-            });
-        });
-    });
-}
-
-
-function cancellaP(id, res) {
-    sql_stmt = "DELETE FROM prenotazioni WHERE id = " + id;
-    http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function() {
-        sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null, professoreP = Null" +
-        " WHERE id = " + id;
-
-        http.get('http://marconitt.altervista.org/timetable.php?getindex=' + sql_stmt, function() {
-            res.json(true);
-        });
-    });
-}
-
-
 // apply the routes to our application with the prefix /api
 app.use('/api', apiRoutes);
 
@@ -819,3 +670,542 @@ app.use('/api', apiRoutes);
 // =======================
 app.listen(port);
 console.log('Magic happens at http://localhost:' + port);
+
+
+// =======================
+// functions =============
+// =======================
+
+
+/*
+ * Funzione che setta la risorsa nella timetable ed aggiunge la prenotazione nella timetable
+ */
+function addPrenotazione(giorno, stanza, ora, risorsa, who, èOraScuola, res) {
+    var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" +
+        stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+
+    connection.query(sql_stmt, function(err) {
+        if (!err) {
+            selectId(giorno, stanza, ora, function(id) {
+                sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", '" + who + "', " + èOraScuola + ", false);";
+                connection.query(sql_stmt, function(err) {
+                     if (!err) {
+                        res(true);
+                    } else {
+                        res(false);
+                    }
+                });
+            })
+        } else {
+            res(false);
+        }
+    });
+}
+
+
+/*
+ * Funzione che ricerca e ritorna un id dalla timetable
+ */
+function  selectId(giorno, stanza, ora, res) {
+    var sql_stmt = "SELECT id FROM timetable WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+    
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            res(rows[0].id);
+        } else {
+            res(false);
+        }
+    });
+}
+
+
+/*
+ * Funzione che vede se la prenotazione per una classe è durante l'orario scolastico.
+ * Se si, allora libera l'aula precedentemente occupata da tale classe.
+ */
+function isSchoolOur(giorno, stanza, ora, risorsa, res) {
+    var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
+        + giorno + "' AND ora = " + ora + ";";
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            var week_day = rows[0].giorno_settimana;
+            sql_stmt = "SELECT `Column 4` AS oldStanza FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '" 
+                + ora + "' AND `Column 1` = '" + risorsa + "';";
+
+            connection.query(sql_stmt, function(err, rows, fields) {
+                if (!err) {
+                    try {
+                        var oldStanza = rows[0].oldStanza;
+                        sql_stmt = "SELECT stanza FROM timetable WHERE ora = " + ora  + " AND  giorno = '" 
+                            + giorno + "' AND risorsa = '" + risorsa + "';";
+
+                        connection.query(sql_stmt, function(err, rows, fields) {
+                            if (!err) {
+                                try {
+                                    var stanzaDaLib = rows[0].stanza;
+
+                                    moveProfessori(stanza, stanzaDaLib, giorno, ora, function(resp) {
+                                        if(resp) {
+                                            liberaRisorse(stanzaDaLib, ora, giorno, function(response) {
+                                                res(response);
+                                            });
+                                        } else {
+                                            res(false);
+                                        }
+                                    })
+                                } catch(e) {
+                                    getProfFromOrario(stanza, giorno, ora, risorsa, function(resp) {
+                                        if(resp == false) {
+                                            res(false);
+                                        } else {
+                                            sql_stmt = resp;
+                                            connection.query(sql_stmt, function(err) {
+                                                if (!err) {
+                                                    res(true);
+                                                } else {
+                                                    res(false);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            } else {
+                                res(false);
+                            }
+                        });
+                    } catch(e) {
+                        res(false);
+                    }
+                } else {
+                    res(false);
+                }
+            });
+        } else {
+            res(false);
+        }
+    });
+}
+
+
+/*
+ * Funzione che libera l'aula occupata da una determinata classe e dai professori ad essa associati.
+ */
+function liberaRisorse(stanza, ora, giorno, res) {
+    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null, professoreS = Null " + 
+        "WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+
+    connection.query(sql_stmt, function(err) {
+        if (!err) {
+            controllaPrenotazioni(stanza, giorno, ora, function(response) {
+                res(response);
+            });
+        } else {
+            res(false);
+        }
+    });
+}
+
+
+/*
+ * Funzione che ritorna il professore1 dalla timetable in una determinata riga.
+ */
+function getProf1(stanza, giorno, ora, res) {
+    var sql_stmt = "SELECT professore1 FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
+        + giorno + "' AND ora = " + ora + ";";
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            var prof1 = rows[0].professore1;
+            res(prof1);
+        } else {
+            res(false);
+        }
+    });
+}
+
+
+/*
+ * Funzione che ritorna il professore2 dalla timetable in una determinata riga.
+ */
+function getProf2(stanza, giorno, ora, res) {
+    var sql_stmt = "SELECT professore2 FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
+        + giorno + "' AND ora = " + ora + ";";
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            var prof2 = rows[0].professore2;
+            res(prof2);
+        } else {
+            res(false);
+        }
+    });
+}
+
+
+/*
+ * Funzione che sposta i professori dalla loro aula a quella prenotata per la rispettiva classe.
+ */
+function moveProfessori(stanza, stanzaDaLib, giorno, ora, res) {
+    getProf1(stanzaDaLib, giorno, ora, function(response1) {
+        prof1 = response1;
+        getProf2(stanzaDaLib, giorno, ora, function(response2) {
+            prof2 = response2;
+            var sql_stmt = "UPDATE timetable SET professore1 = '" + prof1 + "' WHERE ora = " + ora +
+                " AND stanza = '" + stanza + "' AND giorno = '" + giorno + "';";
+
+            connection.query(sql_stmt, function(err) {
+                if (!err) {
+                    try {
+                        var appo = prof2.split(" ")[0];
+                        var sql_stmt = "UPDATE timetable SET professore2 = '" + prof2 + "' WHERE ora = " + ora +
+                            " AND stanza = '" + stanza + "' AND giorno = '" + giorno + "';";
+
+                        connection.query(sql_stmt, function(err) {
+                            if (!err) {
+                                res(true);
+                            } else {
+                                res(false);
+                            }
+                        });
+                    } catch(e) {
+                        var sql_stmt = "UPDATE timetable SET professore2 = Null WHERE ora = " + ora +
+                            " AND stanza = '" + stanza + "' AND giorno = '" + giorno + "';";
+
+                        connection.query(sql_stmt, function(err) {
+                            if (!err) {
+                                res(true);
+                            } else {
+                                res(false);
+                            }
+                        });
+                    }
+                } else {
+                    res(false);
+                }
+            });
+        });
+    });
+}
+
+
+/*
+ * Funzione che ritorna un codice sql per inserire i professori, presi dall'orario, nella timetable
+ */
+function getProfFromOrario(stanza, giorno, ora, risorsa, res) {
+    var prof1;
+    var prof2;
+    console.log("A che sono finito qui");
+    var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
+        + giorno + "' AND ora = " + ora + ";";
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            var week_day = rows[0].giorno_settimana;
+
+            sql_stmt = "SELECT `Column 2` AS prof FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '" 
+                + ora + "' AND `Column 1` = '" + risorsa + "';";
+
+            connection.query(sql_stmt, function(err, rows1, fields) {
+                if (!err) {
+                    var p1 = rows1[0].prof;
+
+                    try {
+                        var p2 = rows1[1].prof;
+                        sql_stmt = "SELECT `Column 1` AS nomeCognome FROM GPU004 WHERE `Column 0` = '" + p2 + "'";
+
+                        connection.query(sql_stmt, function(err, rows, fields) {
+                            if (!err) {
+                                prof2 = rows[0].nomeCognome;
+                                sql_stmt = "SELECT `Column 1` AS nomeCognome FROM GPU004 WHERE `Column 0` = '" + p1 + "'";
+
+                                connection.query(sql_stmt, function(err, rows, fields) {
+                                    if (!err) {
+                                        prof1 = rows[0].nomeCognome;
+                                        sql_stmt = "UPDATE timetable SET professore1 = '" + prof1 + "', professore2 = '" + prof2 +
+                                            "' WHERE stanza = '" + stanza  + "' AND ora = " + ora + " AND giorno = '" + giorno + "'";
+                                        res(sql_stmt);
+                                    } else {
+                                        res(false);
+                                    }
+                                });
+                            } else {
+                                res(false);
+                            }
+                        });
+                    } catch(e) {
+                        var prof2 = "Null";
+                        sql_stmt = "SELECT `Column 1` AS nomeCognome FROM GPU004 WHERE `Column 0` = '" + p1 + "'";
+
+                        connection.query(sql_stmt, function(err, rows, fields) {
+                            if (!err) {
+                                prof1 = rows[0].nomeCognome;
+                                sql_stmt = "UPDATE timetable SET professore1 = '" + prof1 + "', professore2 = '" + prof2 +
+                                    "' WHERE stanza = '" + stanza  + "' AND ora = " + ora + " AND giorno = '" + giorno + "'";
+                                res(sql_stmt);
+                            } else {
+                                res(false);
+                            }
+                        });
+                    }
+                } else {
+                    res(false);
+                }
+            });
+        } else {
+            res(false);
+        }
+    });
+}
+
+
+/*
+ * Funzione che controlla se una prenotazione per una classe dovrebbe annullarne un'altra.
+ * In caso positivo, cancella la prenotazione da annullare.
+ */
+function controllaPrenotazioni(stanza, giorno, ora, res) {
+    sql_stmt = "SELECT id FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + giorno + "' AND ora = " + ora + ";";
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            var id1 = rows[0].id;
+            sql_stmt = "SELECT id FROM prenotazioni WHERE id = " + id1;
+
+            connection.query(sql_stmt, function(err, rows, fields) {
+                if(!err) {
+                    try {
+                        var id2 = rows[0].id;
+                        sql_stmt = "DELETE FROM prenotazioni WHERE id = " + id2;
+                        
+                        connection.query(sql_stmt, function(err) {
+                            if(!err) {
+                                res(true);
+                            } else {
+                                res(false);
+                            }
+                        });
+                    } catch(e) {
+                        res(true);
+                    }
+                } else {
+                    res(false);
+                }
+            });
+        } else {
+            res(false);
+        }
+    });
+}
+
+
+/*
+ * Funzione che cancella una data prenotazione.
+ */
+function cancellaPrenotazione(stanza, giorno, ora, res) {
+    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null, professoreS = Null " + 
+        "WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+
+    connection.query(sql_stmt, function(err) {
+        if(!err) {
+            selectId(giorno, stanza, ora, function(id) {
+                sql_stmt = "DELETE FROM prenotazioni WHERE id = " + id;
+
+                connection.query(sql_stmt, function(err) {
+                    if(!err) {
+                        res(true);
+                    } else {
+                        res(false);
+                    }
+                });
+            });
+        } else {
+            res(false);
+        }
+    });
+}
+
+
+/*
+ * Funzione che fa tornare una classe nella sua stanza, secondo l'orario scolastico, se essa è libera
+ * Altrimenti BISOGNA DECIDERE COSA FARE
+ */
+function undoClasse(stanza, giorno, ora, risorsa, res) {
+    var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
+        + giorno + "' AND ora = " + ora + ";";
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            var week_day = rows[0].giorno_settimana;
+
+            sql_stmt = "SELECT `Column 4` AS stanzaOrario FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '" 
+                + ora + "' AND `Column 1` = '" + risorsa + "';";
+
+            connection.query(sql_stmt, function(err, rows, fields) {
+                if (!err) {
+                    var stanzaOrario = rows[0].stanzaOrario;
+                    sql_stmt = "SELECT risorsa FROM timetable WHERE stanza = '" +
+                        stanzaOrario + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+                    
+                    connection.query(sql_stmt, function(err, rows, fields) {
+                        if (!err) {
+                            classe = rows[0].risorsa;
+
+                            if(classe != null) {
+                                console.log("E' già occupata");
+                                res(true);
+                            } else {
+                                var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" +
+                                    stanzaOrario + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+
+                                connection.query(sql_stmt, function(err) {
+                                    if (!err) {
+                                        moveProfessori(stanzaOrario, stanza, giorno, ora, function(response) {
+                                            res(response);
+                                        });
+                                    } else {
+                                        res(false);
+                                    }
+                                });
+                            }
+                        } else {
+                            res(false);
+                        }
+                    });
+                } else {
+                    res(false);
+                }
+            });
+        } else {
+            res(false);
+        }
+    });
+}
+
+
+function profInEventi(classi, id, giorno, ora, res) {
+    var vett = classi.split(",");
+    var sql_stmt = "";
+    var professori = "";
+    var prof1, prof2 = "";
+    var tot = vett.length * 2;
+    var cont = 0;
+    var ret = 0;
+
+    for(i in vett) {
+        sql_stmt = "SELECT professore1, professore2 FROM timetable WHERE risorsa = '" + vett[i] +
+            "' AND ora = " + ora + " AND giorno = '" + giorno + "'";
+
+        connection.query(sql_stmt, function(err, rows, fields) {
+            if (!err) {
+                try {
+                    professori += rows[0].professore1 + ", ";
+                    cont = cont + 1;
+                    professori += rows[0].professore2 + ", ";
+                    cont = cont + 1;
+
+                    if(cont == tot) {
+                        professori = professori.replace("null, ", "");
+                        var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
+                        connection.query(sql_stmt);;
+                    }
+                } catch(e) {
+                    cont = cont + 1;
+
+                    if(cont == tot) {
+                        professori = professori.replace("null, ", "");
+                        var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
+                        connection.query(sql_stmt);
+                    }
+                }
+            } else {
+                cont = cont + 2;
+
+                if(cont == tot) {
+                    professori = professori.replace("null, ", "");
+                    var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
+                    connection.query(sql_stmt);
+                }
+            }
+        });
+    }
+}
+
+
+function hourToEndHour(giorno, data, res) {
+    var schoolOur = 0;
+
+    var vett = giorno.split("-");
+    var year = vett[0];
+    var month = vett[1];
+    var day = vett[2];
+
+    vett = data.split(":");
+    var hour = vett[0];
+    var minute = vett[1];
+
+    var dt = new Date(year, month, day, hour, minute, 0);
+
+    if(dt >= new Date(year, month, day, "8", "00") && dt <= new Date(year, month, day, "9", "00")) {
+        schoolOur = 1;
+    } else if(dt > new Date(year, month, day, "9", "00") && dt <= new Date(year, month, day, "10", "00")) {
+        schoolOur = 2;
+    } else if(dt > new Date(year, month, day, "10", "00") && dt <= new Date(year, month, day, "11", "00")) {
+        schoolOur = 3;
+    } else if(dt > new Date(year, month, day, "11", "00") && dt <= new Date(year, month, day, "12", "00")) {
+        schoolOur = 4;
+    } else if(dt > new Date(year, month, day, "12", "00") && dt <= new Date(year, month, day, "13", "00")) {
+        schoolOur = 5;
+    } else if(dt > new Date(year, month, day, "13", "00") && dt <= new Date(year, month, day, "14", "30")) {
+        schoolOur = 6;
+    } else if(dt > new Date(year, month, day, "14", "30") && dt <= new Date(year, month, day, "15", "30")) {
+        schoolOur = 7;
+    } else if(dt > new Date(year, month, day, "15", "30") && dt <= new Date(year, month, day, "16", "30")) {
+        schoolOur = 8;
+    } else if(dt > new Date(year, month, day, "16", "30") && dt <= new Date(year, month, day, "17", "30")) {
+        schoolOur = 9;
+    } else if(dt > new Date(year, month, day, "17", "30") && dt <= new Date(year, month, day, "18", "30")) {
+        schoolOur = 10;
+    }
+
+    res(schoolOur);
+}
+
+
+function hourToStartHour(giorno, data, res) {
+    var schoolOur = 0;
+
+    var vett = giorno.split("-");
+    var year = vett[0];
+    var month = vett[1];
+    var day = vett[2];
+
+    vett = data.split(":");
+    var hour = vett[0];
+    var minute = vett[1];
+
+    var dt = new Date(year, month, day, hour, minute, 0);
+
+    if(dt >= new Date(year, month, day, "8", "00") && dt < new Date(year, month, day, "9", "00")) {
+        schoolOur = 1;
+    } else if(dt >= new Date(year, month, day, "9", "00") && dt < new Date(year, month, day, "10", "00")) {
+        schoolOur = 2;
+    } else if(dt >= new Date(year, month, day, "10", "00") && dt < new Date(year, month, day, "11", "00")) {
+        schoolOur = 3;
+    } else if(dt >= new Date(year, month, day, "11", "00") && dt < new Date(year, month, day, "12", "00")) {
+        schoolOur = 4;
+    } else if(dt >= new Date(year, month, day, "12", "00") && dt < new Date(year, month, day, "13", "00")) {
+        schoolOur = 5;
+    } else if(dt >= new Date(year, month, day, "13", "00") && dt < new Date(year, month, day, "14", "30")) {
+        schoolOur = 6;
+    } else if(dt >= new Date(year, month, day, "14", "30") && dt < new Date(year, month, day, "15", "30")) {
+        schoolOur = 7;
+    } else if(dt >= new Date(year, month, day, "15", "30") && dt < new Date(year, month, day, "16", "30")) {
+        schoolOur = 8;
+    } else if(dt >= new Date(year, month, day, "16", "30") && dt < new Date(year, month, day, "17", "30")) {
+        schoolOur = 9;
+    } else if(dt >= new Date(year, month, day, "17", "30") && dt < new Date(year, month, day, "18", "30")) {
+        schoolOur = 10;
+    }
+
+    res(schoolOur);
+}

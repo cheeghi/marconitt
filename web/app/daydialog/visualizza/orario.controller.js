@@ -14,7 +14,7 @@ app.
         
 
         //$http.get('http://88.149.220.222/orario/api.php', {
-        $http.get('http://marconitt.altervista.org/timetable.php', {
+        $http.get('http://localhost/timetable.php', {
             params: {
                 search: ""
             }
@@ -37,24 +37,21 @@ app.
         }
 
 
-        /*$scope.getOrarioRoom = function() {
-            //alert($scope.giornoSelezionato);
-            $scope.sTeacher = undefined;
-            $scope.sClass = undefined;
-            $scope.currentItem = $scope.sRoom;
-            //console.log($scope.sRoom);
-            $http.get('http://marconitt.altervista.org/timetable.php', {
-                params: {
-                    ttroom: $scope.sRoom,
-                    date: $scope.giornoSelezionato
+        /**
+         * called by other controllers in order to re-initialize the controller
+         */
+        $scope.$on("reInitVisualizza", function (event, args) {
+            $scope.init(args.day);
+            if(! $scope.isSunday){
+                if ($scope.sClass != undefined){
+                    $scope.getOrarioClass($scope.sClass);
+                }else if($scope.sTeacher != undefined){
+                    $scope.getOrarioTeacher($scope.sTeacher);
+                }else if($scope.sRoom != undefined){
+                     $scope.getOrarioRoom($scope.sRoom);
                 }
-            }).success(function(response) {
-                console.log("stanza: " +$scope.sRoom);
-                console.log("giorno: " +$scope.giornoSelezionato);
-                console.log("response: " + response);
-                $scope.genTable(response, 'aula');
-            })
-        }*/
+            }
+        });
 
         $scope.getOrarioRoom = function() {
 
@@ -67,7 +64,7 @@ app.
             $scope.query = "select * from timetable where stanza = '" + $scope.sRoom + "' and\
                             giorno = '" + $scope.giornoSelezionato + "' order by ora";
 
-            $http.get('http://marconitt.altervista.org/timetable.php', {
+            $http.get('http://localhost/timetable.php', {
                 cache: false,
                 params: {
                     doquery: $scope.query
@@ -95,7 +92,7 @@ app.
             $scope.query = "select * from timetable where (professore1 = '" + $scope.sTeacher + "' or professore2 = '" + $scope.sTeacher + "' or professoreS = '" + $scope.sTeacher + "') and\
                             giorno = '" + $scope.giornoSelezionato + "' order by ora";
 
-            $http.get('http://marconitt.altervista.org/timetable.php', {
+            $http.get('http://localhost/timetable.php', {
                 params: {
                     doquery: $scope.query
                 }
@@ -103,23 +100,6 @@ app.
                 $scope.genTest(response, 'prof');
             })
         }
-
-
-        /*$scope.getOrarioClass = function() {
-            $scope.sTeacher = undefined;
-            $scope.sRoom = undefined;
-            $scope.currentItem = $scope.sClass;
-
-            $http.get('http://88.149.220.222/orario/api.php', {
-                params: {
-                    class: $scope.sClass
-                }
-            }).success(function(response) {
-                
-                $scope.genTable(response, 'classe');
-                
-            })
-        }*/
 
         $scope.getOrarioClass = function() {
 
@@ -131,7 +111,7 @@ app.
                                 </div></p>';
             $scope.query = "select * from timetable where risorsa = '" + $scope.sClass + "' and giorno = '" + $scope.giornoSelezionato + "' order by ora";
             
-            $http.get('http://marconitt.altervista.org/timetable.php', {
+            $http.get('http://localhost/timetable.php', {
                 cache: false,
                 params: {
                     doquery: $scope.query
@@ -144,62 +124,6 @@ app.
             })
         }
 
-
-        /*$scope.legend = function() {
-            $scope.sTeacher = undefined;
-            $scope.sRoom = undefined;
-            $scope.sClass = undefined;
-            $scope.currentItem = "Legenda";
-            $http.get('http://88.149.220.222/orario/api.php', {
-                params: {
-                    legend: ''
-                }
-            }).success(function(response) {
-                $scope.genLegend(response);
-            })
-        }
-
-
-        $scope.genLegend = function(data) {
-            var x = "<h3>Legenda sorveglianze</h3><table class=\"table\">\
-                    <thead><tr>\
-                        <th>Sigla</th>\
-                        <th>Descrizione</th>\
-                    </tr></thead><tbody>";
-            data.forEach(function(a) {
-                //console.log(a);
-                x += "<tr>\
-                        <td>" + a.sigla + "</td>\
-                        <td>" + a.nome + "</td>\
-                    </tr>";
-            });
-
-            x += "</tbody></table>";
-            $scope.htmlTable = x;
-        }
-
-
-        $scope.plani = function(data) {
-            $scope.sTeacher = undefined;
-            $scope.sRoom = undefined;
-            $scope.sClass = undefined;
-            $http
-                .get('/tpl/planimetrie.tpl.html')
-                .success(function(res) {
-                    $scope.htmlTable = res;
-                    //console.log(res);
-                });
-
-        }
-
-
-        $scope.viewAll = function() {
-            if ($scope.sTeacher != undefined) $scope.getOrarioTeacher();
-            if ($scope.sClass != undefined) $scope.getOrarioClass();
-            if ($scope.sRoom != undefined) $scope.getOrarioRoom();
-        }
-
-*/
         $scope.genTest = function(data, tipo) {
             var days = $mdDateLocale.days;
 
@@ -266,7 +190,7 @@ app.
                         x += "<td>&nbsp;</td>";
                     }else if (data[i].professore2 == null && data[i].professoreS == null){
                         x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
-                    }else if (data[i].professoreS == null){
+                    }else if (data[i].professoreS == null && data[i].professore2 != null){
                         x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
                     }else if (data[i].professore1 == null && data[i].professore2 != null && data[i].professoreS != null){
                         x += "<td><span class='nome'>" + data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
@@ -300,22 +224,24 @@ app.
 
             for (var i = 0; i < 10; i++) {
 
-                /*try{
+                try{
 
-                    if (data[i].risorsa == undefined){
-                        x += "<td>&nbsp;</td>";
-                    }else if (data[i].professore2 == null && data[i].professoreS == null){
-                        x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].risorsa + "<br>" + data[i].stanza + "</td>";
-                    }else if (data[i].professoreS == null){
-                        x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
-                    }else if (data[i].professore1 == null && data[i].professore2 != null && data[i].professoreS != null){
-                        x += "<td><span class='nome'>" + data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                    if (data[i].stanza != null && data[i].risorsa != null){
+                        x += "<td>" + data[i].risorsa + "<br>" + data[i].stanza + "</td>";
+
+                    }else if (data[i].stanza != null && data[i].risorsa == null){
+                        x += "<td>" + data[i].stanza + "</td>";
+
+                    }else if (data[i].stanza == null && data[i].risorsa != null){
+                        x += "<td>" + data[i].risorsa + "</td>";
                     }
-
                 }catch(e){
-                    x += "<td>&nbsp;</td>";
-                }*/
- 
+
+                     x += "<td>&nbsp;</td>";
+                }
+
+
+/*
                 try{
 
                     if (data[i].stanza != null && data[i].risorsa != null){
@@ -385,7 +311,7 @@ app.
                     }catch(e){
                         
                         x += "<td>&nbsp;</td>";
-                    }
+                }*/
 
             }
             x += "</tbody>";
@@ -394,118 +320,4 @@ app.
             }
         };
     });
-        
-            /*
-        $scope.genTable = function(data, tipo) {
-            var days = $mdDateLocale.days;
-            m = [
-                [],
-                [],
-                [],
-                [],
-                [],
-                []
-            ];
 
-            if (tipo == "prof") {
-                var x = "<table class=\"table\">\
-                    <thead><tr>\
-                        <th>&nbsp;</th>\
-                        <th>1</th>\
-                        <th>2</th>\
-                        <th class=\"sorv\">I</th>\
-                        <th>3</th>\
-                        <th>4</th>\
-                        <th class=\"sorv\">II</th>\
-                        <th>5</th>\
-                        <th>6</th>\
-                    </tr></thead>";
-            } else {
-                var x = "<table class=\"table\">\
-                    <thead><tr>\
-                        <th>&nbsp;</th>\
-                        <th>1</th>\
-                        <th>2</th>\
-                        <th>3</th>\
-                        <th>4</th>\
-                        <th>5</th>\
-                        <th>6</th>\
-                    </tr></thead>";
-            }
-
-            data.forEach(function(a) {
-                if (m[a.giorno - 1][a.ora - 1] != undefined) {
-                    try {
-                        if (m[a.giorno - 1][a.ora - 1].concorso == "sos" || m[a.giorno - 1][a.ora - 1].concorso[0] == "C") {
-                            m[a.giorno - 1][a.ora - 1].prof = a.prof + " " + m[a.giorno - 1][a.ora - 1].prof;
-                        } else {
-                            m[a.giorno - 1][a.ora - 1].prof += " " + a.prof;
-                        }
-                    } catch (h) {
-                        m[a.giorno - 1][a.ora - 1].prof += " " + a.prof;
-                    }
-                } else {
-                    m[a.giorno - 1][a.ora - 1] = a;
-                }
-            });
-
-            x += "<tbody>";
-
-
-            if (tipo == "prof") {
-                for (var i = 0; i <= 5; i++) {
-                    if ($scope.all || i == $scope.day.getDay()-1) {
-                        x += "<tr><td>" + days[i+1] + "</td>";
-                        for (var j = 0; j <= 7; j++) {
-                            cella = m[i][j];
-                            try {
-                                if (cella.classe == null) {
-                                    x += "<td class=\"sorv\">" + cella.aula + "</td>";
-                                } else {
-                                    x += "<td>" + cella.aula + " " + cella.materia + " " + cella.classe + "</td>";
-                                }
-                                //console.log(cella);
-                            } catch (e) {
-                                x += "<td>&nbsp;</td>";
-                            }
-                        }
-                        x += "</tr>";
-                    }
-                };
-
-            } else {
-                for (var i = 0; i <= 5; i++) {
-                    if ($scope.all || i == $scope.day.getDay()-1) {
-                        x += "<tr><td>" + days[i+1] + "</td>";
-                        for (var j = 0; j <= 5; j++) {
-                            cella = m[i][j];
-                            if (tipo == "classe") {
-                                try {
-                                    x += "<td>" + cella.aula + " " + cella.materia + "<br><span class='nome'>" + cella.prof.toLowerCase() + "</span></td>";
-                                    //console.log(cella);
-                                } catch (e) {
-                                    x += "<td>&nbsp;</td>";
-                                }
-                            }
-                            if (tipo == "aula") {
-                                try {
-                                    x += "<td><span class='nome'>" + cella.prof.toLowerCase() + "</span><br>" + cella.materia + " " + cella.classe + "</td>";
-                                    //console.log(cella);
-                                } catch (e) {
-                                    x += "<td>&nbsp;</td>";
-                                }
-                            }
-                        }
-                        x += "</tr>";
-                    }
-                };
-            }
-
-            //console.log(m);
-
-            x += "</tbody>";
-            x += "</table>";
-            $scope.htmlTable = x;
-        }*/
-    
-    //});

@@ -1,39 +1,92 @@
 app
     .controller('CalendarioPrenotazioneCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, MaterialCalendarData, $q, $mdToast, $mdDialog, CONFIG, $rootScope) {
-        
-        giorniLimite = 14;
+
+        $scope.direction = "horizontal";
+        $scope.selectedDate;
+        $scope.isLoading = true; // used for isLoading circle
+        $scope.calendar = '';
+        $scope.currentMonth = new Date().getMonth() + 1;
+        $scope.currentYear = new Date().getFullYear();
+        var giorniLimite = 14; // range di prenotazione per un professore
+
+
+        /**
+         * initialization method
+         */
+        $scope.init = function () {
+            $scope.resetCalendar(); // i need to clear the calendar because 'visualizza' and 'prenotazione' share the same calendar data
+            $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
+        };
+
+
+        /**
+         * clears calendar content
+         */
+        $scope.resetCalendar = function () {
+            // we need to do clear the current, the previous and the next month 
+            for (i = 1; i <= 31; i++) {
+                MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + ($scope.currentMonth) + '-' + i), ' ');
+            }  
+            for (i = 1; i <= 31; i++) {
+                MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + ($scope.currentMonth+1) + '-' + i), ' ');
+            }    
+            for (i = 1; i <= 31; i++) {
+                MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + ($scope.currentMonth-1) + '-' + i), ' ');
+            }
+        };
+
+
+        /**
+         * opens the dialog at click
+         * @param date
+         */
         $scope.dayClick = function(date) {
-            tplUrl = 'tpl/daydialog/daydialogprenotazione.tpl.html';
+            var tplUrl = 'tpl/daydialog/daydialogprenotazione.tpl.html';
+            $scope.day = new Date(date);
             var today = new Date();
-            today.setHours(0);
+            var limitDay = new Date();
+            today.setHours(0); // we need to do these sets, otherwise the comparison doesnt work
             today.setMinutes(0);
             today.setSeconds(0);
             today.setMilliseconds(0);
-            $scope.day = new Date(date);
-            var limitDay = new Date();
             limitDay.setDate(limitDay.getDate() + giorniLimite);
-            if (($scope.day > limitDay && !$rootScope.admin) || ($scope.day < today  && !$rootScope.admin)) {
-                $mdToast.show($mdToast.simple().textContent("Selezionare un'altra data"));
-            }
 
-
-
-            else{$mdDialog.show({
+            if ($scope.day > limitDay && !$rootScope.admin) {
+                $mdToast.show($mdToast.simple().textContent("Seleziona una data più vicina"));
+            } else if ($scope.day < today && !$rootScope.admin) {
+                $mdToast.show($mdToast.simple().textContent("Non puoi prenotare per un giorno passato"));
+            } else {
+                $mdDialog.show({
                     templateUrl: tplUrl,
-                    controller: 'DayDialogCtrl',
+                    controller: 'DayDialogPrenotazioneCtrl',
                     clickOutsideToClose: true,
                     locals: {
                         day: date
                     }
-                })
-                .then(function(answer) {
-                    getData();
-                    $scope.selectOptions();
-                }, function() {
-                    getData();
-                    $scope.selectOptions();
                 });
             }
         };
+
+
+        /**
+         * decreases the month
+         * @param date
+         */
+        $scope.prevMonth = function(date) {
+            $scope.currentMonth = date.month;
+            $scope.currentYear = date.year;
+            $scope.resetCalendar();
+        }
+
+
+        /**
+         * increases the month
+         * @param date
+         */
+        $scope.nextMonth = function(date) {
+            $scope.currentMonth = date.month;
+            $scope.currentYear = date.year;
+            $scope.resetCalendar();
+        }
 
     });

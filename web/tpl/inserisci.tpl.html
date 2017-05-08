@@ -33,51 +33,31 @@
                 <i class="material-icons">menu</i>
             </md-button>
             <h2>
-              <span>{{ tool }}</span>
+              <span>Inserisci evento</span>
             </h2>
-            <span flex=""></span>
-            <md-button class="md-icon-button" aria-label="Open sidenav" ng-show="tool=='Visualizza'" ng-click="toggleLayout()">
-                <i class="material-icons">view_agenda</i>
-            </md-button>
         </div>
     </md-toolbar>
+    <div layout="row" layout-sm="column" layout-align="center center" ng-show="isLoading" layout-fill>
+        <md-progress-circular md-mode="indeterminate" md-diameter="200"></md-progress-circular>
+    </div>
     <md-content layout="row" layout-align="center center" style="height: calc(100% - 64px) !important;">
         <form name="insertForm" flex="80">
             <div layout="column">
                 <div layout="row">
                     <md-input-container flex>
-                        <label>Descrizione</label>
+                        <label style="color:#15629E;">Descrizione</label>
                         <textarea ng-model="event.description" placeholder="Descrizione dell'evento"></textarea>
                     </md-input-container>
-                    <md-switch ng-model="event.visible" aria-label="Switch 1">
-                        Visibile
-                    </md-switch>
+                    <md-datepicker ng-model="event.day" md-placeholder="Seleziona data.." md-open-on-focus ></md-datepicker>
                 </div>
                 <div layout="row" layout-align="space-between center">
-                    <md-datepicker ng-model="event.date" md-placeholder="Seleziona data.." md-open-on-focus></md-datepicker>
-                    <mdp-time-picker ng-model="event.hour_start"></mdp-time-picker>
-                    <mdp-time-picker ng-model="event.hour_end"></mdp-time-picker>
-                </div>
-                <div layout="row" layout-align="space-between center">
-                    <md-input-container>
-                        <label>Insegnanti</label>
-                        <md-select ng-model="event.whos.teachers" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona insegnanti..">
-                            <!--<md-select-header class="demo-select-header">
-                                <input ng-model="searchTermT" type="search" placeholder="Cerca.." class="demo-header-searchbox _md-text">
-                            </md-select-header>-->
-                            <md-optgroup label="Insegnanti">
-                                <md-option ng-repeat="teacher in teachers" value="{{teacher}}">
-                                            {{teacher}}
-                                </md-option>
-                            </md-optgroup>
-                        </md-select>
-                    </md-input-container>
+
+                    <mdp-time-picker ng-model="event.hourStart"><span style="color:#15629E;">Ora inizio</span></mdp-time-picker>
+
+                    <mdp-time-picker ng-model="event.hourEnd"><span style="color:#15629E">Ora fine</span></mdp-time-picker>
                     <md-input-container>
                         <label>Classi</label>
-                        <md-select ng-model="event.whos.classes" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona classi..">
-                            <!--<md-select-header class="demo-select-header">
-                                <input ng-model="searchTermT" type="search" placeholder="Cerca.." class="demo-header-searchbox _md-text">
-                            </md-select-header>-->
+                        <md-select ng-model="event.classes" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona classi..">
                             <md-optgroup label="Classi">
                                 <md-option ng-repeat="classe in classes" value="{{classe}}">
                                             {{classe}}
@@ -87,25 +67,22 @@
                     </md-input-container>
                     <md-input-container>
                         <label>Aule</label>
-                        <md-select ng-model="event.whos.rooms" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona aule..">
-                            <!--<md-select-header class="demo-select-header">
-                                <input ng-model="searchTermT" type="search" placeholder="Cerca.." class="demo-header-searchbox _md-text">
-                            </md-select-header>-->
+                        <md-select ng-model="event.rooms" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona aule..">
                             <md-optgroup label="Aule">
-                                <md-option>
+                                <md-option value="aula magna">
                                     Aula Magna
                                 </md-option>
-                                <md-option>
+                                <md-option value="L042">
                                     L042
                                 </md-option>
-                                <md-option>
+                                <md-option value="A304">
                                     A304
                                 </md-option>
                             </md-optgroup>
                         </md-select>
                     </md-input-container>
                 </div>
-                <md-button class="md-raised md-primary" ng-click="insert()">Inserisci</md-button>
+                <md-button class="md-raised md-primary" ng-click="insert()" ng-disabled="event.description==undefined||event.description==''">Inserisci</md-button>
             </div>
         </form>
     </md-content>

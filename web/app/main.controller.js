@@ -1,15 +1,15 @@
 app
-    .controller('MainCtrl', function ($scope, $timeout, $mdSidenav, $log, $filter, $http, $mdToast, CONFIG, $rootScope, $mdSidenav) {
+    .controller('MainCtrl', function ($scope, $timeout, $mdSidenav, $log, $filter, $http, $mdToast, CONFIG, $rootScope) {
       
-        $rootScope.logged = false;
+        $rootScope.logged;
         $rootScope.token;
         $rootScope.admin;
-        $scope.logged = false;
-        $scope.logged = $rootScope.logged;
+        $scope.logged;
         $scope.toggleLeft = buildDelayedToggler('left');
         $scope.mainHtml;
         $scope.logindata = {};
-        $scope.customStyle = {}; 
+        $scope.customStyle = {};
+        $rootScope.loadingTime = 300; // loading circle time
         //$scope.token;
 
 
@@ -109,8 +109,7 @@ app
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 data: "name="+$scope.logindata.name+"&password="+$scope.logindata.password
-                //data: { name: 'dalbo', password: '123456--'}
-            }
+            };
 
             $http(req)
                 .then(
@@ -145,29 +144,24 @@ app
          * performs logout
          */
         $scope.logout = function() {
-            $scope.highlight(2);
             $http.get('http://'+CONFIG.HOST+':8080/api/logout');
-            $rootScope.username = undefined;
-            $rootScope.token = undefined;
-            $rootScope.logged = false;
-            $scope.logged = false;
-            $scope.setView('calendario/calendariovisualizza');
+            location.reload();
         }
 
 
         /**
          * closes side bar and calls setView method
          */
-        $scope.view = function(tplName, viewName) {
+        $scope.view = function(tplName) {
             $mdSidenav('left').close();
-            $scope.setView(tplName, viewName);
+            $scope.setView(tplName);
         }
 
 
         /**
          * sets the view (the middle content of the page)
          */
-        $scope.setView = function(tplName, viewName) {
+        $scope.setView = function(tplName) {
             $scope.cambiaSchermata = true;
            
             $http

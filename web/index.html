@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="vendor/mdPickers.css" />
     <link rel="stylesheet" href="css/custom.css" />
     <meta name="theme-color" content="#2196F3">
+    <link rel="icon" type="image/png" href="img/icon.png" sizes="16x16" />
     <meta charset="UTF-8">
     <title>Marconi TT</title>
 </head>
@@ -22,15 +23,7 @@
                 <md-list-item ng-style="customStyle.visualizza" ng-click="view('calendario/calendariovisualizza'); highlight(1);" md-ink-ripple="#2196F3">
                     <p ng-style="customStyle.visualizzaText">Visualizza</p>
                 </md-list-item>
-                <md-list-item ng-style="customStyle.prenota" ng-click="view('calendario/calendarioprenotazione'); highlight(2);" ng-show="logged" md-ink-ripple="#2196F3">
-                    <p ng-style="customStyle.prenotaText">Prenota</p>
-                </md-list-item>
-                <md-list-item ng-style="customStyle.lmp" ng-click="view('prenotazioniutente'); highlight(3);" ng-show="logged" md-ink-ripple="#2196F3">
-                    <p ng-style="customStyle.lmpText">Le mie prenotazioni</p>
-                </md-list-item>                
-                <!--<md-list-item ng-click="view('Cerca')">
-                    <p>Cerca</p>
-                </md-list-item>-->
+
                 <md-divider ng-hide="logged"></md-divider>
                 <md-subheader class="md-no-sticky" ng-hide="logged">Effettua il login per poter prenotare</md-subheader>
                 <div layout="column" layout-padding ng-hide="logged">
@@ -45,10 +38,22 @@
                         </md-input-container>
                     </div>
                     <md-button class="md-accent md-raised" ng-click="login()">Entra</md-button>
-                </div>
-                <md-list-item ng-style="customStyle.eventi" ng-click="view('Inserisci'); highlight(4);" ng-show="logged && admin">
-                    <p ng-style="customStyle.eventiText">Eventi</p>
+                </div>   
+                             
+                <md-list-item ng-style="customStyle.prenota" ng-click="view('calendario/calendarioprenotazione'); highlight(2);" ng-show="logged" md-ink-ripple="#2196F3">
+                    <p ng-style="customStyle.prenotaText">Prenota</p>
                 </md-list-item>
+                <md-list-item ng-style="customStyle.eventi" ng-click="view('inserisci'); highlight(4);" ng-show="logged && admin">
+                    <p ng-style="customStyle.eventiText">Inserisci evento</p>
+                </md-list-item>                
+                <md-list-item ng-style="customStyle.lmp" ng-click="view('prenotazioniutente'); highlight(3);" ng-show="logged" md-ink-ripple="#2196F3">
+                    <p ng-style="customStyle.lmpText"><span ng-show="!admin">Le mie prenotazioni</span><span ng-show="admin">Tutte le prenotazioni</span></p>
+                </md-list-item>                
+                <!--<md-list-item ng-click="view('Cerca')">
+                    <p>Cerca</p>
+                </md-list-item>-->
+                <md-divider ng-show="logged"></md-divider>
+                <md-divider ng-show="logged"></md-divider>
                 <md-divider ng-show="logged"></md-divider>
                 <md-list-item ng-click="logout()" ng-show="logged">
                     <p>Logout</p>
@@ -83,7 +88,7 @@
                         <div>three</div>
             </div>
     </md-sidenav>
-    <md-content flex compile="mainHtml" style="height: 100% !important;">
+    <md-content flex compile="mainHtml" style="height: 100% !important;" id="mainHtml">
     </md-content>
     <script src="node_modules/angular/angular.js"></script>
     <script src="node_modules/angular-sanitize/angular-sanitize.min.js"></script>
@@ -96,14 +101,14 @@
     <script src="vendor/mdPickers.js"></script>
     <script src="app/app.js"></script>
     <script src="app/main.controller.js"></script>
-    <script src="app/calendario/calendario.controller.js"></script>
     <script src="app/calendario/calendarioprenotazione.controller.js"></script>
     <script src="app/calendario/calendariovisualizza.controller.js"></script>
-    <script src="app/daydialog/daydialog.controller.js"></script>
     <script src="app/daydialog/visualizza/orario.controller.js"></script>
+    <script src="app/daydialog/visualizza/daydialogvisualizza.controller.js"></script>
     <script src="app/daydialog/visualizza/event.controller.js"></script>
     <script src="app/daydialog/prenotazione/prenotazione.controller.js"></script>
     <script src="app/daydialog/prenotazione/confermaprenotazione.controller.js"></script>
+    <script src="app/daydialog/prenotazione/daydialogprenotazione.controller.js"></script>
     <script src="app/search.controller.js"></script>
     <script src="app/insert.controller.js"></script>
     <script src="app/ngenter.directive.js"></script>

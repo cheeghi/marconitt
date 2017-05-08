@@ -1,9 +1,20 @@
 <md-dialog aria-label="{{ dayString }}" id="dayDialogElement">
     <form>
         <md-toolbar>
-            <div class="md-toolbar-tools">
-                <h2>{{ dayString }}</h2>
+           <div class="md-toolbar-tools">
+                <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="cursor: pointer;" ng-click="previousDay()">
+                    <svg version="1.1" x="0px" y="0px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fit="" height="100%" width="100%" preserveAspectRatio="xMidYMid meet" focusable="false">
+                    <g><polygon points="15.4,7.4 14,6 8,12 14,18 15.4,16.6 10.8,12 "></polygon></g></svg>
+                </md-icon>
+
+                <h2 style="text-align: center; width: 100%">{{ dayString }}</h2>
                 <span flex></span>
+
+                <md-icon md-svg-icon="md-tabs-arrow" aria-hidden="true" style="transform: rotate(180deg); cursor: pointer;" ng-click="nextDay()">
+                    <svg version="1.1" x="0px" y="0px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fit="" height="100%" width="100%" preserveAspectRatio="xMidYMid meet" focusable="false">
+                    <g><polygon points="15.4,7.4 14,6 8,12 14,18 15.4,16.6 10.8,12 "></polygon></g></svg>
+                </md-icon>
+
                 <md-button class="md-icon-button" ng-click="cancel()">
                     <i class="material-icons">close</i>
                 </md-button>
@@ -11,7 +22,6 @@
         </md-toolbar>
         <md-dialog-content>
             <md-tabs md-dynamic-height md-stretch-tabs="always">
- 
                 <md-tab label="situazione del giorno">
                     <md-content ng-controller="OrarioCtrl" ng-init="init(day)">
                         <md-content layout-padding>
@@ -40,55 +50,30 @@
                                         </md-option>
                                     </md-select>
                                 </md-input-container>
-                                <!--<md-switch ng-model="all" aria-label="Vedi tutto" ng-change="viewAll()">
-                                    Tutto
-                                </md-switch>-->
                             </div>
-                            <div ng-show="selected" ><center>Situazione al Marconi il giorno:<br> {{ dayString }}</center></div>
                             <div layout="row" layout-align="center">
                                 <div compile="htmlTable" id="orario"></div>
                             </div>
                         </md-content>
                     </md-content>
                 </md-tab>
-                
-                <md-tab label="eventi">
-                    <md-content class="md-padding"  ng-controller="EventCtrl">
-                        <div>
-                        {{test}}
-                            <md-list class="md-dense" flex>
-                                <md-list-item class="md-3-line borderType{{event.type}} dotted_{{event.visible}}" ng-repeat="event in events | orderBy:'hour_start' | orderBy:'hour_end'">
-                                    <div class="md-list-item-text" layout="column">
-                                        <h4>{{ event.hour_start | number:2}} - {{ event.hour_end | number:2}}</h4>
-                                        <p>
-                                            <md-chips ng-model="event.who" name="who" readonly="true">
-                                                <md-chip-template>
-                                                    {{$chip.name}}
-                                                </md-chip-template>
-                                            </md-chips>
-                                        </p>
-                                        <p flex="80">
-                                            {{ event.description }}
-                                        </p>
-                                    </div>
-                                    <md-button class="md-secondary md-icon-button" ng-click="delete($event, event)" aria-label="delete" ng-show="logged">
-                                        <i class="material-icons">delete</i>
-                                        <md-tooltip md-direction="top">
-                                            Elimina evento
-                                        </md-tooltip>
-                                    </md-button>
-                                    <md-button class="md-secondary md-icon-button" ng-click="toggleVisibility($event, event)" aria-label="delete" ng-show="logged" style="margin-right: 34px;">
-                                        <md-tooltip md-direction="top">
-                                            <span ng-if="event.visible">Nascondi</span> <span ng-if="!event.visible">Mostra</span>
-                                        </md-tooltip>
-                                        <i class="material-icons" ng-if="!event.visible">visibility_off</i><i class="material-icons" ng-if="event.visible">visibility</i>
-                                    </md-button>
+                <md-tab label="eventi" >
+                    <md-content class="md-padding" ng-controller="EventCtrl" ng-init="init()">     <!--inizializza alla scelta del giorno-->
+                        <h4 ng-show="isEmpty" style="text-align: center; width: 100%; padding-top: 5%">Nessun evento in programma per oggi!</h4>
+                            <md-list style="">                    
+                                <md-list-item ng-repeat="evento in eventsArray" class="md-3-line">
+                                    <div class="md-list-item-text">
+                                        <h3>{{evento.descrizione}}</h3>
+                                        <h4>Orario: {{evento.orainizio}} - {{evento.orafine}}</h4>
+                                        <p>Classi: {{evento.classi}}</p>
+                                        <p>Aule: {{evento.stanze}}</p>
+                                    </div>                                                  
+                                    <md-divider></md-divider>
                                 </md-list-item>
+                                <span> </span>
                             </md-list>
-                        </div>
                     </md-content>
                 </md-tab>
-
             </md-tabs>
         </md-dialog-content>
     </form>

@@ -33,9 +33,9 @@
     -webkit-overflow-scrolling: auto !important;
 } 
 
-/*::-webkit-scrollbar {
+#mainHtml::-webkit-scrollbar {
     display: none;
-}*/
+}
 
 .type1 {
     background-color: red !important;
@@ -70,6 +70,15 @@ th {
     padding: 0.75em 1.5em;
     text-align: left;
     border: 0.5px solid #15629e;
+}
+
+.table_prenotazioni td, th{
+    min-width: 35px;
+}
+
+.table_prenotazioni tr {
+    line-height: 35px;
+
 }
 
 .table td.err {
@@ -262,9 +271,9 @@ md-fab {
     background-color:red;
 }
 
-.scroll-container {
+/*.scroll-container {
   overflow-x: scroll;
-}
+}*/
 
 #aaa::-webkit-scrollbar {
     display: none;

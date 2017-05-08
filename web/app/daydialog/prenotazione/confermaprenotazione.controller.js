@@ -13,6 +13,8 @@ app.
         $scope.sTeacher; // selected teacher
         $scope.sDescrizione; // descrizione inserita
         $scope.disabled; // boolean for confirm button disabling
+        $scope.teacherClasses; // list of logged teacher's classes
+        $scope.sTeacherClass; // selected teacher class
 
 
         /**
@@ -27,10 +29,18 @@ app.
          * makes http requests to populate classes, rooms, teachers, progetti arrays
          */
         $scope.initializeHttpCalls = function() {
-            $http.get('http://marconitt.altervista.org/timetable.php').success(function(response) {
+            $http.get('http://localhost/timetable.php').success(function(response) {
                 $scope.classes = response.classes;
                 $scope.teachers = response.teachers;
                 $scope.progetti = response.projects;
+            });
+
+            $http.get('http://localhost/timetable.php', {
+                params: {
+                    classesbyteacher: 'gbellini'
+                }
+            }).success(function(response) {
+                $scope.teacherClasses = response;
             });
         };
 
@@ -47,13 +57,14 @@ app.
             $scope.disabled = true;
             var risorsa;
             var isClasse = false;
-
+            var classe = $scope.sClass == undefined ? $scope.sTeacherClass : $scope.sClass;
+            
             if ($scope.admin) {
                 if ($scope.tipoPrenotazione == 'Classe') {
-                    risorsa = $scope.sClass;
+                    risorsa = classe;
                     isClasse = true;
                 } else if ($scope.tipoPrenotazione == 'Progetto') {
-                    risorsa = $scope.sProgetto;
+                    risorsa = 'Progetto: ' + $scope.sProgetto;
                 } else if ($scope.tipoPrenotazione == 'Sportello') {
                     risorsa = "Sportello: " + $scope.sTeacher;
                 } else if ($scope.tipoPrenotazione == 'Altro') {
@@ -61,10 +72,10 @@ app.
                 } else if ($scope.tipoPrenotazione == 'Tutoraggio/Studio') {
                     risorsa = $scope.tipoPrenotazione;
                 } else {
-                    risorsa = $scope.tipoPrenotazione + ": " + $scope.sClass;
+                    risorsa = $scope.tipoPrenotazione + ": " + classe;
                 }
             } else {
-                risorsa = $scope.sClass;
+                risorsa = classe;
                 isClasse = true;
             }
 
@@ -87,7 +98,7 @@ app.
                     $scope.cancel();
                     $scope.refresh();
                     $mdToast.show($mdToast.simple().textContent('Prenotazione avvenuta con successo!'));
-
+                    console.log("eijqjfioq   ", data);
                 }).error(function(err) {
                     $mdToast.show($mdToast.simple().textContent('Errore'));
                 });
