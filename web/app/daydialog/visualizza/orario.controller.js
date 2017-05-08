@@ -12,6 +12,7 @@ app.
         $scope.type;
         $scope.selected = false;
         
+        
 
         //$http.get('http://88.149.220.222/orario/api.php', {
         $http.get('http://localhost/timetable.php', {
@@ -30,6 +31,7 @@ app.
 
         $scope.init = function(date) {
 
+            
             $scope.day = new Date(date);
             $scope.isSunday = $scope.day.getDay() == 0;
             $scope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1) + "-" + $scope.day.getDate();
@@ -63,7 +65,6 @@ app.
                                 </div></p>';
             $scope.query = "select * from timetable where stanza = '" + $scope.sRoom + "' and\
                             giorno = '" + $scope.giornoSelezionato + "' order by ora";
-
             $http.get('http://localhost/timetable.php', {
                 cache: false,
                 params: {
@@ -73,8 +74,11 @@ app.
                 console.log("stanza: " +$scope.sRoom);
                 console.log("giorno: " +$scope.giornoSelezionato);
                 console.log("response: " + response);
+
+
                 $scope.genTest(response, 'aula');
-            })
+                
+            });
         }
 //http://marconitt.altervista.org/timetable.php
 //http://88.149.220.222/orario/api.php?room=L247
@@ -101,6 +105,35 @@ app.
             })
         }
 
+        /*$scope.getOrarioClass = function() {
+
+            $scope.selected = true;
+            $scope.sTeacher = undefined;
+            $scope.sRoom = undefined;
+            $scope.htmlTable = '<p><div layout="row" layout-sm="column" layout-align="center center" layout-fill>\
+                                <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>\
+                                </div></p>';
+            
+            var orarioClass = {};
+            $scope.queryTimetable = "select * from timetable where risorsa = '" + $scope.sClass + "' and giorno = '" + $scope.giornoSelezionato + "' order by ora";
+            $http.get('http://localhost/timetable.php', {
+                cache: false,
+                params: {
+                    doquery: $scope.queryTimetable
+                }
+            }).success(function(response) {
+                //console.log("classe: " +$scope.sClass);
+                //console.log("giorno: " +$scope.giornoSelezionato);
+                //console.log("response: " + response);
+                response.forEach (function (risposta){
+                console.log("sssssss");
+                    orarioClass[risposta.ora] = risposta.risorsa + "," + risposta.professore1 + "," + risposta.professore2 + "," + risposta.professoreS;
+                });
+                console.log(orarioClass);
+                $scope.genTest(response, 'classe');
+            })
+        }*/
+
         $scope.getOrarioClass = function() {
 
             $scope.selected = true;
@@ -123,6 +156,7 @@ app.
                 $scope.genTest(response, 'classe');
             })
         }
+
 
         $scope.genTest = function(data, tipo) {
             var days = $mdDateLocale.days;
@@ -178,15 +212,20 @@ app.
                         <th>4</th>\
                         <th>5</th>\
                         <th>6</th>\
+                        <th>7</th>\
+                        <th>8</th>\
+                        <th>9</th>\
+                        <th>10</th>\
                     </tr></thead>\
                     <tbody>";
 
-            for (var i = 0; i < 6; i++) {
+
+            for (var i = 0; i < 10; i++) {
 
                 try{
 
-
-                    if (data[i].risorsa == undefined){
+                    console.log(i + ":" + data[i].risorsa);
+                    if (data[i].risorsa == undefined || data[i].risorsa == null){
                         x += "<td>&nbsp;</td>";
                     }else if (data[i].professore2 == null && data[i].professoreS == null){
                         x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
@@ -197,6 +236,7 @@ app.
                     }
 
                 }catch(e){
+                    console.log(i + ": null");
                     x += "<td>&nbsp;</td>";
                 }
 
