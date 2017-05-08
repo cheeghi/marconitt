@@ -120,18 +120,51 @@ app.
                         <th style='border: 0.5px solid white;'>&nbsp;</th>\ ";
                         
             if ($scope.sHour == undefined || $scope.sHour == 'Qualsiasi') {
-                x += "<th style='border: 0.5px solid white;'>1°</th>\
-                        <th style='border: 0.5px solid white;'>2°</th>\
-                        <th style='border: 0.5px solid white;'>3°</th>\
-                        <th style='border: 0.5px solid white;'>4°</th>\
-                        <th style='border: 0.5px solid white;'>5°</th>\
-                        <th style='border: 0.5px solid white;'>6°</th>\
-                        <th style='border: 0.5px solid white;'>7°</th>\
-                        <th style='border: 0.5px solid white;'>8°</th>\
-                        <th style='border: 0.5px solid white;'>9°</th>\
-                        <th style='border: 0.5px solid white;'>10°</th>\ ";
+                x += "<th style='border: 0.5px solid white;'>1°<md-tooltip md-direction='top'>8:00 - 9:00</md-tooltip></th>\
+                        <th style='border: 0.5px solid white;'>2°<md-tooltip md-direction='top'>9:00 - 9:50</md-tooltip></th>\
+                        <th style='border: 0.5px solid white;'>3°<md-tooltip md-direction='top'>10:00 - 11:00</md-tooltip></th>\
+                        <th style='border: 0.5px solid white;'>4°<md-tooltip md-direction='top'>11:00 - 11:50</md-tooltip></th>\
+                        <th style='border: 0.5px solid white;'>5°<md-tooltip md-direction='top'>12:00 - 12:55</md-tooltip></th>\
+                        <th style='border: 0.5px solid white;'>6°<md-tooltip md-direction='top'>12:55 - 13:50</md-tooltip></th>\
+                        <th style='border: 0.5px solid white;'>7°<md-tooltip md-direction='top'>14:30 - 15:30</md-tooltip></th>\
+                        <th style='border: 0.5px solid white;'>8°<md-tooltip md-direction='top'>15:30 - 16:30</md-tooltip></th>\
+                        <th style='border: 0.5px solid white;'>9°<md-tooltip md-direction='top'>16:30 - 17:30</md-tooltip></th>\
+                        <th style='border: 0.5px solid white;'>10°<md-tooltip md-direction='top'>17:30 - 18:30</md-tooltip></th>\ ";
             } else {
-                x += "<th style='border: 0.5px solid white;'>" + $scope.sHour + "°</th>";
+                var tooltipText;
+                switch ($scope.sHour) {
+                    case "1":
+                        tooltipText = '8:00 - 9:00';
+                        break;
+                    case "2":
+                        tooltipText = '9:00 - 9:50';
+                        break;
+                    case "3":
+                        tooltipText = '10:00 - 11:00';
+                        break;
+                    case "4":
+                        tooltipText = '11:00 - 11:50';
+                        break;
+                    case "5":
+                        tooltipText = '12:00 - 12:55';
+                        break;
+                    case "6":
+                        tooltipText = '12:55 - 13:50';
+                        break;
+                    case "7":
+                        tooltipText = '14:30 - 15:30';
+                        break;
+                    case "8":
+                        tooltipText = '15:30 - 16:30';
+                        break;
+                    case "9":
+                        tooltipText = '16:30 - 17:30';
+                        break;
+                    case "10":
+                        tooltipText = '17:30 - 18:30';
+                        break;
+                }
+                x += "<th style='border: 0.5px solid white;'>"+$scope.sHour+"°<md-tooltip md-direction='top'>"+tooltipText+"</md-tooltip></th>";
             }
 
             x += "</tr></thead>";
