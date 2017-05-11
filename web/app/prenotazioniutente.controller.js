@@ -43,6 +43,8 @@ app.
                         prenotazione.fgiorno = fgiorno;
                     });
                     $scope.fillsAltrePrenotazioni();
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                 });    
 
                 $http.get('http://localhost/timetable.php', {
@@ -59,6 +61,8 @@ app.
                         prenotazione.fgiorno = fgiorno;
                     });
                     $scope.fillsEventi();
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                 });  
             } 
 
@@ -76,6 +80,8 @@ app.
                 });
                 $scope.fillsMiePrenotazioni();
                 $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
+            }).error(function() {
+                $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
             });
         };
 
@@ -177,10 +183,14 @@ app.
 
                 $http(req)
                     .success(function(data) {
-                        $scope.initializeHttpCalls();
-                        $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                   
+                        if (data) {
+                            $scope.initializeHttpCalls();
+                            $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                       
+                        } else {
+                            $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));                       
+                        }
                     }).error(function(err) {
-                        $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
+                        $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                     });
                     
             });
@@ -207,10 +217,14 @@ app.
 
             $http(req)
                 .success(function(data) {
-                    $scope.initializeHttpCalls();
-                    $mdToast.show($mdToast.simple().textContent('Prenotazione approvata con successo'));                   
+                    if (data) {
+                        $scope.initializeHttpCalls();
+                        $mdToast.show($mdToast.simple().textContent('Prenotazione approvata con successo'));      
+                    } else {
+                        $mdToast.show($mdToast.simple().textContent('Errore durante la approvazione'));      
+                    }             
                 }).error(function(err) {
-                    $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
+                    $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                 });            
         };
 
@@ -249,10 +263,14 @@ app.
 
                 $http(req)
                     .success(function(data) {
-                        $scope.initializeHttpCalls();
-                        $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                   
+                        if (data) {
+                            $scope.initializeHttpCalls();
+                            $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                   
+                        } else {
+                            $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));                   
+                        }
                     }).error(function(err) {
-                        $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
+                        $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                     });
             });
         };

@@ -24,7 +24,7 @@ const querystring = require('querystring');
 // configuration =========
 // =======================
 var port = process.env.PORT || 8080; // used to create, sign, and verify tokens
-mongoose.connect(config.database); // connect to database
+//mongoose.connect(config.database); // connect to database
 app.set('secret', config.secret); // secret variable
 
 
@@ -208,36 +208,36 @@ apiRoutes.post('/authenticate', function(req, res) {
                 };
 
                 const request = http.request(options, (result) => {
-                console.log(`STATUS: ${res.statusCode}`);
-                console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-                result.setEncoding('utf8');
-                result.on('data', (chunk) => {
-                    console.log(`BODY: ${chunk}`);
-                    if (chunk == 'true') {
-                        var token = jwt.sign(user, app.get('secret'), { 
-                            expiresInMinutes: 1440 // expires in 24 hours 
-                        }); 
+                    console.log(`STATUS: ${res.statusCode}`);
+                    console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+                    result.setEncoding('utf8');
+                    result.on('data', (chunk) => {
+                        console.log(`BODY: ${chunk}`);
+                        if (chunk == 'true') {
+                            var token = jwt.sign(user, app.get('secret'), { 
+                                expiresInMinutes: 1440 // expires in 24 hours 
+                            }); 
 
-                        req.session.username = user.name; 
-                        req.session.admin = user.admin; 
-                        req.session.token = token; 
+                            req.session.username = user.username; 
+                            req.session.admin = user.admin; 
+                            req.session.token = token; 
 
-                        // return the information including token as JSON 
-                        res.json({ 
-                            success: true, 
-                            message: 'Enjoy your token!', 
-                            token: token, 
-                            username: req.session.username, 
-                            admin: user.admin 
-                        }); 
-                        
-                    } else {
-                        res.json({ success: false, message: 'Credenziali errate.' });
-                    }
-                });
-                result.on('end', () => {
-                    console.log('No more data in response.');
-                });
+                            // return the information including token as JSON 
+                            res.json({ 
+                                success: true, 
+                                message: 'Enjoy your token!', 
+                                token: token, 
+                                username: user.username, 
+                                admin: user.admin 
+                            }); 
+
+                        } else {
+                            res.json({ success: false, message: 'Credenziali errate.' });
+                        }
+                    });
+                    result.on('end', () => {
+                        console.log('No more data in response.');
+                    });
                 });
 
                 request.on('error', (e) => {

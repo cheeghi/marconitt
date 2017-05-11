@@ -1,10 +1,4 @@
 ##IMPORT
-import requests
-import json
-import datetime
-from datetime import date
-from datetime import datetime
-from datetime import timedelta
 import mysql.connector
 
 ##DOC

@@ -35,10 +35,13 @@ app.
          * makes http requests to populate classes, rooms, teachers, labs and classrooms arrays
          */
         $scope.initializeHttpCalls = function() {
-            $http.get('http://localhost/timetable.php').success(function(response) {
-                $scope.classrooms = response.classrooms;
-                $scope.labs = response.labs;
-            });
+            $http.get('http://localhost/timetable.php')
+                .success(function(response) {
+                    $scope.classrooms = response.classrooms;
+                    $scope.labs = response.labs;
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
+                });
         };
 
 
@@ -77,6 +80,8 @@ app.
                 }).success(function(response) {
                     $scope.genTable(response.rooms);
                     $scope.isLoading = false;
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                 });
                 $scope.dim(); //for scrollbar
 
@@ -90,6 +95,8 @@ app.
                     $scope.genTable(response.rooms);
                     $scope.isLoading = false;
                     $scope.dim(); //for scrollbar (leo)
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                 });
                     
             }

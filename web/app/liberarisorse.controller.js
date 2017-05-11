@@ -15,13 +15,16 @@ app
          * Initialization method
          */
         var init = function() {
-             $http.get('http://localhost/timetable.php').success(function(response) {
-                $scope.classes = response.classes;
-                $scope.teachers = response.teachers;
-                $scope.ore = response.ore;
-                console.log($scope.teachers + "---------" + $scope.classes);
-                 $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
-            });
+            $http.get('http://localhost/timetable.php')
+                .success(function(response) {
+                    $scope.classes = response.classes;
+                    $scope.teachers = response.teachers;
+                    $scope.ore = response.ore;
+                    console.log($scope.teachers + "---------" + $scope.classes);
+                    $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
+                });
         };
 
 
@@ -56,12 +59,16 @@ app
                 $http(req)
                     .then(
                         function(data) {
-                            $mdToast.show($mdToast.simple().textContent("Risorsa liberata con successo"));
-                            $scope.event = {};
-                            $scope.event.day = new Date();
+                            if (data) {
+                                $mdToast.show($mdToast.simple().textContent("Risorsa liberata con successo"));
+                                $scope.event = {};
+                                $scope.event.day = new Date();   
+                            } else {
+                                $mdToast.show($mdToast.simple().textContent("Errore durante la liberazione"));
+                            }
                         },
                         function(err) {
-                            $mdToast.show($mdToast.simple().textContent("Errore di rete: "+ err));
+                            $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                         }
                     );
             });    
