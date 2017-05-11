@@ -115,24 +115,61 @@ app.
                                 </div></p>';
             
             var orarioClass = {};
+
+            $scope.queryLiberazione = "select liberazione.descrizione, prof_liberazione.professori, prof_liberazione.ora from liberazione inner join prof_liberazione on\
+             liberazione.id = prof_liberazione.liberazione where liberazione.classe = '" + $scope.sClass + "' and giorno = '" + $scope.giornoSelezionato + "' order by ora";
             $scope.queryTimetable = "select * from timetable where risorsa = '" + $scope.sClass + "' and giorno = '" + $scope.giornoSelezionato + "' order by ora";
+            $scope.queryEventi = "select eventi.descrizione, eventi.stanze, prof_eventi.ora, prof_eventi.professori from eventi inner join prof_eventi\
+            on eventi.id = prof_eventi.id where eventi.giorno = '" + $scope.giornoSelezionato + "' and eventi.classi like '%" + $scope.sClass + "%' order by oraInizio;"
+
             $http.get('http://localhost/timetable.php', {
                 cache: false,
                 params: {
-                    doquery: $scope.queryTimetable
+                    doquery: $scope.queryLiberazione
                 }
             }).success(function(response) {
-                //console.log("classe: " +$scope.sClass);
-                //console.log("giorno: " +$scope.giornoSelezionato);
-                //console.log("response: " + response);
-                response.forEach (function (risposta){
-                    orarioClass[risposta.ora] = risposta;
+
+                response.forEach (function (response){
+                    orarioClass[response.ora] = response;
                 });
+
+                $http.get('http://localhost/timetable.php', {
+                    cache: false,
+                    params: {
+                        doquery: $scope.queryTimetable
+                    }
+                }).success(function(response2) {
+                    response2.forEach (function (response2){
+                        orarioClass[response2.ora] = response2;
+                    });
                 //console.log(orarioClass);
                 //$scope.genTable(response, 'classe');
-                $scope.genTest(orarioClass, 'classe');
+                //$scope.genTest(orarioClass, 'classe');
+                    $http.get('http://localhost/timetable.php', {
+                        cache: false,
+                        params: {
+                            doquery: $scope.queryEventi
+                        }
+                    }).success(function(response3) {
+                        response3.forEach (function (response3){
+                            orarioClass[response3.ora] = response3;
+                        });
+                    //console.log(orarioClass);
+                    //$scope.genTable(response, 'classe');
+                    //$scope.genTest(orarioClass, 'classe');
+                    
+                    })
+                
+                })
+
+            console.log(orarioClass);
+                
 
             })
+            $scope.genTest(orarioClass, 'classe');
+
+           /* 
+            */
         }
 
         /*$scope.getOrarioClass = function() {
@@ -159,6 +196,7 @@ app.
         }*/
 
         $scope.genTest = function(data, tipo) {
+            console.log("righetti è gay");
             var days = $mdDateLocale.days;
 
             if (tipo == 'classe'){
@@ -178,16 +216,25 @@ app.
                     </tr></thead>\
                     <tbody>";
 
+                    console.log(typeof(data[1].descrizione));
             for (var i = 1; i <= 10; i++) {
 
-                console.log(data[i]);
                 try{
-                    
-                    //x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
-                    x += "<td>" + data[i].stanza + "</td>";
+                    //console.log("KREKJGERKGREGJKH     " + i);
+                    if (data[i].descrizione != undefined && data[i].stanze != undefined){
+                        console.log("<td>" + data[i].descrizione + "<br>" + data[i].professori + "<br>" + data[i].stanze + "</td>");
+                        x += "<td>" + data[i].descrizione + "<br>" + data[i].professori + "<br>" + data[i].stanze + "</td>";
+                    }else if(data[i].descrizione != undefined && data[i].stanze == undefined){
+                        x += "<td>" + data[i].descrizione + "</td>";
+                    }else{
+                        console.log("44444444");
+                        
+                    }
 
                 }catch(e){
 
+                    //console.log("aAAAAAAAAAAAA   " + i);
+                    //console.log(e);
                     x += "<td>&nbsp;</td>";
 
                 }
