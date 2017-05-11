@@ -21,12 +21,17 @@
 
 }
 
+#dialogContent_dayDialogElement::-webkit-scrollbar {
+    display: none;
+}
+
 .md-toolbar-tools md-select-value span {
     max-height: 30px !important;
     line-height: 30px !important;
     color: white !important;
     white-space: nowrap !important;
     overflow: auto !important;
+    display: none;
     text-overflow: ellipsis !important;
     overflow: -moz-scrollbars !important;
     -ms-overflow-style: auto !important;
@@ -275,16 +280,15 @@ md-fab {
   overflow-x: scroll;
 }*/
 
+#aaa::-webkit-scrollbar {
+    display: none;
+}
+
 #footer {
-    background-color: #0066ff;
+    background-color: #0066ff; /*#0000ff*/
     color: white;
-    align-content: flex-end;
-    /*font: 9px Arial, Helvetica */
-    width: 100%;
-    /*line-height:30%;*/
-    border: 1px solid black;
     display: inline-flex;
-    vertical-align: top;
+    width: 100%;
 }
 
 .footerDiv {

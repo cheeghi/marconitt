@@ -18,7 +18,7 @@
     <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
         <md-toolbar class="md-primary" style="height: 200px; background-image: url(img/marconitt.png); background-repeat: no-repeat; background-position: center center; background-color: transparent; background-size: 50%;">
         </md-toolbar>
-        <md-content>
+        <md-content id="aaa">
             <md-list ng-cloak>
                 <md-list-item ng-style="customStyle.visualizza" ng-click="view('calendario/calendariovisualizza'); highlight(1);" md-ink-ripple="#2196F3">
                     <p ng-style="customStyle.visualizzaText">Visualizza</p>
@@ -61,16 +61,20 @@
                 <md-list-item ng-click="logout()" ng-show="logged">
                     <p>Logout</p>
                 </md-list-item>
-                <!--<md-list-item flex ng-show="logged" id="footer">
+                <md-list-item>
+                    <p> </p>
+                </md-list-item>
+                <!--<md-list-item flex layout="row" ng-show="logged" id="footer">
                     <div class="footerDiv">Logo</div>
                     <hr>
                     <div class="footerDiv">Link</div>
                     <hr>
                     <div class="footerDiv">
-                        <h3 id="team">Team</h3>
+                        <h3>Team</h3>
                         <hr>
                         <br>
                         <h4 class="teamComponent">Berrighi Leonardo</h4>
+                        <h4>...</h4>
                         <h4 class="teamComponent">Semprebon Elia</h4>
                         <h4 class="teamComponent">Righetti Michele</h4>
                         <h4 class="teamComponent">Tanello Giuseppe</h4>
@@ -79,6 +83,13 @@
                 </md-list-item>-->
             </md-list>
         </md-content>
+        <!--<div layout="row" layout-align="center stretch" style="background-color:red; height:200px;">
+                        <div>one</div>
+                        <hr>
+                        <div>two</div>
+                        <hr>
+                        <div>three</div>
+            </div>-->
     </md-sidenav>
     <md-content flex compile="mainHtml" style="height: 100% !important;" id="mainHtml">
     </md-content>
