@@ -618,6 +618,45 @@ apiRoutes.post('/cancellaEvento', function(req, res) {
 });
 
 
+apiRoutes.post('/liberaRisorse', function(req, res) {
+    var classe = req.body.classe;
+    var s_ore = req.body.ore;
+    var giorno = req.body.day;
+    var descrizione = req.body.descrizione;
+
+    var ore = s_ore.split(",");
+    var sql_stmt;
+    var stanza;
+    var id;
+
+    sql_stmt = "INSERT INTO liberazione(giorno, descrizione, classe, ore) VALUES ('" + giorno + "', '" + 
+        descrizione + "', '" + classe + "', '" + ore + "')";
+
+    connection.query(sql_stmt, function(err) {
+        if (!err) {
+            //seleziono l'id della liberazione
+            sql_stmt = "SELECT id FROM liberazione WHERE giorno = '" + giorno + "' AND ore = '" + ore 
+                + "' AND descrizione = '" + descrizione + "' AND classe = '" + classe + "'";
+
+            connection.query(sql_stmt, function(err, rows, fields) {
+                if (!err) {
+                    id = rows[0].id;
+
+                    for(var i in ore) {
+                        liberazione(id, classe, ore[i], giorno);
+                    }
+                    res.json(true);
+                } else {
+                    res.json(false);
+                }
+            });
+        } else {
+            res.json(false);
+        }
+    });
+});
+
+
 apiRoutes.post('/events/:year/:month/:day', function(req, res) {
     console.log(req.body);
     var day = new Day({
@@ -1208,4 +1247,49 @@ function hourToStartHour(giorno, data, res) {
     }
 
     res(schoolOur);
+}
+
+
+function liberazione(id, classe, ora, giorno) {
+    var sql_stmt = "SELECT stanza FROM timetable WHERE risorsa = '" + classe + "' AND ora = " + ora + " AND giorno = '" + giorno + "'";
+    var prof1;
+    var prof2;
+    var professori;
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            try {
+                stanza = rows[0].stanza;
+                var sql_stmt2 = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null, professoreS = Null " + 
+                    "WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+            } catch(e) {
+                return;
+            }
+            sql_stmt = "SELECT professore1, professore2 FROM timetable WHERE ora = " + ora + 
+                " AND risorsa = '" + classe + "' AND giorno = '" + giorno + "'";
+
+            connection.query(sql_stmt, function(err, rows, fields) {
+                if (!err) {
+                    try {
+                        prof1 = rows[0].professore1;
+                        prof2 = rows[0].professore2;
+                        professori = prof1 + ", " + prof2;
+                        professori = professori.replace(", null", "");
+
+                        sql_stmt = "INSERT INTO prof_liberazione VALUES(" + id + ", " + ora + ", '" + professori + "')";
+                        connection.query(sql_stmt);
+                        connection.query(sql_stmt2);
+                    } catch(e) {
+                        prof2 = "";
+                        professori = prof1 + ", " + prof2;
+                        professori = professori.replace(", null", "");
+
+                        sql_stmt = "INSERT INTO prof_liberazione VALUES(" + id + ", " + ora + ", '" + professori + "')";
+                        connection.query(sql_stmt);
+                        connection.query(sql_stmt2);
+                    }
+                }
+            });
+        }
+    });
 }
