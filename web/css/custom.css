@@ -296,7 +296,24 @@ md-fab {
 }
 
 .teamComponent {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: normal;
     text-align: justify;
+}
+
+#footerDiv {
+    font-size: 10px;
+    text-align: justify;
+}
+
+.gantt-scrollable {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+@media screen and (max-width: 600px) {
+    .gantt-scrollable {
+        max-height: 168px;
+        overflow-y: auto;
+    }
 }
