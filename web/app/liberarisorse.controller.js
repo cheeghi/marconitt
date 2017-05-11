@@ -7,7 +7,7 @@ app
         $scope.event.description;
         $scope.event.day = new Date();
         $scope.event.class;
-        $scope.event.ore = [];
+        $scope.event.ore;
         $scope.isLoading = true; // used for loading circle
 
 
@@ -59,7 +59,6 @@ app
                             $mdToast.show($mdToast.simple().textContent("Risorsa liberata con successo"));
                             $scope.event = {};
                             $scope.event.day = new Date();
-                            $scope.event.ore = [];
                         },
                         function(err) {
                             $mdToast.show($mdToast.simple().textContent("Errore di rete: "+ err));
