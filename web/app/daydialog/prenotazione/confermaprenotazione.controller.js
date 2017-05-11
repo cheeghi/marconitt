@@ -29,18 +29,25 @@ app.
          * makes http requests to populate classes, rooms, teachers, progetti arrays
          */
         $scope.initializeHttpCalls = function() {
-            $http.get('http://localhost/timetable.php').success(function(response) {
-                $scope.classes = response.classes;
-                $scope.teachers = response.teachers;
-                $scope.progetti = response.projects;
-            });
+            $http.get('http://localhost/timetable.php')
+                .success(function(response) {
+                    $scope.classes = response.classes;
+                    $scope.teachers = response.teachers;
+                    $scope.progetti = response.projects;
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent("Errore di rete"));
+                });
 
+            // IF NON ADMIN
+            //*********************
             $http.get('http://localhost/timetable.php', {
                 params: {
                     classesbyteacher: 'gbellini'
                 }
             }).success(function(response) {
                 $scope.teacherClasses = response;
+            }).error(function() {
+                $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
             });
         };
 
@@ -103,12 +110,15 @@ app.
             
             $http(req)
                 .success(function(data) {
-                    $scope.cancel();
-                    $scope.refresh();
-                    $mdToast.show($mdToast.simple().textContent('Prenotazione avvenuta con successo!'));
-                    console.log("eijqjfioq   ", data);
+                    if (data) {
+                         $scope.cancel();
+                        $scope.refresh();
+                        $mdToast.show($mdToast.simple().textContent('Prenotazione avvenuta con successo!'));   
+                    } else {
+                        $mdToast.show($mdToast.simple().textContent("Errore durante la prenotazione"));
+                    }
                 }).error(function(err) {
-                    $mdToast.show($mdToast.simple().textContent('Errore'));
+                    $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                 });
 
         };

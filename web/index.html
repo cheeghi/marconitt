@@ -37,7 +37,10 @@
                             <input ng-model="logindata.password" ng-enter="login()" type="password">
                         </md-input-container>
                     </div>
-                    <md-button class="md-accent md-raised" ng-click="login()">Entra</md-button>
+                    <md-button ng-disabled="isLoading" class="md-accent md-raised" ng-click="login()">Entra</md-button>
+                    <div layout="row" layout-sm="column" layout-align="center center"  layout-fill>
+                        <md-button><md-progress-circular ng-show="isLoading" md-mode="indeterminate" md-diameter="50"></md-progress-circular></md-button>
+                    </div>
                 </div>   
                              
                 <md-list-item ng-style="customStyle.prenota" ng-click="view('calendario/calendarioprenotazione'); highlight(2);" ng-show="logged" md-ink-ripple="#2196F3">

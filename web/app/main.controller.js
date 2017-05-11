@@ -10,6 +10,7 @@ app
         $scope.logindata = {};
         $scope.customStyle = {};
         $rootScope.loadingTime = 300; // loading circle time
+        $scope.isLoading;
         //$scope.token;
 
 
@@ -99,6 +100,7 @@ app
          * performs login
          */
         $scope.login = function() {
+            $scope.isLoading = true;
             //chiamata http che ritorna il token da utilizzare nelle prossime chiamate
             console.log($scope.logindata);
 
@@ -114,6 +116,7 @@ app
             $http(req)
                 .then(
                       function(data) {
+                          $scope.isLoading = false;
                           if (data.data.success) {
                               $rootScope.token = data.data.token;
                               $rootScope.admin = data.data.admin;
@@ -132,7 +135,8 @@ app
                           }
                       },
                       function(err) {
-                          $mdToast.show($mdToast.simple().textContent('Errore di rete'));
+                          $scope.isLoading = false;
+                          $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                       }
                 );
             

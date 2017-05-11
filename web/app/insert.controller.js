@@ -17,12 +17,15 @@ app
          * Initialization method
          */
         var init = function() {
-             $http.get('http://localhost/timetable.php').success(function(response) {
-                $scope.classes = response.classes;
-                $scope.teachers = response.teachers;
-                $scope.rooms = response.rooms;
-                $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
-            });
+            $http.get('http://localhost/timetable.php')
+                .success(function(response) {
+                    $scope.classes = response.classes;
+                    $scope.teachers = response.teachers;
+                    $scope.rooms = response.rooms;
+                    $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
+                });
         };
 
 
@@ -84,16 +87,20 @@ app
             $http(req)
                 .then(
                     function(data) {
-                        $mdToast.show($mdToast.simple().textContent("Evento inserito correttamente"));
-                        $scope.event = {};
-                        $scope.event.day = new Date();
-                        $scope.event.hourStart = new Date();
-                        $scope.event.hourEnd = new Date();
-                        $scope.event.classes = [];
-                        $scope.event.rooms = [];
+                        if (data) {
+                            $mdToast.show($mdToast.simple().textContent("Evento inserito correttamente"));
+                            $scope.event = {};
+                            $scope.event.day = new Date();
+                            $scope.event.hourStart = new Date();
+                            $scope.event.hourEnd = new Date();
+                            $scope.event.classes = [];
+                            $scope.event.rooms = [];   
+                        } else {
+                            $mdToast.show($mdToast.simple().textContent("Errore durante l'inserimento"));
+                        }
                     },
                     function(err) {
-                        $mdToast.show($mdToast.simple().textContent("Errore di rete: "+ err));
+                        $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                     }
                 );
         }
