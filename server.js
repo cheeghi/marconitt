@@ -176,79 +176,82 @@ var apiRoutes = express.Router();
 
 // route to authenticate a user (POST http://localhost:8080/api/authenticate)
 apiRoutes.post('/authenticate', function(req, res) {
-    // find the user
-    
     //query to search if user is in db
-    if (isInDb)
-        var utente = { 
-            username: req.body.name,
-            password: req.body.password,
-            admin: 
-        };
-    
-    const postData = querystring.stringify({
-        'username': req.body.name,
-        'password': req.body.password
-    });
+    var sql_stmt = "SELECT admin FROM users WHERE username ='" + req.body.name + "'";
 
-    const options = {
-      hostname: '88.149.220.222',
-      port: 80,
-      path: '/marconitt/ldap.php',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(postData)
-      }
-    };
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            try {
+                var adm = rows[0].admin;
+                var admin = adm === "0" ? false : true;
 
-    const request = http.request(options, (result) => {
-      console.log(`STATUS: ${res.statusCode}`);
-      console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-      result.setEncoding('utf8');
-      result.on('data', (chunk) => {
-        console.log(`BODY: ${chunk}`);
-        if (chunk == 'true') {
-            var user = {
-                name: req.body.name,
-                password: req.body.password,
-                admin: 
-            };
-            
-            var token = jwt.sign(user, app.get('secret'), { 
-                expiresInMinutes: 1440 // expires in 24 hours 
-            }); 
+                var user = { 
+                    username: req.body.name,
+                    password: req.body.password,
+                    admin: admin
+                };
+                
+                const postData = querystring.stringify({
+                    'username': req.body.name,
+                    'password': req.body.password
+                });
 
-            req.session.username = user.name; 
-            req.session.admin = user.admin; 
-            req.session.token = token; 
+                const options = {
+                hostname: '88.149.220.222',
+                port: 80,
+                path: '/marconitt/ldap.php',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Length': Buffer.byteLength(postData)
+                    }
+                };
 
-            // return the information including token as JSON 
-            res.json({ 
-                success: true, 
-                message: 'Enjoy your token!', 
-                token: token, 
-                username: req.session.username, 
-                admin: user.admin 
-            }); 
-            
-        } else {
-            res.json({ success: false, message: 'Credenziali errate.' });
+                const request = http.request(options, (result) => {
+                console.log(`STATUS: ${res.statusCode}`);
+                console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+                result.setEncoding('utf8');
+                result.on('data', (chunk) => {
+                    console.log(`BODY: ${chunk}`);
+                    if (chunk == 'true') {
+                        var token = jwt.sign(user, app.get('secret'), { 
+                            expiresInMinutes: 1440 // expires in 24 hours 
+                        }); 
+
+                        req.session.username = user.name; 
+                        req.session.admin = user.admin; 
+                        req.session.token = token; 
+
+                        // return the information including token as JSON 
+                        res.json({ 
+                            success: true, 
+                            message: 'Enjoy your token!', 
+                            token: token, 
+                            username: req.session.username, 
+                            admin: user.admin 
+                        }); 
+                        
+                    } else {
+                        res.json({ success: false, message: 'Credenziali errate.' });
+                    }
+                });
+                result.on('end', () => {
+                    console.log('No more data in response.');
+                });
+                });
+
+                request.on('error', (e) => {
+                console.error(`problem with request: ${e.message}`);
+                });
+
+                // write data to request body
+                request.write(postData);
+                request.end();
+            } catch(e) {
+                res.json({ success: false, message: 'Credenziali errate.' });
+            }
         }
-      });
-      result.on('end', () => {
-        console.log('No more data in response.');
-      });
     });
-
-    request.on('error', (e) => {
-      console.error(`problem with request: ${e.message}`);
-    });
-
-    // write data to request body
-    request.write(postData);
-    request.end();
-    
 });
 
 
