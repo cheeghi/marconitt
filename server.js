@@ -1081,7 +1081,7 @@ function controllaPrenotazioni(stanza, giorno, ora, res) {
 function cancellaPrenotazione(stanza, giorno, ora, res) {
     var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null, professoreS = Null " + 
         "WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
-
+    
     connection.query(sql_stmt, function(err) {
         if(!err) {
             selectId(giorno, stanza, ora, function(id) {
@@ -1293,14 +1293,16 @@ function liberazione(id, classe, ora, giorno) {
     var prof1;
     var prof2;
     var professori;
+    var vett = [];
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
             try {
                 stanza = rows[0].stanza;
-                var sql_stmt2 = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null, professoreS = Null " + 
-                    "WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+                vett.push(stanza);
             } catch(e) {
+                sql_stmt = "INSERT INTO prof_liberazione VALUES(" + id + ", " + ora + ", NULL)";
+                connection.query(sql_stmt);
                 return;
             }
             sql_stmt = "SELECT professore1, professore2 FROM timetable WHERE ora = " + ora + 
@@ -1316,15 +1318,25 @@ function liberazione(id, classe, ora, giorno) {
 
                         sql_stmt = "INSERT INTO prof_liberazione VALUES(" + id + ", " + ora + ", '" + professori + "')";
                         connection.query(sql_stmt);
-                        connection.query(sql_stmt2);
+
+                        for(i in vett) {
+                            cancellaPrenotazione(stanza, giorno, ora, function(response) {
+                                //console.log("liberata");
+                            });
+                        }
                     } catch(e) {
                         prof2 = "";
                         professori = prof1 + ", " + prof2;
                         professori = professori.replace(", null", "");
-
+                        
                         sql_stmt = "INSERT INTO prof_liberazione VALUES(" + id + ", " + ora + ", '" + professori + "')";
                         connection.query(sql_stmt);
-                        connection.query(sql_stmt2);
+
+                        for(i in vett) {
+                            cancellaPrenotazione(stanza, giorno, ora, function(response) {
+                                //console.log("liberata");
+                            });
+                        }
                     }
                 }
             });
