@@ -37,10 +37,7 @@
                             <input ng-model="logindata.password" ng-enter="login()" type="password">
                         </md-input-container>
                     </div>
-                    <md-button ng-disabled="isLoading" class="md-accent md-raised" ng-click="login()">Entra</md-button>
-                    <div layout="row" layout-sm="column" layout-align="center center"  layout-fill>
-                        <md-button><md-progress-circular ng-show="isLoading" md-mode="indeterminate" md-diameter="50"></md-progress-circular></md-button>
-                    </div>
+                    <md-button class="md-accent md-raised" ng-click="login()">Entra</md-button>
                 </div>   
                              
                 <md-list-item ng-style="customStyle.prenota" ng-click="view('calendario/calendarioprenotazione'); highlight(2);" ng-show="logged" md-ink-ripple="#2196F3">
@@ -69,12 +66,13 @@
                     <p> </p>
                 </md-list-item>
                 <md-list-item flex layout="row" ng-show="logged" id="footer">
-                    <div class="footerDiv">&copy; copyright <br> all rights reserved</div>
-                    <hr>
                     <div class="footerDiv">
                         <h3>Team</h3>
                         <hr>
-                        <br>
+                        &copy; copyright <br> all rights reserved
+                    </div>
+                    <hr>
+                    <div class="footerDiv">
                         <h4 class="teamComponent">Berrighi Leonardo</h4>
                         <h4 class="teamComponent">Semprebon Elia</h4>
                         <h4 class="teamComponent">Righetti Michele</h4>
