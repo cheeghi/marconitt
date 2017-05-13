@@ -31,7 +31,10 @@ app.
 
         $scope.init = function(date) {
 
-            
+
+            $scope.sem1 = false;
+            $scope.sem2 = false;
+            $scope.sem3 = false;
             $scope.day = new Date(date);
             $scope.isSunday = $scope.day.getDay() == 0;
             $scope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1) + "-" + $scope.day.getDate();
@@ -131,7 +134,7 @@ app.
 
                 response.forEach (function (response){
                     orarioClass[response.ora] = response;
-                });
+                });      
 
                 $http.get('http://localhost/timetable.php', {
                     cache: false,
@@ -142,10 +145,8 @@ app.
                     response2.forEach (function (response2){
                         orarioClass[response2.ora] = response2;
                     });
-                //console.log(orarioClass);
-                //$scope.genTable(response, 'classe');
-                //$scope.genTest(orarioClass, 'classe');
-                    $http.get('http://localhost/timetable.php', {
+
+                $http.get('http://localhost/timetable.php', {
                         cache: false,
                         params: {
                             doquery: $scope.queryEventi
@@ -154,22 +155,12 @@ app.
                         response3.forEach (function (response3){
                             orarioClass[response3.ora] = response3;
                         });
-                    //console.log(orarioClass);
-                    //$scope.genTable(response, 'classe');
-                    //$scope.genTest(orarioClass, 'classe');
-                    
-                    })
-                
+                        
+                    console.log("orarioClass dopo orario(completo): " + JSON.stringify(orarioClass));
+                    $scope.genTest(orarioClass, 'classe');
+                    })    
                 })
-
-            console.log(orarioClass);
-                
-
             })
-            $scope.genTest(orarioClass, 'classe');
-
-           /* 
-            */
         }
 
         /*$scope.getOrarioClass = function() {
@@ -196,7 +187,6 @@ app.
         }*/
 
         $scope.genTest = function(data, tipo) {
-            console.log("righetti è gay");
             var days = $mdDateLocale.days;
 
             if (tipo == 'classe'){
@@ -216,25 +206,33 @@ app.
                     </tr></thead>\
                     <tbody>";
 
-                    console.log(typeof(data[1].descrizione));
             for (var i = 1; i <= 10; i++) {
 
                 try{
-                    //console.log("KREKJGERKGREGJKH     " + i);
+                   
                     if (data[i].descrizione != undefined && data[i].stanze != undefined){
-                        console.log("<td>" + data[i].descrizione + "<br>" + data[i].professori + "<br>" + data[i].stanze + "</td>");
-                        x += "<td>" + data[i].descrizione + "<br>" + data[i].professori + "<br>" + data[i].stanze + "</td>";
+                        
+                        x += "<td>" + data[i].descrizione.toLowerCase()  + "<br>" + data[i].professori.toLowerCase() + "<br>" + data[i].stanze + "</td>";
+
                     }else if(data[i].descrizione != undefined && data[i].stanze == undefined){
-                        x += "<td>" + data[i].descrizione + "</td>";
+                        x += "<td>" + data[i].descrizione.toLowerCase()  + "</td>";
+
                     }else{
-                        console.log("44444444");
+
+                        if (data[i].risorsa == undefined || data[i].risorsa == null){
+                            x += "<td>&nbsp;</td>";
+                        }else if (data[i].professore2 == null && data[i].professoreS == null){
+                            x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                        }else if (data[i].professoreS == null && data[i].professore2 != null){
+                            x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                        }else if (data[i].professore1 == null && data[i].professore2 != null && data[i].professoreS != null){
+                            x += "<td><span class='nome'>" + data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                        }
                         
                     }
 
                 }catch(e){
 
-                    //console.log("aAAAAAAAAAAAA   " + i);
-                    //console.log(e);
                     x += "<td>&nbsp;</td>";
 
                 }
