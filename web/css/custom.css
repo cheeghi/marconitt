@@ -289,11 +289,10 @@ md-fab {
     color: white;
     display: inline-flex;
     width: 100%;
-    min-height: 150px;
+    min-height: 120px;
 
     position: relative;
     bottom: 0px;
-    vertical-align: text-top;
 }
 
 .footerDiv {
