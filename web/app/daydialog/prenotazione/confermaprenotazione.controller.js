@@ -29,7 +29,7 @@ app.
          * makes http requests to populate classes, rooms, teachers, progetti arrays
          */
         $scope.initializeHttpCalls = function() {
-            $http.get('http://localhost/timetable.php')
+            $http.get('http://'+CONFIG.TIMETABLE)
                 .success(function(response) {
                     $scope.classes = response.classes;
                     $scope.teachers = response.teachers;
@@ -40,15 +40,18 @@ app.
 
             // IF NON ADMIN
             //*********************
-            $http.get('http://localhost/timetable.php', {
-                params: {
-                    classesbyteacher: 'gbellini'
-                }
-            }).success(function(response) {
-                $scope.teacherClasses = response;
-            }).error(function() {
-                $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
-            });
+            if (!$rootScope.admin) {
+                $http.get('http://'+CONFIG.TIMETABLE, {
+                    params: {
+                        classesbyteacher: 'gbellini'
+                        //classesbyteacher: $rootScope.username
+                    }
+                }).success(function(response) {
+                    $scope.teacherClasses = response;
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
+                });
+            }
         };
 
 

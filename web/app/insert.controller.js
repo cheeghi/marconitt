@@ -17,7 +17,7 @@ app
          * Initialization method
          */
         var init = function() {
-            $http.get('http://localhost/timetable.php')
+            $http.get('http://'+CONFIG.TIMETABLE)
                 .success(function(response) {
                     $scope.classes = response.classes;
                     $scope.teachers = response.teachers;

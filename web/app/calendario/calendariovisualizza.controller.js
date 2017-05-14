@@ -17,7 +17,8 @@ app
             
             var req = {
                 method: 'GET',
-                url: 'http://localhost/timetable.php?eventscountbymonth='+ ($scope.currentMonth),
+                //url: 'http://localhost/timetable.php?eventscountbymonth='+ ($scope.currentMonth),
+                url: 'http://'+CONFIG.TIMETABLE+'?eventscountbymonth='+ ($scope.currentMonth),
                 cache: false
             }
             $http(req)

@@ -36,10 +36,10 @@ app.use(express.static(__dirname + '/web'));
 
 //connection to mysql database
 var connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database : 'marconitt'
+    host: config.db_host,
+    user: config.db_user,
+    password: config.db_password,
+    database : config.db_name
 });
 connection.connect();
 
@@ -183,7 +183,7 @@ apiRoutes.post('/authenticate', function(req, res) {
         if (!err) {
             try {
                 var adm = rows[0].admin;
-                var admin = adm === "0" ? false : true;
+                var admin = adm === 0 ? false : true;
 
                 var user = { 
                     username: req.body.name,
@@ -197,7 +197,7 @@ apiRoutes.post('/authenticate', function(req, res) {
                 });
 
                 const options = {
-                hostname: '88.149.220.222',
+                hostname: config.webserver,
                 port: 80,
                 path: '/marconitt/ldap.php',
                 method: 'POST',

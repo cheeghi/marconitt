@@ -37,7 +37,10 @@
                             <input ng-model="logindata.password" ng-enter="login()" type="password">
                         </md-input-container>
                     </div>
-                    <md-button class="md-accent md-raised" ng-click="login()">Entra</md-button>
+                    <md-button ng-disabled="isLoading" class="md-accent md-raised" ng-click="login()">Entra</md-button>
+                    <div layout="row" layout-sm="column" layout-align="center center"  layout-fill>
+                            <md-progress-circular ng-show="isLoading" md-mode="indeterminate" md-diameter="50"></md-progress-circular>
+                    </div>
                 </div>   
                              
                 <md-list-item ng-style="customStyle.prenota" ng-click="view('calendario/calendarioprenotazione'); highlight(2);" ng-show="logged" md-ink-ripple="#2196F3">
@@ -50,7 +53,7 @@
                     <p ng-style="customStyle.liberarisorseText">Libera risorse</p>
                 </md-list-item>
                 <md-list-item ng-style="customStyle.lmp" ng-click="view('prenotazioniutente'); highlight(3);" ng-show="logged" md-ink-ripple="#2196F3">
-                    <p ng-style="customStyle.lmpText"><span ng-show="!admin">Le mie prenotazioni</span><span ng-show="admin">Prenotazioni / Eventi</span></p>
+                    <p ng-style="customStyle.lmpText"><span ng-show="!admin">Le mie prenotazioni</span><span ng-show="admin">Gestisci prenotazioni</span></p>
                 </md-list-item>
                 <md-divider ng-show="logged"></md-divider>
                 <md-divider ng-show="logged"></md-divider>

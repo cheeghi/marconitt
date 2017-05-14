@@ -30,7 +30,7 @@ app.
             $scope.isLoading = true;
 
             if ($scope.admin) {
-                $http.get('http://localhost/timetable.php', {
+                $http.get('http://'+CONFIG.TIMETABLE, {
                     cache: false,
                     params: {
                         prenotazioniexceptadmin: ""
@@ -47,7 +47,7 @@ app.
                     $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                 });    
 
-                $http.get('http://localhost/timetable.php', {
+                $http.get('http://'+CONFIG.TIMETABLE, {
                     cache: false,
                     params: {
                         events: "" 
@@ -66,7 +66,7 @@ app.
                 });  
             } 
 
-            $http.get('http://localhost/timetable.php', {  
+            $http.get('http://'+CONFIG.TIMETABLE, {  
                 cache: false,
                 params: {
                     prenotazioni: $rootScope.username

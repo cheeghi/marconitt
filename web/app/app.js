@@ -37,5 +37,6 @@ app.config(function($mdThemingProvider, $mdDateLocaleProvider, $httpProvider) {
 });
 
 app.constant("CONFIG", {
-    'HOST' : 'localhost'
+    'HOST' : 'localhost',
+    'TIMETABLE' : 'localhost/timetable.php'
 });

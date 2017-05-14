@@ -1,5 +1,5 @@
 app.
-    controller("PrenotazioneCtrl", function($scope, $http, $window, $mdDialog, $mdToast, $rootScope) {
+    controller("PrenotazioneCtrl", function($scope, $http, $window, $mdDialog, $mdToast, $rootScope, CONFIG) {
      
         $scope.day;
         $scope.currentItem = '';
@@ -35,7 +35,7 @@ app.
          * makes http requests to populate classes, rooms, teachers, labs and classrooms arrays
          */
         $scope.initializeHttpCalls = function() {
-            $http.get('http://localhost/timetable.php')
+            $http.get('http://'+CONFIG.TIMETABLE)
                 .success(function(response) {
                     $scope.classrooms = response.classrooms;
                     $scope.labs = response.labs;
@@ -72,7 +72,7 @@ app.
             $scope.htmlTable = '';
             $scope.isLoading = true;
             if ($scope.sRoomType == "LABORATORIO") {
-                $http.get('http://localhost/timetable.php', {
+                $http.get('http://'+CONFIG.TIMETABLE, {
                     cache: false,
                     params: {
                         labroomsbydate: $rootScope.giornoSelezionato
@@ -86,7 +86,7 @@ app.
                 $scope.dim(); //for scrollbar
 
             } else if ($scope.sRoomType == "AULA") {
-                $http.get('http://localhost/timetable.php', {
+                $http.get('http://'+CONFIG.TIMETABLE, {
                     cache: false,
                     params: {
                         classroomsbydate: $rootScope.giornoSelezionato
