@@ -20,7 +20,6 @@ app
                     $scope.classes = response.classes;
                     $scope.teachers = response.teachers;
                     $scope.ore = response.ore;
-                    console.log($scope.teachers + "---------" + $scope.classes);
                     $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
                 }).error(function() {
                     $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
@@ -53,8 +52,6 @@ app
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 };
-
-                console.log(req.data);
 
                 $http(req)
                     .then(

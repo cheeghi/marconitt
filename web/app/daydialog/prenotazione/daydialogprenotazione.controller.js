@@ -3,7 +3,6 @@ app
 
         $scope.day = day;
         $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();
-        var giorniLimite = 14; // range di prenotazione per un professore;
 
 
         /**
@@ -14,7 +13,7 @@ app
             day.setDate(day.getDate() + 1);
             
             var limitDay = new Date();
-            limitDay.setDate(limitDay.getDate() + giorniLimite);
+            limitDay.setDate(limitDay.getDate() + $rootScope.giorniLimite);
 
             if (day > limitDay && !$rootScope.admin) {
                 $mdToast.show($mdToast.simple().textContent('Seleziona una data più vicina'));

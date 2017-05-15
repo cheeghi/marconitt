@@ -37,9 +37,7 @@ app.
                 }).error(function() {
                     $mdToast.show($mdToast.simple().textContent("Errore di rete"));
                 });
-
-            // IF NON ADMIN
-            //*********************
+            
             if (!$rootScope.admin) {
                 $http.get('http://'+CONFIG.TIMETABLE, {
                     params: {
@@ -59,11 +57,6 @@ app.
          * makes a 'prenotazione' request to the server
          */
         $scope.prenota = function() {
-            /*console.log($rootScope.stanzaPrenotata);
-            console.log($rootScope.oraPrenotata);
-            console.log($rootScope.prenotazioneString);
-            console.log($rootScope.giornoSelezionato);
-            console.log($scope.sClass);*/
             $scope.disabled = true;
             var risorsa;
             var isClasse = false;
@@ -108,13 +101,11 @@ app.
                 },
                 data: data
             };
-
-            console.log(req);
             
             $http(req)
                 .success(function(data) {
                     if (data) {
-                         $scope.cancel();
+                        $scope.cancel();
                         $scope.refresh();
                         $mdToast.show($mdToast.simple().textContent('Prenotazione avvenuta con successo!'));   
                     } else {

@@ -49,16 +49,6 @@ app
          * sends event information to server
          */
         $scope.insert = function () {
-            
-            /*
-                descrizione dell'evento = descrizione,
-                giorno = day,
-                ora di inizio = oraInizio,
-                ora di fine = oraFine,
-                classi = classi,
-                stanze = stanze
-            */
-
             var oreStart = $scope.sanitize($scope.event.hourStart.getHours());
             var minutiStart = $scope.sanitize($scope.event.hourStart.getMinutes());
             var oreEnd = $scope.sanitize($scope.event.hourEnd.getHours());
@@ -81,8 +71,6 @@ app
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             };
-
-            console.log(req.data);
             
             $http(req)
                 .then(

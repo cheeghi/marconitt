@@ -1,5 +1,5 @@
 app.
-    controller("EventCtrl", function($scope, $rootScope, $filter, $http, $q, $window, $sce, $mdDateLocale, $timeout) {
+    controller("EventCtrl", function($scope, $rootScope, $filter, $http, $q, $window, $sce, $mdDateLocale, $timeout, CONFIG) {
 
         $scope.day;
         $rootScope.selectedDate;
@@ -26,7 +26,7 @@ app.
         });
 
         $scope.fillEvents = function(giorno) {
-            $http.get('http://localhost/timetable.php', {
+            $http.get('http://' + CONFIG.TIMETABLE, {
                 cache: false,
                 params: {
                     eventsbyday: giorno

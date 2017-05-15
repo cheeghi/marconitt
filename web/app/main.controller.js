@@ -11,7 +11,7 @@ app
         $scope.customStyle = {};
         $rootScope.loadingTime = 300; // loading circle time
         $scope.isLoading;
-        //$scope.token;
+        $rootScope.giorniLimite = 14; // range di prenotazione per un professore
 
 
         /**
@@ -101,9 +101,8 @@ app
          */
         $scope.login = function() {
             $scope.isLoading = true;
+            
             //chiamata http che ritorna il token da utilizzare nelle prossime chiamate
-            console.log($scope.logindata);
-
             var req = {
                 method: 'POST',
                 url: 'http://'+CONFIG.HOST+':8080/api/authenticate',
@@ -172,18 +171,17 @@ app
                 .get('tpl/'+tplName+'.tpl.html')
                     .then(
                         function(res) {
-                            //console.log(res.data);
                             $scope.mainHtml = res.data;
                             $scope.cambiaSchermata = false;
                         }, function(err) {
-                            console.log(err);
+                            $mdToast.show($mdToast.simple().textContent('Errore!'));
                         }
                     );
         }
 
 
         /**
-         * highlight selected option of side bar
+         * highlights selected option of side bar
          */
         $scope.highlight = function(type) {
             if ($scope.logged) {
