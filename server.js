@@ -496,21 +496,22 @@ apiRoutes.post('/prenota', function(req, res) {
 	var risorsa = req.body.risorsa;
 	var isClasse = (req.body.isclasse == "true");
     var user = req.body.user;
+    var admin = req.body.admin;
 
     if(isClasse) {
         isSchoolOur(giorno, stanza, ora, risorsa, function(response) {
             if(response) {
-                addPrenotazione(giorno, stanza, ora, risorsa, user, true, function(response1) {
+                addPrenotazione(giorno, stanza, ora, risorsa, user, true, admin,  function(response1) {
                     res.json(response1);
                 });
             } else {
-                addPrenotazione(giorno, stanza, ora, risorsa, user, false, function(response1) {
+                addPrenotazione(giorno, stanza, ora, risorsa, user, false, admin, function(response1) {
                     res.json(response1);
                 });
             }
         });
     } else {
-        addPrenotazione(giorno, stanza, ora, risorsa, user, false, function(response) {
+        addPrenotazione(giorno, stanza, ora, risorsa, user, false, admin, function(response) {
             res.json(response);
         });
     }
@@ -757,14 +758,14 @@ console.log('Magic happens at http://localhost:' + port);
 /*
  * Funzione che setta la risorsa nella timetable ed aggiunge la prenotazione nella timetable
  */
-function addPrenotazione(giorno, stanza, ora, risorsa, who, èOraScuola, res) {
+function addPrenotazione(giorno, stanza, ora, risorsa, who, èOraScuola, admin, res) {
     var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" +
         stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
 
     connection.query(sql_stmt, function(err) {
         if (!err) {
             selectId(giorno, stanza, ora, function(id) {
-                sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", '" + who + "', " + èOraScuola + ", false);";
+                sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", '" + who + "', " + èOraScuola + ", " + admin + ");";
                 connection.query(sql_stmt, function(err) {
                      if (!err) {
                         res(true);

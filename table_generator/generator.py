@@ -10,7 +10,7 @@ import os
 
 ##DOC
 __author__ = 'Elia Semprebon'
-__description__ = 'Generatore della tabella centrale per marconitt'
+__description__ = "Generatore della tabella centrale per marconitt e dei file con i dati dell'anno passato"
 
 
 ##VARIABILI
@@ -171,6 +171,7 @@ def fn_tablesToCsv():
     cursore = connessione.cursor()
 
     #timetable and prenotazioni
+    f1.write("giorno;ora;stanza;risorsa;professore1;professore2;who;isSchoolHour;approvata\n")
     query = "SELECT giorno, ora, stanza, risorsa, professore1, professore2, who, isSchoolHour, approvata" + " FROM timetable, prenotazioni WHERE timetable.id = prenotazioni.id;"
     cursore.execute(query)
 
@@ -184,6 +185,7 @@ def fn_tablesToCsv():
     f1.close()
 
     #eventi
+    f2.write("giorno;descrizione;oraInizio;oraFine;classi;stanze\n")
     query = "SELECT giorno, descrizione, oraInizio, oraFine, classi, stanze FROM eventi;"
     cursore.execute(query)
 
@@ -197,6 +199,7 @@ def fn_tablesToCsv():
     f2.close()
 
     #liberazioni
+    f3.write("giorno;descrizione;classe;ore\n")
     query = "SELECT giorno, descrizione, classe, ore FROM liberazione;"
     cursore.execute(query)
 
