@@ -13,8 +13,6 @@ app
          * retrieves events data and fills the calendar
          */
         $scope.getData = function () {
-            //$timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
-            
             var req = {
                 method: 'GET',
                 //url: 'http://localhost/timetable.php?eventscountbymonth='+ ($scope.currentMonth),
@@ -23,10 +21,8 @@ app
             }
             $http(req)
                 .then(function (data) {
-                    console.log(data.data);
                     data.data.forEach(function(entry) {
                         var d = new Date(entry.giorno);
-                        console.log(entry.quantity);
                         MaterialCalendarData.setDayContent(d, '<md-button class="md-fab md-mini md-tiny type">' + entry.quantity + '</md-button>');
                     }, this);
                     $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);

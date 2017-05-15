@@ -4,16 +4,16 @@ app.
         $scope.admin = $rootScope.admin; // is admin or not
         $scope.miePrenotazioni; // array that contains logged user's reservations
         $scope.altrePrenotazioni; // array that contains every user's reservations
-        $scope.disabled;
         $scope.isLoading; // used for loading circle
         $scope.fMiePrenotazioni = []; // filtered array of $scope.miePrenotazioni
         $scope.fAltrePrenotazioni = []; // filtered array of $scope.altrePrenotazioni
         $scope.passedMiePrenotazioni = false; // toggle for showing / not showing passed reservations
         $scope.passedAltrePrenotazioni = false; // toggle for showing / not showing passed reservations
         $scope.passedEventi = false; // toggle for showing / not showing passed reservations
-        $scope.events;
-        $scope.fEvents;
+        $scope.events; // array that contains admin events
+        $scope.fEvents; // filtered array of $scope.events
 
+    
         /**
          * initialize method
          */
@@ -53,7 +53,6 @@ app.
                         events: "" 
                     }
                 }).success(function(response) {
-                    console.log("eventi", response);
                     $scope.events = response;
                     $scope.events.forEach(function(prenotazione) {
                         var giorno = new Date(prenotazione.giorno);
@@ -145,8 +144,6 @@ app.
                 $scope.passedAltrePrenotazioni = $scope.passedAltrePrenotazioni ? false : true;
             else if (type == 3)
                 $scope.passedEventi = $scope.passedEventi ? false : true;            
-
-            console.log($scope.passedEventi);
         };
 
 
@@ -154,9 +151,6 @@ app.
          * calls the server method for removing a 'prenotazione'
          */
         $scope.removePrenotazione = function(giorno, stanza, risorsa, ora) {
-            //console.log(giorno, stanza, risorsa, ora, $rootScope.username);
-            //$scope.disabled = true;
-
             var giornoDate = new Date(giorno);
 
             var confirm = $mdDialog.confirm()
@@ -170,7 +164,7 @@ app.
 
                 var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
                         + "&risorsa="+ risorsa;
-                console.log(ora);
+                
                 var req = {
                     method: 'POST',
                     url: 'http://'+CONFIG.HOST+':8080/api/cancellaPrenotazione',
@@ -201,8 +195,6 @@ app.
          * approves a request of 'prenotazione'
          */
         $scope.approva = function(giorno, stanza, ora) {
-            console.log("approvato");
-
             var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno;
             
             var req = {
@@ -239,8 +231,10 @@ app.
         };
 
 
+        /**
+         * removes an event
+        */
         $scope.removeEvento = function(id) {
-
             var confirm = $mdDialog.confirm()
               .textContent("L'evento verrà rimosso per sempre. Continuare?")
               .ok('CONFERMA')
@@ -277,7 +271,7 @@ app.
 
 
         /**
-            returns true if the given day is passed
+         * returns true if the given day is passed
         */
         $scope.isPassed = function(giorno) {
             var today = new Date();

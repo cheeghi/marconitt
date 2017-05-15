@@ -196,23 +196,15 @@ app.
                             if ($scope.sHour != undefined && $scope.sHour != 'Qualsiasi') {
                                 if (element.ora == $scope.sHour) {
                                     if (element.risorsa != null) {
-                                        /*x += '<td><md-button class="md-raised md-primary button_prenotazione" id="button_np"'
-                                            + 'ng-click="aulaPrenotata()">NP</td>';*/
                                         x += '<td ng-click="aulaPrenotata()" style="border: 0.5px solid white;background-color:red; cursor: pointer"></td>';
                                     } else {
-                                        /*x += '<td><md-button class="md-raised md-primary button_prenotazione" id="button_p"'
-                                            + 'ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" >P</td>';*/
                                         x += '<td ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" style="border: 0.5px solid white;background-color:green; cursor: pointer"></td>';
                                     }
                                 }
                             } else {
                                 if (element.risorsa != null) {
-                                    /*x += '<td><md-button class="md-raised md-primary button_prenotazione" id="button_np"'
-                                        + 'ng-click="aulaPrenotata()">NP</td>';*/
                                     x += '<td ng-click="aulaPrenotata()" style="border: 0.5px solid white;background-color:red; cursor: pointer"></td>';
                                 } else {
-                                    /*x += '<td><md-button class="md-raised md-primary button_prenotazione" id="button_p"'
-                                        + 'ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" >P</td>';*/
                                     x += '<td ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" style="border: 0.5px solid white;background-color:green; cursor: pointer"></td>';
                                 }
                             }
@@ -221,23 +213,15 @@ app.
                         if ($scope.sHour != undefined && $scope.sHour != 'Qualsiasi') {
                             if (element.ora == $scope.sHour) {
                                 if (element.risorsa != null) {
-                                    /*x += '<td><md-button class="md-raised md-primary button_prenotazione" id="button_np"'
-                                        + 'ng-click="aulaPrenotata()">NP</td>';*/
                                     x += '<td ng-click="aulaPrenotata()" style="border: 0.5px solid white;background-color:red; cursor: pointer"></td>';
                                 } else {
-                                    /*x += '<td><md-button class="md-raised md-primary button_prenotazione" id="button_p"'
-                                        + 'ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" >P</td>';*/
                                     x += '<td ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" style="border: 0.5px solid white;background-color:green; cursor: pointer"></td>';
                                 }
                             }
                         } else {
                             if (element.risorsa != null) {
-                                /*x += '<td><md-button class="md-raised md-primary button_prenotazione" id="button_np"'
-                                    + 'ng-click="aulaPrenotata()">NP</td>';*/
                                 x += '<td ng-click="aulaPrenotata()" style="border: 0.5px solid white;background-color:red; cursor: pointer"></td>';
                             } else {
-                                /*x += '<td><md-button class="md-raised md-primary button_prenotazione" id="button_p"'
-                                    + 'ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" >P</td>';*/
                                 x += '<td ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" style="border: 0.5px solid white;background-color:green; cursor: pointer"></td>';
                             }
                         }
@@ -260,7 +244,6 @@ app.
             $rootScope.stanzaPrenotata = stanza;
             $rootScope.oraPrenotata = ora;
             $rootScope.prenotazioneString = stanza + ' ' + (ora) + '°ora';
-            //$rootScope.sClass = $scope.sClass;
             $mdDialog.show({
                     templateUrl: 'tpl/daydialog/confermaprenotazione.tpl.html',
                     controller: 'ConfermaPrenotazioneCtrl',
