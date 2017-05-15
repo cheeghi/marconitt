@@ -199,7 +199,7 @@ apiRoutes.post('/authenticate', function(req, res) {
                 const options = {
                 hostname: config.webserver,
                 port: 80,
-                path: '/marconitt/ldap.php',
+                path: '/ldap/login/loginldap_marconitt.php',
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
