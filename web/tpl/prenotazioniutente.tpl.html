@@ -54,7 +54,7 @@
                             <h3>{{prenotazione.fgiorno}}</h3>
                             <h4>{{prenotazione.stanza}} - {{prenotazione.ora}}°ORA</h4>
                             <p>{{prenotazione.risorsa}}</p>
-                            <p>Richiedente: {{prenotazione.who}}</p>
+                            <p>Richiedente: {{prenotazione.user}}</p>
                         </div>
                         <md-button ng-disabled="isPassed(prenotazione.giorno)"  ng-hide='prenotazione.approvata==1||isPassed(prenotazione.giorno)' style="color:#2196F3; margin-right: 1%; margin-top: 2.5%" class="md-raised" ng-click="approva(prenotazione.giorno, prenotazione.stanza, prenotazione.ora)" class="md-block" >
                             APPROVA

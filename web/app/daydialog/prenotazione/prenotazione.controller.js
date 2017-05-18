@@ -132,7 +132,7 @@ app.
                         <th style='border: 0.5px solid white;'>3°<md-tooltip md-direction='top'>10:00 - 11:00</md-tooltip></th>\
                         <th style='border: 0.5px solid white;'>4°<md-tooltip md-direction='top'>11:00 - 11:50</md-tooltip></th>\
                         <th style='border: 0.5px solid white;'>5°<md-tooltip md-direction='top'>12:00 - 12:55</md-tooltip></th>\
-                        <th style='border: 0.5px solid white;'>6°<md-tooltip md-direction='top'>12:55 - 13:50</md-tooltip></th>\
+                        <th style='border: 0.5px solid white;'>6°<md-tooltip md-direction='top'>12:55 - 14:30</md-tooltip></th>\
                         <th style='border: 0.5px solid white;'>7°<md-tooltip md-direction='top'>14:30 - 15:30</md-tooltip></th>\
                         <th style='border: 0.5px solid white;'>8°<md-tooltip md-direction='top'>15:30 - 16:30</md-tooltip></th>\
                         <th style='border: 0.5px solid white;'>9°<md-tooltip md-direction='top'>16:30 - 17:30</md-tooltip></th>\
@@ -156,7 +156,7 @@ app.
                         tooltipText = '12:00 - 12:55';
                         break;
                     case "6":
-                        tooltipText = '12:55 - 13:50';
+                        tooltipText = '12:55 - 14:30';
                         break;
                     case "7":
                         tooltipText = '14:30 - 15:30';

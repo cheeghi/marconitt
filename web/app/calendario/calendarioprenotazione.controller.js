@@ -52,7 +52,7 @@ app
 
             if ($scope.day > limitDay && !$rootScope.admin) {
                 $mdToast.show($mdToast.simple().textContent("Seleziona una data più vicina"));
-            } else if ($scope.day < today && !$rootScope.admin) {
+            } else if ($scope.day < today) {
                 $mdToast.show($mdToast.simple().textContent("Non puoi prenotare per un giorno passato"));
             } else {
                 $mdDialog.show({
