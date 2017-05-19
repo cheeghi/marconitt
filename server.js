@@ -217,10 +217,6 @@ apiRoutes.post('/authenticate', function(req, res) {
                                 expiresInMinutes: 1440 // expires in 24 hours 
                             }); 
 
-                            req.session.username = user.username; 
-                            req.session.admin = user.admin; 
-                            req.session.token = token;
-
                             // return the information including token as JSON 
                             res.json({ 
                                 success: true, 

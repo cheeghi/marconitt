@@ -37,14 +37,11 @@ app
             }).success(function(response) {
                 if (response.success) {
                     $rootScope.logged = true;
-                    $rootScope.admin = response.admin;
-
-                    if ($rootScope.admin)
-                        $rootScope.username = "admin";
-                    else
-                        $rootScope.username = response.username;
-
                     $scope.logged = true;
+                    $rootScope.admin = response.admin;
+                    $scope.admin = response.admin;
+                    $rootScope.username = response.admin ? 'admin' : response.username;
+
                     $scope.highlight(1);
                 }
             })
@@ -122,14 +119,11 @@ app
                         if (data.data.success) {
                             sessionStorage.token = data.data.token;
                             $rootScope.admin = data.data.admin;
-
-                            if ($rootScope.admin)
-                                $rootScope.username = "admin";
-                            else
-                                $rootScope.username = data.data.username;
-
+                            $scope.admin = data.data.admin;
                             $rootScope.logged = true;
                             $scope.logged = true;
+                            $rootScope.username = data.data.admin ? 'admin' : data.data.username;
+
                             $mdToast.show($mdToast.simple().textContent('Login avvenuto con successo!'));
                             $scope.highlight(1);
                           } else {
@@ -154,6 +148,7 @@ app
             $rootScope.logged = false;
             $scope.logged = false;
             $scope.highlight(2);
+            $scope.setView('calendario/calendariovisualizza');
         }
 
 
