@@ -162,7 +162,7 @@ app.
                   
                 $scope.isLoading = true;
 
-                var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
+                var data = "token="+sessionStorage.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
                         + "&risorsa="+ risorsa;
                 
                 var req = {
@@ -195,7 +195,7 @@ app.
          * approves a request of 'prenotazione'
          */
         $scope.approva = function(giorno, stanza, ora) {
-            var data = "token="+$rootScope.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno;
+            var data = "token="+sessionStorage.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno;
             
             var req = {
                 method: 'POST',
@@ -244,7 +244,7 @@ app.
                 
                 $scope.isLoading = true;
 
-                var data = "token="+$rootScope.token+"&id="+id;
+                var data = "token="+sessionStorage.token+"&id="+id;
                 var req = {
                     method: 'POST',
                     url: 'http://'+CONFIG.HOST+':8080/api/cancellaEvento',

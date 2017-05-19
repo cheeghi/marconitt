@@ -2,8 +2,8 @@ app
     .controller('MainCtrl', function ($scope, $timeout, $mdSidenav, $log, $filter, $http, $mdToast, CONFIG, $rootScope) {
       
         $rootScope.logged;
-        $rootScope.token;
         $rootScope.admin;
+        $scope.admin;
         $scope.logged;
         $scope.toggleLeft = buildDelayedToggler('left');
         $scope.mainHtml;
@@ -18,7 +18,7 @@ app
          * initialize method
          */
         $scope.init = function() {
-            $scope.checkLogin();
+            $scope.verifyToken();
             //PRESUMO CHE L'INIT SIA IL MOMENTO GIUSTO IN OGNI CASO PER EFFETTUARE IL SETUP, ALTRIMENTI CAMBIA METODO
             var a = $http.get('http://'+CONFIG.HOST+':8080/setup'); //AVVIAMENTO AUTOMATICO DEL SETUP INIZIALE
             a.error(function(response) {console.log('fallisce il setup')});
@@ -29,11 +29,14 @@ app
         /**
         * checkLogin: if session is active --> logged = true
         */
-        $scope.checkLogin = function() {
-            $http.get('http://'+CONFIG.HOST+':8080/api/checklogin').success(function(response) {
+        $scope.verifyToken = function() {
+            $http.get('http://'+CONFIG.HOST+':8080/api/verifyToken', {
+                params: {
+                    token: sessionStorage.token
+                }
+            }).success(function(response) {
                 if (response.success) {
                     $rootScope.logged = true;
-                    $rootScope.token = response.token;
                     $rootScope.admin = response.admin;
 
                     if ($rootScope.admin)
@@ -114,21 +117,21 @@ app
 
             $http(req)
                 .then(
-                      function(data) {
-                          $scope.isLoading = false;
-                          if (data.data.success) {
-                              $rootScope.token = data.data.token;
-                              $rootScope.admin = data.data.admin;
+                    function(data) {
+                        $scope.isLoading = false;
+                        if (data.data.success) {
+                            sessionStorage.token = data.data.token;
+                            $rootScope.admin = data.data.admin;
 
                             if ($rootScope.admin)
                                 $rootScope.username = "admin";
                             else
                                 $rootScope.username = data.data.username;
 
-                              $rootScope.logged = true;
-                              $scope.logged = true;
-                              $mdToast.show($mdToast.simple().textContent('Login avvenuto con successo!'));
-                              $scope.highlight(1);
+                            $rootScope.logged = true;
+                            $scope.logged = true;
+                            $mdToast.show($mdToast.simple().textContent('Login avvenuto con successo!'));
+                            $scope.highlight(1);
                           } else {
                               $mdToast.show($mdToast.simple().textContent('Errore! '+data.data.message));
                           }
@@ -147,8 +150,10 @@ app
          * performs logout
          */
         $scope.logout = function() {
-            $http.get('http://'+CONFIG.HOST+':8080/api/logout');
-            location.reload();
+            sessionStorage.token = undefined;
+            $rootScope.logged = false;
+            $scope.logged = false;
+            $scope.highlight(2);
         }
 
 
@@ -184,70 +189,67 @@ app
          * highlights selected option of side bar
          */
         $scope.highlight = function(type) {
-            if ($scope.logged) {
-                switch (type) {
-                    case 1:
-                        $scope.customStyle.prenota = {"background-color" : "white"};
-                        $scope.customStyle.prenotaText = {"color" : "black"};
-                        $scope.customStyle.lmp = {"background-color" : "white"};
-                        $scope.customStyle.lmpText = {"color" : "black"};
-                        $scope.customStyle.eventi = {"background-color" : "white"};
-                        $scope.customStyle.eventiText = {"color" : "black"}; 
-                        $scope.customStyle.liberarisorse = {"background-color" : "white"};
-                        $scope.customStyle.liberarisorseText = {"color" : "black"};
-                        $scope.customStyle.visualizza = {"background-color" : "#2196F3"};
-                        $scope.customStyle.visualizzaText = {"color" : "white"};                    
-                        break;
-                    case 2:
-                        $scope.customStyle.visualizza = {"background-color" : "white"};
-                        $scope.customStyle.visualizzaText = {"color" : "black"};
-                        $scope.customStyle.lmp = {"background-color" : "white"};
-                        $scope.customStyle.lmpText = {"color" : "black"};
-                        $scope.customStyle.eventi = {"background-color" : "white"};
-                        $scope.customStyle.eventiText = {"color" : "black"}; 
-                        $scope.customStyle.liberarisorse = {"background-color" : "white"};
-                        $scope.customStyle.liberarisorseText = {"color" : "black"};                    
-                        $scope.customStyle.prenota = {"background-color" : "#2196F3"};
-                        $scope.customStyle.prenotaText = {"color" : "white"}; 
-                        break;
-                    case 3:
-                        $scope.customStyle.visualizza = {"background-color" : "white"};
-                        $scope.customStyle.visualizzaText = {"color" : "black"};
-                        $scope.customStyle.prenota = {"background-color" : "white"};
-                        $scope.customStyle.prenotaText = {"color" : "black"};
-                        $scope.customStyle.eventi = {"background-color" : "white"};
-                        $scope.customStyle.eventiText = {"color" : "black"};
-                        $scope.customStyle.liberarisorse = {"background-color" : "white"};
-                        $scope.customStyle.liberarisorseText = {"color" : "black"};  
-                        $scope.customStyle.lmp = {"background-color" : "#2196F3"};
-                        $scope.customStyle.lmpText = {"color" : "white"};                    
-                        break;
-                    case 4:
-                        $scope.customStyle.visualizza = {"background-color" : "white"};
-                        $scope.customStyle.visualizzaText = {"color" : "black"};
-                        $scope.customStyle.prenota = {"background-color" : "white"};
-                        $scope.customStyle.prenotaText = {"color" : "black"};
-                        $scope.customStyle.lmp = {"background-color" : "white"};
-                        $scope.customStyle.lmpText = {"color" : "black"};
-                        $scope.customStyle.liberarisorse = {"background-color" : "white"};
-                        $scope.customStyle.liberarisorseText = {"color" : "black"};
-                        $scope.customStyle.eventi = {"background-color" : "#2196F3"};
-                        $scope.customStyle.eventiText = {"color" : "white"}; 
-                        break;
-                    case 5:
-                        $scope.customStyle.visualizza = {"background-color" : "white"};
-                        $scope.customStyle.visualizzaText = {"color" : "black"};
-                        $scope.customStyle.prenota = {"background-color" : "white"};
-                        $scope.customStyle.prenotaText = {"color" : "black"};
-                        $scope.customStyle.lmp = {"background-color" : "white"};
-                        $scope.customStyle.lmpText = {"color" : "black"};
-                        $scope.customStyle.eventi = {"background-color" : "white"};
-                        $scope.customStyle.eventiText = {"color" : "black"}; 
-                        $scope.customStyle.liberarisorse = {"background-color" : "#2196F3"};
-                        $scope.customStyle.liberarisorseText = {"color" : "white"}; 
-                        break;
-                        
-                }
+            switch (type) {
+                case 1:
+                    $scope.customStyle.prenota = {"background-color" : "white"};
+                    $scope.customStyle.prenotaText = {"color" : "black"};
+                    $scope.customStyle.lmp = {"background-color" : "white"};
+                    $scope.customStyle.lmpText = {"color" : "black"};
+                    $scope.customStyle.eventi = {"background-color" : "white"};
+                    $scope.customStyle.eventiText = {"color" : "black"}; 
+                    $scope.customStyle.liberarisorse = {"background-color" : "white"};
+                    $scope.customStyle.liberarisorseText = {"color" : "black"};
+                    $scope.customStyle.visualizza = {"background-color" : "#2196F3"};
+                    $scope.customStyle.visualizzaText = {"color" : "white"};                    
+                    break;
+                case 2:
+                    $scope.customStyle.visualizza = {"background-color" : "white"};
+                    $scope.customStyle.visualizzaText = {"color" : "black"};
+                    $scope.customStyle.lmp = {"background-color" : "white"};
+                    $scope.customStyle.lmpText = {"color" : "black"};
+                    $scope.customStyle.eventi = {"background-color" : "white"};
+                    $scope.customStyle.eventiText = {"color" : "black"}; 
+                    $scope.customStyle.liberarisorse = {"background-color" : "white"};
+                    $scope.customStyle.liberarisorseText = {"color" : "black"};                    
+                    $scope.customStyle.prenota = {"background-color" : "#2196F3"};
+                    $scope.customStyle.prenotaText = {"color" : "white"}; 
+                    break;
+                case 3:
+                    $scope.customStyle.visualizza = {"background-color" : "white"};
+                    $scope.customStyle.visualizzaText = {"color" : "black"};
+                    $scope.customStyle.prenota = {"background-color" : "white"};
+                    $scope.customStyle.prenotaText = {"color" : "black"};
+                    $scope.customStyle.eventi = {"background-color" : "white"};
+                    $scope.customStyle.eventiText = {"color" : "black"};
+                    $scope.customStyle.liberarisorse = {"background-color" : "white"};
+                    $scope.customStyle.liberarisorseText = {"color" : "black"};  
+                    $scope.customStyle.lmp = {"background-color" : "#2196F3"};
+                    $scope.customStyle.lmpText = {"color" : "white"};                    
+                    break;
+                case 4:
+                    $scope.customStyle.visualizza = {"background-color" : "white"};
+                    $scope.customStyle.visualizzaText = {"color" : "black"};
+                    $scope.customStyle.prenota = {"background-color" : "white"};
+                    $scope.customStyle.prenotaText = {"color" : "black"};
+                    $scope.customStyle.lmp = {"background-color" : "white"};
+                    $scope.customStyle.lmpText = {"color" : "black"};
+                    $scope.customStyle.liberarisorse = {"background-color" : "white"};
+                    $scope.customStyle.liberarisorseText = {"color" : "black"};
+                    $scope.customStyle.eventi = {"background-color" : "#2196F3"};
+                    $scope.customStyle.eventiText = {"color" : "white"}; 
+                    break;
+                case 5:
+                    $scope.customStyle.visualizza = {"background-color" : "white"};
+                    $scope.customStyle.visualizzaText = {"color" : "black"};
+                    $scope.customStyle.prenota = {"background-color" : "white"};
+                    $scope.customStyle.prenotaText = {"color" : "black"};
+                    $scope.customStyle.lmp = {"background-color" : "white"};
+                    $scope.customStyle.lmpText = {"color" : "black"};
+                    $scope.customStyle.eventi = {"background-color" : "white"};
+                    $scope.customStyle.eventiText = {"color" : "black"}; 
+                    $scope.customStyle.liberarisorse = {"background-color" : "#2196F3"};
+                    $scope.customStyle.liberarisorseText = {"color" : "white"}; 
+                    break;    
             }
         };
 

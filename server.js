@@ -218,10 +218,6 @@ apiRoutes.post('/authenticate', function(req, res) {
                                 expiresInMinutes: 1440 // expires in 24 hours 
                             }); 
 
-                            req.session.username = user.username; 
-                            req.session.admin = user.admin; 
-                            req.session.token = token; 
-
                             // return the information including token as JSON 
                             res.json({ 
                                 success: true, 
@@ -255,20 +251,41 @@ apiRoutes.post('/authenticate', function(req, res) {
 });
 
 
-apiRoutes.get('/checklogin', function(req, res) {
-    if (req.session.username) {
-        res.json({
-            success: true,
-            username: req.session.username,
-            admin: req.session.admin,
-            token: req.session.token
+apiRoutes.get('/verifyToken', function(req, res, next) {
+    var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+    //console.log(req.body);
+    // decode token
+    if (token) {
+
+        // verifies secret and checks exp
+        jwt.verify(token, app.get('secret'), function(err, decoded) {
+            if (err) {
+                return res.json({ success: false, message: 'Failed to authenticate token.' });
+            } else {
+                // if everything is good, save to request for use in other routes
+                req.decoded = decoded;
+                
+                res.json({
+                    success: true, 
+                    username: decoded.username,
+                    admin: decoded.admin
+                });
+                
+                next();
+            }
         });
+
+    } else {
+
+        // if there is no token
+        // return an error
+        return res.status(403).send({
+            success: false,
+            message: 'No token provided.'
+        });
+
     }
-});
-
-
-apiRoutes.get('/logout', function(req, res) {
-    req.session.destroy();
 });
 
 

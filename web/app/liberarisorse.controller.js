@@ -42,7 +42,7 @@ app
                 var sClass = $scope.event.class; //$scope.event.class.toString().replace(/,(?=[^\s])/g, ", ");
                 var sOre = $scope.event.ore; //$scope.event.ore.toString().replace(/,(?=[^\s])/g, ", ");
                 var data = "descrizione="+desc+"&day="+day+"&classe="
-                    +sClass+"&ore="+sOre+"&token="+$rootScope.token;
+                    +sClass+"&ore="+sOre+"&token="+sessionStorage.token;
 
                 var req = {
                     method: 'POST',
