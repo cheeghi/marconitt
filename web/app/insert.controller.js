@@ -61,7 +61,7 @@ app
             var sClasses = $scope.event.classes; //$scope.event.classes.toString().replace(/,(?=[^\s])/g, ", ");
             var sRooms = $scope.event.rooms; //$scope.event.rooms.toString().replace(/,(?=[^\s])/g, ", ");
             var data = "descrizione="+desc+"&day="+day+"&oraInizio="+hStart+"&oraFine="+hEnd+"&classi="
-                +sClasses+"&stanze="+sRooms+"&token="+$rootScope.token;
+                +sClasses+"&stanze="+sRooms+"&token="+sessionStorage.token;
 
             var req = {
                 method: 'POST',

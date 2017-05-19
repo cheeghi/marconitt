@@ -63,13 +63,15 @@ app.
             $scope.htmlTable = '<p><div layout="row" layout-sm="column" layout-align="center center" layout-fill>\
                                 <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>\
                                 </div></p>';
-            $scope.query = "select * from timetable where stanza = '" + $scope.sRoom + "' and\
-                            giorno = '" + $scope.giornoSelezionato + "' order by ora";
+            /*$scope.query = "select * from timetable where stanza = '" + $scope.sRoom + "' and\
+                            giorno = '" + $scope.giornoSelezionato + "' order by ora";*/
 
             $http.get("http://" + CONFIG.TIMETABLE, {
                 cache: false,
                 params: {
-                    doquery: $scope.query
+                    ttroombyday: '',
+                    stanza: $scope.sRoom,
+                    day: $scope.giornoSelezionato
                 }
             }).success(function(response) {
 
@@ -89,15 +91,17 @@ app.
 
             var orarioTeacher = {};
 
-            $scope.queryTimetable = "select * from timetable where (professore1 = '" + $scope.sTeacher + "' or professore2 = '" + $scope.sTeacher + "' or professoreS = '" + $scope.sTeacher + "') and\
+            /*$scope.queryTimetable = "select * from timetable where (professore1 = '" + $scope.sTeacher + "' or professore2 = '" + $scope.sTeacher + "' or professoreS = '" + $scope.sTeacher + "') and\
                             giorno = '" + $scope.giornoSelezionato + "' order by ora";
             $scope.queryEventi = "select distinct eventi.descrizione, eventi.stanze, prof_eventi.ora from eventi inner join prof_eventi\
-            on eventi.id = prof_eventi.id where eventi.giorno = '" + $scope.giornoSelezionato + "' and prof_eventi.professori like '%" + $scope.sTeacher + "%' order by oraInizio";             
+            on eventi.id = prof_eventi.id where eventi.giorno = '" + $scope.giornoSelezionato + "' and prof_eventi.professori like '%" + $scope.sTeacher + "%' order by oraInizio";             */
 
             $http.get("http://" + CONFIG.TIMETABLE, {
                 cache: false,
                 params: {
-                    doquery: $scope.queryTimetable
+                    ttteacherbyday: '',
+                    prof: $scope.sTeacher,
+                    day: $scope.giornoSelezionato
                 }
             }).success(function(response) {
 
@@ -108,7 +112,9 @@ app.
                 $http.get("http://" + CONFIG.TIMETABLE, {
                         cache: false,
                         params: {
-                            doquery: $scope.queryEventi
+                            teachereventsbyday: '',
+                            prof: $scope.sTeacher,
+                            day: $scope.giornoSelezionato
                         }
                     }).success(function(response2) {
                         response2.forEach (function (response2){
@@ -131,16 +137,18 @@ app.
             
             var orarioClass = {};
 
-            $scope.queryLiberazione = "select liberazione.descrizione, prof_liberazione.professori, prof_liberazione.ora from liberazione inner join prof_liberazione on\
+            /*$scope.queryLiberazione = "select liberazione.descrizione, prof_liberazione.professori, prof_liberazione.ora from liberazione inner join prof_liberazione on\
              liberazione.id = prof_liberazione.liberazione where liberazione.classe = '" + $scope.sClass + "' and giorno = '" + $scope.giornoSelezionato + "' order by ora";
             $scope.queryTimetable = "select * from timetable where risorsa = '" + $scope.sClass + "' and giorno = '" + $scope.giornoSelezionato + "' order by ora";
             $scope.queryEventi = "select eventi.descrizione, eventi.stanze, prof_eventi.ora, prof_eventi.professori from eventi inner join prof_eventi\
-            on eventi.id = prof_eventi.id where eventi.giorno = '" + $scope.giornoSelezionato + "' and eventi.classi like '%" + $scope.sClass + "%' order by oraInizio;"
+            on eventi.id = prof_eventi.id where eventi.giorno = '" + $scope.giornoSelezionato + "' and eventi.classi like '%" + $scope.sClass + "%' order by oraInizio;"*/
 
             $http.get("http://" + CONFIG.TIMETABLE, {
                 cache: false,
                 params: {
-                    doquery: $scope.queryLiberazione
+                    liberazioniclassbyday: '',
+                    classe: $scope.sClass,
+                    day: $scope.giornoSelezionato
                 }
             }).success(function(response) {
 
@@ -151,7 +159,9 @@ app.
                 $http.get("http://" + CONFIG.TIMETABLE, {
                     cache: false,
                     params: {
-                        doquery: $scope.queryTimetable
+                        ttclassbyday: '',
+                        classe: $scope.sClass,
+                        day: $scope.giornoSelezionato
                     }
                 }).success(function(response2) {
                     response2.forEach (function (response2){
@@ -161,7 +171,9 @@ app.
                 $http.get("http://" + CONFIG.TIMETABLE, {
                         cache: false,
                         params: {
-                            doquery: $scope.queryEventi
+                            eventiclassbyday: '',
+                            classe: $scope.sClass,
+                            day: $scope.giornoSelezionato
                         }
                     }).success(function(response3) {
                         response3.forEach (function (response3){
