@@ -184,7 +184,6 @@ apiRoutes.post('/authenticate', function(req, res) {
             try {
                 var adm = rows[0].admin;
                 var admin = adm === 0 ? false : true;
-
                 var user = { 
                     username: req.body.name,
                     password: req.body.password,
@@ -220,7 +219,7 @@ apiRoutes.post('/authenticate', function(req, res) {
 
                             req.session.username = user.username; 
                             req.session.admin = user.admin; 
-                            req.session.token = token; 
+                            req.session.token = token;
 
                             // return the information including token as JSON 
                             res.json({ 
@@ -230,7 +229,6 @@ apiRoutes.post('/authenticate', function(req, res) {
                                 username: user.username, 
                                 admin: user.admin 
                             }); 
-
                         } else {
                             res.json({ success: false, message: 'Credenziali errate.' });
                         }
@@ -239,7 +237,6 @@ apiRoutes.post('/authenticate', function(req, res) {
                         console.log('No more data in response.');
                     });
                 });
-
                 request.on('error', (e) => {
                 console.error(`problem with request: ${e.message}`);
                 });
@@ -256,13 +253,23 @@ apiRoutes.post('/authenticate', function(req, res) {
 
 
 apiRoutes.get('/checklogin', function(req, res) {
-    if (req.session.username) {
-        res.json({
-            success: true,
-            username: req.session.username,
-            admin: req.session.admin,
-            token: req.session.token
+    token = req.session.token;
+    
+    if(token) {
+        jwt.verify(token, app.get('secret'), function(err, decoded) {
+            if(!err) {
+                 res.json({
+                    success: true,
+                    username: req.session.username,
+                    admin: req.session.admin,
+                    token: req.session.token
+                });
+            } else {
+                console.log("Token error");
+            }
         });
+    } else {
+        console.log("No Token provided");
     }
 });
 
@@ -461,10 +468,8 @@ apiRoutes.use(function(req, res, next) {
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
-    //console.log(req.body);
     // decode token
     if (token) {
-
         // verifies secret and checks exp
         jwt.verify(token, app.get('secret'), function(err, decoded) {
             if (err) {
@@ -475,9 +480,7 @@ apiRoutes.use(function(req, res, next) {
                 next();
             }
         });
-
     } else {
-
         // if there is no token
         // return an error
         return res.status(403).send({
