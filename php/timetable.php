@@ -4,13 +4,12 @@
 	ini_set('display_startup_errors', 1);
 	error_reporting(E_ALL);
 	header('Access-Control-Allow-Origin: *');  
-	//$mysqli = new mysqli("localhost", "orario", "orario123456--", "orario"); //connessione edu-x04
 	$mysqli = new mysqli("localhost", "root", "", "marconitt"); //connessione marconitt.altervista.org
 	//$mysqliOrario = new mysqli("localhost", "root", "", "marconitt"); //connessione marconitt.altervista.org
 	
 	//var_dump($_GET);
 	
-	if (isset($_GET["room"])) {
+	/*if (isset($_GET["room"])) {
 		echo json_encode(getOrarioRoom($mysqli,$_GET["room"]));
 	} elseif (isset($_GET["class"])) {
 		echo json_encode(getOrarioClass($mysqli,$_GET["class"]));
@@ -30,7 +29,7 @@
 		echo json_encode(dochange($mysqli,$_GET["dochange"]));
     } elseif (isset($_GET["getindex"])) {
 		echo json_encode(getindex($mysqli,$_GET["getindex"]));
-    } else if (isset($_GET["prenotazioni"])) {
+    } else*/if (isset($_GET["prenotazioni"])) {
 		echo json_encode(getPrenotazioni($mysqli, $_GET["prenotazioni"]));
     } else if (isset($_GET["prenotazionidaapprovare"])) {
 		echo json_encode(getPrenotazioniDaApprovare($mysqli, $_GET["prenotazionidaapprovare"]));
@@ -46,11 +45,20 @@
 		echo json_encode(getEventsByDay($mysqli, $_GET["eventsbyday"])); 		
     } else if (isset($_GET["events"])) {
 		echo json_encode(getEvents($mysqli, $_GET["events"])); 					
-
+    } else if (isset($_GET["ttroombyday"])) {
+        echo json_encode(getTTRoomByDay($mysqli, $_GET["stanza"], $_GET["day"])); 					
+    } else if (isset($_GET["ttteacherbyday"])) {
+        echo json_encode(getTTTeacherByDay($mysqli, $_GET["prof"], $_GET["day"])); 					
+    } else if (isset($_GET["teachereventsbyday"])) {
+        echo json_encode(getTeacherEventsByDay($mysqli, $_GET["prof"], $_GET["day"])); 					
+    } else if (isset($_GET["liberazioniclassbyday"])) {
+        echo json_encode(getLiberazioniClassByDay($mysqli, $_GET["classe"], $_GET["day"])); 					
+    } else if (isset($_GET["ttclassbyday"])) {
+        echo json_encode(getTTClassByDay($mysqli, $_GET["classe"], $_GET["day"])); 					
+    } else if (isset($_GET["eventiclassbyday"])) {
+        echo json_encode(getEventiClassByDay($mysqli, $_GET["classe"], $_GET["day"])); 					
 	} elseif (isset($_GET["roomsbydate"])) {
 		echo json_encode(getRoomsByDate($mysqli,$_GET["roomsbydate"]));
-    } elseif (isset($_GET["ttroom"])) {
-		echo json_encode(getOrarioTTRoom($mysqli,$_GET["ttroom"] && $_GET["date"]));
 	} elseif (isset($_GET["classroomsbydate"])) {
 		echo json_encode(getClassRoomsByDate($mysqli,$_GET["classroomsbydate"]));	
 	} elseif (isset($_GET["labroomsbydate"])) {
@@ -441,5 +449,77 @@
 		}
 		return $celle;
     }
+
+    function getTTRoomByDay($mysqli, $room, $day) {
+        $query = "select * from timetable where stanza = '$room' and giorno = '$day' order by ora";
+		$celle = array();
+        
+		if ($result = $mysqli->query($query)) {
+        	while($c = $result->fetch_array()){
+				array_push($celle,$c);
+			}
+		}
+		return $celle;
+    }
+
+    function getTTTeacherByDay($mysqli, $teacher, $day) {
+        $query = "select * from timetable where (professore1 = '$teacher' or professore2 = '$teacher' or professoreS = '$teacher') and giorno = '$day' order by ora";
+		$celle = array();
+        
+		if ($result = $mysqli->query($query)) {
+        	while($c = $result->fetch_array()){
+				array_push($celle,$c);
+			}
+		}
+		return $celle;
+    }
+
+    function getTeacherEventsByDay($mysqli, $teacher, $day) {
+        $query = "select distinct eventi.descrizione, eventi.stanze, prof_eventi.ora from eventi inner join prof_eventi on eventi.id = prof_eventi.id where eventi.giorno = '$day' and prof_eventi.professori like '%$teacher%' order by oraInizio";             
+		$celle = array();
+        
+		if ($result = $mysqli->query($query)) {
+        	while($c = $result->fetch_array()){
+				array_push($celle,$c);
+			}
+		}
+		return $celle;
+    }
     
+    function getLiberazioniClassByDay($mysqli, $class, $day) {
+        $query = "select liberazione.descrizione, prof_liberazione.professori, prof_liberazione.ora from liberazione inner join prof_liberazione on liberazione.id = prof_liberazione.liberazione where liberazione.classe = '$class' and giorno = '$day' order by ora";
+		$celle = array();
+        
+		if ($result = $mysqli->query($query)) {
+        	while($c = $result->fetch_array()){
+				array_push($celle,$c);
+			}
+		}
+		return $celle;
+    }
+
+    function getTTClassByDay($mysqli, $class, $day) {
+        $query = "select * from timetable where risorsa = '$class' and giorno = '$day' order by ora";
+		$celle = array();
+        
+		if ($result = $mysqli->query($query)) {
+        	while($c = $result->fetch_array()){
+				array_push($celle,$c);
+			}
+		}
+		return $celle;
+    }
+
+    function getEventiClassByDay($mysqli, $class, $day) {
+        $query = "select eventi.descrizione, eventi.stanze, prof_eventi.ora, prof_eventi.professori from eventi inner join prof_eventi on eventi.id = prof_eventi.id where eventi.giorno = '$day' and eventi.classi like '%$class%' order by oraInizio;";
+		$celle = array();
+        
+		if ($result = $mysqli->query($query)) {
+        	while($c = $result->fetch_array()){
+				array_push($celle,$c);
+			}
+		}
+		return $celle;
+    }
+
 ?>
