@@ -5,17 +5,12 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
-var mongoose = require('mongoose');
 var http = require('http');
 var Converter = require("csvtojson").Converter;
-var session = require('express-session');
 var mysql = require('mysql');
 var dateFormat = require('dateformat');
 var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config_default'); // get our config file
-var User = require('./app/models/user');
-var Day = require('./app/models/day');
-var Who = require('./app/models/who');
 var sendmail = require('sendmail')();
 const querystring = require('querystring');
 
@@ -24,7 +19,6 @@ const querystring = require('querystring');
 // configuration =========
 // =======================
 var port = process.env.PORT || 8080; // used to create, sign, and verify tokens
-//mongoose.connect(config.database); // connect to database
 app.set('secret', config.secret); // secret variable
 
 
@@ -42,14 +36,6 @@ var connection = mysql.createConnection({
     database : config.db_name
 });
 connection.connect();
-
-
-// session management setup
-app.use(session({
-    secret: config.secret,
-    resave: false,
-    saveUninitialized: true
-}));
 
 
 // use morgan to log requests to the console
@@ -70,91 +56,8 @@ app.get('/', function(req, res) {
     res.send('Hello! The API is at http://localhost:' + port + '/api');
 });
 
-// API ROUTES -------------------
-// we'll get to these in a second
-app.get('/setup', function(req, res) {
-    User.remove({},function(a) {});
 
-    // create a sample user
-    var nick = new User({ 
-      name: '15932', 
-      password: '123456--',
-      admin: true 
-    });
-
-    // save the sample user
-    nick.save(function(err) {
-      if (err) throw err;
-
-      console.log('User saved successfully');
-      //res.json({ success: true });
-    });
-
-    var nick2 = new User({ 
-      name: 'gb', 
-      password: '123456--',
-      admin: false 
-    });
-
-    // save the sample user
-    nick2.save(function(err) {
-      if (err) throw err;
-
-      console.log('User saved successfully');
-      res.json({ success: true });
-    });
-
-    Who.remove({},function(a) {});
-    
-    var gb = new Who({
-      name: "Gianni Bellini",
-      type: 1
-    });
-    gb.save(function(err,who) {
-      if (err) throw err;
-
-      console.log('User saved successfully '+who.id);
-      //res.json({ success: true });
-    });
-
-     Day.remove({},function(a) {console.log("ok")});
-
-    var d = new Day({
-        description: "Test a maggio",
-        hour_start: 12,
-        hour_end: 12.15,
-        type: 0,
-        date: new Date(2016, 4, 26),
-        who: ['5740ad60a543dc300f0d77b1']
-    });
-
-    d.save(function(err, day) {
-        if (err) throw err;
-
-        console.log('Day saved successfully ' + day.id);
-        //res.json(day);
-    });
-
-    /*
-      Day.find({date: new Date(2016,5,22)}, function(err, days) {
-        var dd = days;
-        dd.forEach(function(day) {
-          day.who.forEach(function(w) {
-            day.whos = [];
-            Who.findById(w, function(err, ww) {
-              console.log(ww);
-              day.whos[day.whos.length] = ww;
-            });
-          })
-        }); 
-        console.log(dd);   
-        res.json(dd);
-      });
-
-    */
-});
-
-app.get('/sendMail',function(req,res){
+app.get('/sendMail',function(req,res) {
 	sendmail({
 	  from: 'marconiTT@marconivr.com',
 	  to: 'fedrigo22@gmail.com',
@@ -169,7 +72,6 @@ app.get('/sendMail',function(req,res){
 });
 
 // API ROUTES -------------------
-
 // get an instance of the router for api routes
 var apiRoutes = express.Router();
 
@@ -248,32 +150,9 @@ apiRoutes.post('/authenticate', function(req, res) {
 });
 
 
-apiRoutes.get('/checklogin', function(req, res) {
-    token = req.session.token;
-    
-    if(token) {
-        jwt.verify(token, app.get('secret'), function(err, decoded) {
-            if(!err) {
-                 res.json({
-                    success: true,
-                    username: req.session.username,
-                    admin: req.session.admin,
-                    token: req.session.token
-                });
-            } else {
-                console.log("Token error");
-            }
-        });
-    } else {
-        console.log("No Token provided");
-    }
-});
-
-
-apiRoutes.get('/verifyToken', function(req, res, next) {
+apiRoutes.post('/verifyToken', function(req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
-    //console.log(req.body);
     // decode token
     if (token) {
         // verifies secret and checks exp
@@ -283,13 +162,11 @@ apiRoutes.get('/verifyToken', function(req, res, next) {
             } else {
                 // if everything is good, save to request for use in other routes
                 req.decoded = decoded;
-                
                 res.json({
                     success: true, 
                     username: decoded.username,
                     admin: decoded.admin
                 });
-                
                 next();
             }
         });
@@ -307,183 +184,6 @@ apiRoutes.get('/verifyToken', function(req, res, next) {
 // route to show a random message (GET http://localhost:8080/api/)
 apiRoutes.get('/', function(req, res) {
     res.json({ message: 'Welcome to the coolest API on earth!' });
-});
-
-
-apiRoutes.get('/who', function(req, res) {
-    Who.find({}, function(err, whos) {
-        res.json(whos);
-    });
-});
-
-
-apiRoutes.get('/events/:year/:month', function(req, res) {
-    var y = parseInt(req.params.year);
-    var m = parseInt(req.params.month);
-    var start = new Date(y, m, 1);
-    var end = new Date(y, m + 1, 0);
-    Day.find({ date: { $gte: start, $lt: end } }, function(err, events) {
-        res.json(events);
-    });
-});
-
-
-apiRoutes.get('/events/:year/:month/:day', function(req, res) {
-
-    var day = new Date(parseInt(req.params.year), parseInt(req.params.month), parseInt(req.params.day));
-
-    Day.find({ date: day })
-        .sort({hour_start: 'asc', hour_end: 'asc'})
-        .populate('who')
-        .exec(function(err, events) {
-            res.json(events);
-        })
-});
-
-
-apiRoutes.get('/who/insert', function(req, res) {
-Who.remove({},function(a){});
-
-
-var converter = new Converter({});
-converter.fromFile("./alunni.csv",function(err,result){
-  result.forEach(function(alunno){
-    toSave = new Who({
-        name: (alunno.cognome+" "+alunno.nome).toLowerCase().capitalize(),
-        type: 4
-    });
-    toSave.save(function(err, d) {
-        if (err) throw err;
-    });
-  })
-});
-
-
-String.prototype.capitalize = function() {
-    return this.replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
-};
-  everyone = http.get({
-    host: '88.149.220.222',
-    path: '/orario/api.php?search=a'
-  }, function(response) {
-        var body = '';
-        response.on('data', function(d) {
-            body += d;
-        });
-        response.on('end', function() {
-            // Data reception is done, do whatever with it!
-            var parsed = JSON.parse(body);
-
-            parsed.classes.forEach(function(classs) {
-                  toSave = new Who({
-                      name: classs.toLowerCase().capitalize(),
-                      type: 2
-                  });
-                  toSave.save(function(err, d) {
-                      if (err) throw err;
-                  });
-                });
-            parsed.teachers.forEach(function(teacher) {
-                  toSave = new Who({
-                      name: teacher.toLowerCase().capitalize(),
-                      type: 1
-                  });
-                  toSave.save(function(err, d) {
-                      if (err) throw err;
-                  });
-                });
-            parsed.rooms.forEach(function(room) {
-                  toSave = new Who({
-                      name: room.toLowerCase().capitalize(),
-                      type: 3
-                  });
-                  toSave.save(function(err, d) {
-                      if (err) throw err;
-                  });
-                });
-
-            res.json({ success: true });
-        });
-  })
-
-});
-
-
-var salva = function(req,res,day) {
-  console.log(day);
-    events = http.get({
-        host: 'vps226037.ovh.net',
-        path: '/marconi-tt/agenda.php?data=' + day.getFullYear() + "-" + (day.getMonth()+1) + "-" + day.getDate()
-    }, function(response) {
-        // Continuously update stream with data
-        var body = '';
-        response.on('data', function(d) {
-            body += d;
-        });
-        response.on('end', function() {
-
-            Day.remove({ date: day, type: 1 }, function(a) {});
-            
-            // Data reception is done, do whatever with it!
-            try {
-              var parsed = JSON.parse(body);
-
-              parsed.forEach(function(event) {
-                var who = [];
-                  Who.find({ $or: [{name: { $regex: new RegExp("^" + event.who[0].toLowerCase(), "i") }}, {name: { $regex: new RegExp("^" + event.who[1].toLowerCase(), "i") }}]  }).exec(function(err, w) {
-                    if (w[0]) {
-                      w.forEach(function(ww) {
-                        who.push(ww._id);
-                      })
-                    } else {
-                      who = [];
-                    }
-                    dayToSave = new Day({
-                        date: day,
-                        hour_start: parseFloat(event.hour_start.replace(':', '.')),
-                        hour_end: parseFloat(event.hour_end.replace(':', '.')),
-                        type: 1,
-                        description: event.description,
-                        who: who
-                    });
-                    dayToSave.save(function(err, d) {
-                        if (err) console.log(err);
-                        console.log(d);
-                    });
-                  });
-              });
-            } catch (e) {
-              console.log(e);
-              console.log(day);
-            }
-
-        });
-    });
-}
-
-
-apiRoutes.get('/spaggiari', function(req,res) {
-  var now = new Date();
-  days = [];
-  for (var d = new Date(2016, 3, 1); d <= now; d.setDate(d.getDate() + 1)) {
-    //setTimeout(salva, 6000, req, res, d);
-    days.push(new Date(d));
-  }
-  console.log(days);
-  l = days.length;
-  c = 0;
-  var refreshId = setInterval(function() {
-    if(c == l) clearInterval(refreshId);
-    salva(req,res,days[c]);
-    c += 1;
-  }, 6000);
-})
-
-
-apiRoutes.get('/spaggiari/:year/:month/:day', function(req, res) {
-    var day = new Date(parseInt(req.params.year), parseInt(req.params.month), parseInt(req.params.day));
-    salva(req,res,day);
-    res.json({ success: true });
 });
 
 
@@ -512,7 +212,6 @@ apiRoutes.use(function(req, res, next) {
             success: false,
             message: 'No token provided.'
         });
-
     }
 });
 
@@ -720,49 +419,6 @@ apiRoutes.post('/liberaRisorse', function(req, res) {
         } else {
             res.json(false);
         }
-    });
-});
-
-
-apiRoutes.post('/events/:year/:month/:day', function(req, res) {
-    console.log(req.body);
-    var day = new Day({
-        date: new Date(parseInt(req.params.year), parseInt(req.params.month), parseInt(req.params.day)),
-        hour_start: parseFloat(req.body.hour_start),
-        hour_end: parseFloat(req.body.hour_end),
-        type: 0,
-        description: req.body.description,
-        who: req.body.who.split(','),
-        visible: req.body.visible
-    });
-    console.log(day);
-    day.save(function(err, d) {
-        if (err) throw err;
-
-        console.log('Day saved successfully ' + d.id);
-        res.json({ success: true });
-    });
-});
-
-
-apiRoutes.post('/events/delete/:id', function(req, res) {
-    Day.remove({_id: req.params.id}).exec(function(err,d) {
-      if (err) {
-        res.json(err);
-      } else {
-        res.json({success: true});
-      }
-    });
-});
-
-
-apiRoutes.post('/events/visibility/:id', function(req, res) {
-    Day.update({_id: req.params.id}, { visible: req.body.visible }).exec(function(err,d) {
-      if (err) {
-        res.json(err);
-      } else {
-        res.json({success: true});
-      }
     });
 });
 
