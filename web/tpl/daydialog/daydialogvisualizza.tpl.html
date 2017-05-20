@@ -25,7 +25,7 @@
                 <md-tab label="situazione del giorno">
                     <md-content ng-controller="OrarioCtrl" ng-init="init(day)">
                         <md-content layout-padding>
-                            <div layout="row" ng-hide="isSunday">                             
+                            <div layout="row" ng-hide="isHoliday">                             
                                 <md-input-container>
                                     <label>Classe</label>
                                     <md-select ng-model="sClass" ng-change="getOrarioClass()" size="20">

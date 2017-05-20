@@ -30,21 +30,29 @@ app
         * checkLogin: if session is active --> logged = true
         */
         $scope.verifyToken = function() {
-            $http.get('http://'+CONFIG.HOST+':8080/api/verifyToken', {
-                params: {
-                    token: sessionStorage.getItem('token')
-                }
-            }).success(function(response) {
-                if (response.success) {
-                    $rootScope.logged = true;
-                    $scope.logged = true;
-                    $rootScope.admin = response.admin;
-                    $scope.admin = response.admin;
-                    $rootScope.username = response.admin ? 'admin' : response.username;
+            var data = "token="+sessionStorage.token;
 
-                    $scope.highlight(1);
-                }
-            })
+            var req = {
+                method: 'POST',
+                url: 'http://'+CONFIG.HOST+':8080/api/verifyToken',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                data: data
+            };
+            
+            $http(req)
+                .success(function(response) {
+                    if (response.success) {
+                        $rootScope.logged = true;
+                        $scope.logged = true;
+                        $rootScope.admin = response.admin;
+                        $scope.admin = response.admin;
+                        $rootScope.username = response.admin ? 'admin' : response.username;
+
+                        $scope.highlight(1);
+                    }
+            });
         };
 
 

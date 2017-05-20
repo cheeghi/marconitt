@@ -25,7 +25,7 @@
                     <md-tab label="PRENOTA">
                         <md-content ng-controller="PrenotazioneCtrl" ng-init="init(day)">
                             <md-content layout-padding id="contentPrenotazione">
-                                <div layout="row" ng-hide="isSunday">
+                                <div layout="row" ng-hide="isHoliday">
                                     <md-input-container>
                                         <label>Seleziona</label>
                                         <md-select ng-model="sRoomType" ng-change="clearMdSelect();getPrenotazioni();" size="20">

@@ -5,7 +5,8 @@ app.
         $scope.currentItem = '';
         $scope.viewPlani = false;
         $scope.classes = [];
-        $scope.isSunday = true;
+        //$scope.isSunday = true;
+        $scope.isHoliday = true;
         $scope.htmlTable = "";
         $scope.all = false;
         $scope.data;
@@ -18,24 +19,40 @@ app.
                 search: ""
             }
         }).success(function(response) {
-          
             $scope.classes = response.classes;        
             $scope.rooms = response.rooms;
             $scope.teachers = response.teachers;
             $scope.projects = response.projects;
-
         })
 
 
         $scope.init = function(date) {
-
-            $scope.sem1 = false;
-            $scope.sem2 = false;
-            $scope.sem3 = false;
             $scope.day = new Date(date);
-            $scope.isSunday = $scope.day.getDay() == 0;
+            //$scope.isSunday = $scope.day.getDay() == 0;
             $scope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1) + "-" + $scope.day.getDate();
-            $scope.htmlTable = ($scope.isSunday) ? "<p>Non c'è scuola di domenica</p>" : "<p>Seleziona una classe, un insegnante o un'aula</p>";
+            
+            $http.get('http://'+CONFIG.TIMETABLE, {
+                    cache: false,
+                    params: {
+                        isholiday: $scope.giornoSelezionato
+                    }
+                }).success(function(response) {
+                    response = response.replace(/\s/g, '');
+                    $scope.isHoliday = response == 'true';
+                    $scope.htmlTable = ($scope.isHoliday) ? "<p>Non c'è scuola oggi, prenditi una pausa!</p>" : "";
+                    if(!$scope.isHoliday){
+                        if ($scope.sClass != undefined){
+                            $scope.getOrarioClass($scope.sClass);
+                        }else if($scope.sTeacher != undefined){
+                            $scope.getOrarioTeacher($scope.sTeacher);
+                        }else if($scope.sRoom != undefined){
+                             $scope.getOrarioRoom($scope.sRoom);
+                        }
+                    }                
+                
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
+                });            
         }
 
 
@@ -44,7 +61,7 @@ app.
          */
         $scope.$on("reInitVisualizza", function (event, args) {
             $scope.init(args.day);
-            if(! $scope.isSunday){
+            if(!$scope.isHoliday){
                 if ($scope.sClass != undefined){
                     $scope.getOrarioClass($scope.sClass);
                 }else if($scope.sTeacher != undefined){
