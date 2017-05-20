@@ -32,7 +32,7 @@ app
         $scope.verifyToken = function() {
             $http.get('http://'+CONFIG.HOST+':8080/api/verifyToken', {
                 params: {
-                    token: sessionStorage.token
+                    token: sessionStorage.getItem('token')
                 }
             }).success(function(response) {
                 if (response.success) {
@@ -117,7 +117,7 @@ app
                     function(data) {
                         $scope.isLoading = false;
                         if (data.data.success) {
-                            sessionStorage.token = data.data.token;
+                            sessionStorage.setItem('token', data.data.token);
                             $rootScope.admin = data.data.admin;
                             $scope.admin = data.data.admin;
                             $rootScope.logged = true;
@@ -144,7 +144,7 @@ app
          * performs logout
          */
         $scope.logout = function() {
-            sessionStorage.token = undefined;
+            sessionStorage.removeItem('token');
             $rootScope.logged = false;
             $scope.logged = false;
             $scope.highlight(2);

@@ -63,6 +63,8 @@
 		echo json_encode(getClassRoomsByDate($mysqli,$_GET["classroomsbydate"]));	
 	} elseif (isset($_GET["labroomsbydate"])) {
 		echo json_encode(getLabRoomsByDate($mysqli,$_GET["labroomsbydate"]));	
+	} elseif (isset($_GET["isholiday"])) {
+		echo json_encode(isHoliday($mysqli,$_GET["isholiday"]));	
 	} else {
 		echo json_encode(getOptions($mysqli));
 	}
@@ -520,6 +522,12 @@
 			}
 		}
 		return $celle;
+    }
+
+    function isHoliday($mysqli, $day) {
+        $query = "SELECT * FROM timetable WHERE giorno='$day'";
+        $result = $mysqli->query($query);
+		return $result->num_rows === 0;
     }
 
 ?>

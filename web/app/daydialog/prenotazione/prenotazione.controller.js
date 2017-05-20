@@ -289,5 +289,22 @@ app.
             }
 
         }
-
+        
+        
+        /**
+         * Returns true if the day is holiday
+         */
+        $scope.isHoliday = function(day) {
+           $http.get('http://'+CONFIG.TIMETABLE, {
+                    cache: false,
+                    params: {
+                        isholiday: day
+                    }
+                }).success(function(response) {
+                    return response == 'true';
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
+                });
+        };
+        
     });
