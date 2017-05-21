@@ -71,7 +71,11 @@ app.get('/sendMail',function(req,res) {
 	res.send("ok");
 });
 
+
+// =======================
 // API ROUTES -------------------
+// =======================
+
 // get an instance of the router for api routes
 var apiRoutes = express.Router();
 
@@ -266,7 +270,7 @@ apiRoutes.post('/approva', function(req, res) {
 });
 
 
-apiRoutes.post('/cancellaPrenotazione', function(req, res) {
+apiRoutes.delete('/cancellaPrenotazione', function(req, res) {
     var stanza = req.body.stanza;
 	var giorno = req.body.giorno;
 	var ora = req.body.ora;
@@ -362,7 +366,7 @@ apiRoutes.post('/creaEvento', function(req, res) {
 });
 
 
-apiRoutes.post('/cancellaEvento', function(req, res) {
+apiRoutes.delete('/cancellaEvento', function(req, res) {
     var id = req.body.id;
     var sql_stmt = "DELETE FROM prof_eventi WHERE id = " + id;
 
@@ -437,7 +441,6 @@ console.log('Magic happens at http://localhost:' + port);
 // =======================
 // functions =============
 // =======================
-
 
 /*
  * Funzione che setta la risorsa nella timetable ed aggiunge la prenotazione nella timetable
