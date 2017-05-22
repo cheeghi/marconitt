@@ -59,7 +59,7 @@
                 </md-tab>
                 <md-tab label="eventi" >
                     <md-content class="md-padding" ng-controller="EventCtrl" ng-init="init()">     <!--inizializza alla scelta del giorno-->
-                        <h4 ng-show="isEmpty" style="text-align: center; width: 100%; padding-top: 5%">Nessun evento in programma per oggi!</h4>
+                        <p ng-show="isEmpty" style="text-align: center; width: 100%;">Nessun evento in programma per oggi!</p>
                             <md-list style="">                    
                                 <md-list-item ng-repeat="evento in eventsArray" class="md-3-line">
                                     <div class="md-list-item-text">
