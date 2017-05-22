@@ -41,8 +41,8 @@ app.
             if (!$rootScope.admin) {
                 $http.get('http://'+CONFIG.TIMETABLE, {
                     params: {
-                        classesbyteacher: 'gbellini'
-                        //classesbyteacher: $rootScope.username
+                        //classesbyteacher: 'gbellini'
+                        classesbyteacher: $rootScope.username
                     }
                 }).success(function(response) {
                     $scope.teacherClasses = response;
