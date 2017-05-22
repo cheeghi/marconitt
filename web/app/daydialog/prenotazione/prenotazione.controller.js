@@ -1,14 +1,10 @@
 app.
-    controller("PrenotazioneCtrl", function($scope, $http, $window, $mdDialog, $mdToast, $rootScope, CONFIG) {
+    controller("PrenotazioneCtrl", function($scope, $http, $mdDialog, $mdToast, $rootScope, CONFIG) {
      
-        $scope.day;
-        $scope.currentItem = '';
-        $scope.classes = [];
-        //$scope.isSunday = true;
-        $scope.isHoliday = true;
+        $scope.day; // selected day
+        $scope.isHoliday = true; // says if the selected day is holiday or not
         $scope.htmlTable = ""; // 'prenotazioni' table html code
-        $scope.all = false;
-        $scope.admin = $rootScope.admin; // is protocollo or not
+        $scope.admin = $rootScope.admin; // is admin or not
         $scope.isLoading; // boolean for showing isLoading circle
         $scope.classes; // list of classes
         $scope.teachers; // list of teachers
@@ -18,26 +14,31 @@ app.
         $scope.sRoomType; // type of selected room (lab or classroom)
         $scope.sRoom; // selected room
         $scope.sHour; // selected hour
+        $rootScope.stanzaPrenotata; // selected room that has to be passed to confermaprenotazione.controller
+        $rootScope.oraPrenotata; // selected hour that has to be passed to confermaprenotazione.controller
+        $rootScope.prenotazioneString; // prenotazione string that has to be passed to confermaprenotazione.controller
 
 
         /**
-         * initialize method
+         * initialization method
          */
-        $scope.init = function(date) {
+        $scope.init = function() {
+
             $scope.initializeHttpCalls();
-            $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1)
-                + "-" + $scope.day.getDate();
-            //$scope.isSunday = $scope.day.getDay() == 0;
-            
+            $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1) + "-" + $scope.day.getDate();
+
+            // do the check if the selected day is holiday or not
             $http.get('http://'+CONFIG.TIMETABLE, {
                     cache: false,
                     params: {
                         isholiday: $rootScope.giornoSelezionato
                     }
                 }).success(function(response) {
-                    response = response.replace(/\s/g, '');
+
+                    response = response.replace(/\s/g, ''); // remove spaces from the response
                     $scope.isHoliday = response == 'true';
                     $scope.htmlTable = ($scope.isHoliday) ? "<p>Non c'è scuola oggi, prenditi una pausa!</p>" : "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
+
                 }).error(function() {
                     $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                 });
@@ -60,33 +61,35 @@ app.
 
         /**
          * re-initialize method
+         * method called when the user change the day with the right/left arrows
+         * @param date
          */
         $scope.reInit = function(date) {
+
             $scope.htmlTable = '';
             $scope.day = new Date(date);
-            $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1)
-                + "-" + $scope.day.getDate();
-            //$scope.isSunday = $scope.day.getDay() == 0;
-            
+            $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1) + "-" + $scope.day.getDate();
+
+            // do the check if the selected day is holiday or not
             $http.get('http://'+CONFIG.TIMETABLE, {
                 cache: false,
                 params: {
                     isholiday: $rootScope.giornoSelezionato
                 }
             }).success(function(response) {
-                response = response.replace(/\s/g, '');
+
+                response = response.replace(/\s/g, ''); // remove spaces from the response
                 $scope.isHoliday = response == 'true';
-                if ($scope.isHoliday){
+                if ($scope.isHoliday)
                      $scope.htmlTable = "<p>Non c'è scuola oggi, prenditi una pausa!</p>";
-                } else if($scope.sRoomType == undefined || $scope.isLoading) {
+                else if($scope.sRoomType == undefined || $scope.isLoading)
                     $scope.htmlTable = "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
-                } else {
+                else
                     $scope.getPrenotazioni();
-                }
+
             }).error(function() {
                 $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
             });
-
         }
 
 
@@ -94,8 +97,10 @@ app.
          * calls timetable API and passes the response to genTable() method
          */
         $scope.getPrenotazioni = function() {
+
             $scope.htmlTable = '';
             $scope.isLoading = true;
+
             if ($scope.sRoomType == "LABORATORIO") {
                 $http.get('http://'+CONFIG.TIMETABLE, {
                     cache: false,
@@ -123,7 +128,6 @@ app.
                 }).error(function() {
                     $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                 });
-                    
             }
         };
 
@@ -149,19 +153,19 @@ app.
 
             var x = "<table class=\"table table_prenotazioni\">\
                     <thead><tr>\
-                        <th style='border: 0.5px solid white;'>&nbsp;</th>\ ";
+                        <th class='border_prenotazionitable'>&nbsp;</th>\ ";
                         
             if ($scope.sHour == undefined || $scope.sHour == 'Qualsiasi') {
-                x += "<th style='border: 0.5px solid white;'>1°<md-tooltip md-direction='top'>8:00 - 9:00</md-tooltip></th>\
-                        <th style='border: 0.5px solid white;'>2°<md-tooltip md-direction='top'>9:00 - 9:50</md-tooltip></th>\
-                        <th style='border: 0.5px solid white;'>3°<md-tooltip md-direction='top'>10:00 - 11:00</md-tooltip></th>\
-                        <th style='border: 0.5px solid white;'>4°<md-tooltip md-direction='top'>11:00 - 11:50</md-tooltip></th>\
-                        <th style='border: 0.5px solid white;'>5°<md-tooltip md-direction='top'>12:00 - 12:55</md-tooltip></th>\
-                        <th style='border: 0.5px solid white;'>6°<md-tooltip md-direction='top'>12:55 - 14:30</md-tooltip></th>\
-                        <th style='border: 0.5px solid white;'>7°<md-tooltip md-direction='top'>14:30 - 15:30</md-tooltip></th>\
-                        <th style='border: 0.5px solid white;'>8°<md-tooltip md-direction='top'>15:30 - 16:30</md-tooltip></th>\
-                        <th style='border: 0.5px solid white;'>9°<md-tooltip md-direction='top'>16:30 - 17:30</md-tooltip></th>\
-                        <th style='border: 0.5px solid white;'>10°<md-tooltip md-direction='top'>17:30 - 18:30</md-tooltip></th>\ ";
+                x += "<th class='border_prenotazionitable'>1°<md-tooltip md-direction='top'>8:00 - 9:00</md-tooltip></th>\
+                        <th class='border_prenotazionitable'>2°<md-tooltip md-direction='top'>9:00 - 9:50</md-tooltip></th>\
+                        <th class='border_prenotazionitable'>3°<md-tooltip md-direction='top'>10:00 - 11:00</md-tooltip></th>\
+                        <th class='border_prenotazionitable'>4°<md-tooltip md-direction='top'>11:00 - 11:50</md-tooltip></th>\
+                        <th class='border_prenotazionitable'>5°<md-tooltip md-direction='top'>12:00 - 12:55</md-tooltip></th>\
+                        <th class='border_prenotazionitable'>6°<md-tooltip md-direction='top'>12:55 - 14:30</md-tooltip></th>\
+                        <th class='border_prenotazionitable'>7°<md-tooltip md-direction='top'>14:30 - 15:30</md-tooltip></th>\
+                        <th class='border_prenotazionitable'>8°<md-tooltip md-direction='top'>15:30 - 16:30</md-tooltip></th>\
+                        <th class='border_prenotazionitable'>9°<md-tooltip md-direction='top'>16:30 - 17:30</md-tooltip></th>\
+                        <th class='border_prenotazionitable'>10°<md-tooltip md-direction='top'>17:30 - 18:30</md-tooltip></th>\ ";
             } else {
                 var tooltipText;
                 switch ($scope.sHour) {
@@ -196,7 +200,7 @@ app.
                         tooltipText = '17:30 - 18:30';
                         break;
                 }
-                x += "<th style='border: 0.5px solid white;'>"+$scope.sHour+"°<md-tooltip md-direction='top'>"+tooltipText+"</md-tooltip></th>";
+                x += "<th class='border_prenotazionitable'>"+$scope.sHour+"°<md-tooltip md-direction='top'>"+tooltipText+"</md-tooltip></th>";
             }
 
             x += "</tr></thead>";
@@ -207,48 +211,42 @@ app.
                     continue;
                 
                 if ($scope.sRoom != undefined && $scope.sRoom != 'Qualsiasi') {
-                    if ($scope.sRoom == key) {
+                    if ($scope.sRoom == key)
                         x += "<tr><td style='border: 0.5px solid white;'>" + key + "</td>";
-                    }
-                } else {
+                } else
                     x += "<tr><td style='border: 0.5px solid white;'>" + key + "</td>";
-                }
                 
                 responses[key].forEach(function(element) {
 
-                    if ($scope.sRoom != undefined && $scope.sRoom != 'Qualsiasi') {
+                    if ($scope.sRoom&& $scope.sRoom != 'Qualsiasi') {
                         if ($scope.sRoom == element.stanza) {
-                            if ($scope.sHour != undefined && $scope.sHour != 'Qualsiasi') {
+                            if ($scope.sHour && $scope.sHour != 'Qualsiasi') {
                                 if (element.ora == $scope.sHour) {
-                                    if (element.risorsa != null) {
+                                    if (element.risorsa)
                                         x += '<td ng-click="aulaPrenotata()" style="border: 0.5px solid white;background-color:red; cursor: pointer"></td>';
-                                    } else {
+                                    else
                                         x += '<td ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" style="border: 0.5px solid white;background-color:green; cursor: pointer"></td>';
-                                    }
                                 }
                             } else {
-                                if (element.risorsa != null) {
+                                if (element.risorsa)
                                     x += '<td ng-click="aulaPrenotata()" style="border: 0.5px solid white;background-color:red; cursor: pointer"></td>';
-                                } else {
+                                else
                                     x += '<td ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" style="border: 0.5px solid white;background-color:green; cursor: pointer"></td>';
-                                }
                             }
                         }
                     } else {
-                        if ($scope.sHour != undefined && $scope.sHour != 'Qualsiasi') {
+                        if ($scope.sHour && $scope.sHour != 'Qualsiasi') {
                             if (element.ora == $scope.sHour) {
-                                if (element.risorsa != null) {
+                                if (element.risorsa)
                                     x += '<td ng-click="aulaPrenotata()" style="border: 0.5px solid white;background-color:red; cursor: pointer"></td>';
-                                } else {
+                                else
                                     x += '<td ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" style="border: 0.5px solid white;background-color:green; cursor: pointer"></td>';
-                                }
                             }
                         } else {
-                            if (element.risorsa != null) {
+                            if (element.risorsa)
                                 x += '<td ng-click="aulaPrenotata()" style="border: 0.5px solid white;background-color:red; cursor: pointer"></td>';
-                            } else {
+                            else
                                 x += '<td ng-click="prenotaClick(\'' + key + '\'' + ',' + (element.ora) + ')" style="border: 0.5px solid white;background-color:green; cursor: pointer"></td>';
-                            }
                         }
                     }
                     
@@ -270,24 +268,18 @@ app.
             $rootScope.oraPrenotata = ora;
             $rootScope.prenotazioneString = stanza + ' ' + (ora) + '°ora';
             $mdDialog.show({
-                    templateUrl: 'tpl/daydialog/confermaprenotazione.tpl.html',
-                    controller: 'ConfermaPrenotazioneCtrl',
-                    clickOutsideToClose: true,
-                    skipHide: true
-            })
+                templateUrl: 'tpl/daydialog/confermaprenotazione.tpl.html',
+                controller: 'ConfermaPrenotazioneCtrl',
+                clickOutsideToClose: true,
+                skipHide: true
+            });
         };
-        
 
-        /**
-         * called by other controllers in order to refresh the 'prenotazioni' table
-         */
-        $scope.$on("refreshTable", function (event, args) {
-            $scope.getPrenotazioni();
-        });
 
-        
         /**
          * called by other controllers in order to re-initialize the controller
+         * @param event
+         * @param args
          */
         $scope.$on("reInit", function (event, args) {
             $scope.reInit(args.day);
@@ -295,42 +287,42 @@ app.
 
 
         /**
+         * called by other controllers in order to refresh the 'prenotazioni' table
+         * @param event
+         * @param args
+         */
+        $scope.$on("refreshTable", function (event, args) {
+            $scope.getPrenotazioni();
+        });
+
+
+    /**
          * shows an alert message if the user clicks on 'ora già prenotata'
          */
         $scope.aulaPrenotata = function(){
-
-            if ($scope.sRoomType == "LABORATORIO"){
-                $mdToast.show($mdToast.simple()
-                                .textContent('Laboratorio non prenotabile!')
-                                .hideDelay(1500)
-                                );
-            }
-            
-            if ($scope.sRoomType == "AULA"){
-                $mdToast.show($mdToast.simple()
-                                .textContent('Aula non prenotabile!')
-                                .hideDelay(1500)
-                                );
-            }
-
+            if ($scope.sRoomType == "LABORATORIO")
+                $mdToast.show($mdToast.simple().textContent('Laboratorio non prenotabile!').hideDelay(1500));
+            else if ($scope.sRoomType == "AULA")
+                $mdToast.show($mdToast.simple().textContent('Aula non prenotabile!').hideDelay(1500));
         }
         
         
         /**
          * Returns true if the day is holiday
+         * @param giorno
          */
         $scope.isHolidayDay = function(giorno) {
            $http.get('http://'+CONFIG.TIMETABLE, {
-                    cache: false,
-                    params: {
-                        isholiday: giorno
-                    }
-                }).success(function(response) {
-                    response = response.replace(/\s/g, '');
-                    return response == 'true';
-                }).error(function() {
-                    $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
-                });
+                cache: false,
+                params: {
+                    isholiday: giorno
+                }
+            }).success(function(response) {
+                response = response.replace(/\s/g, ''); // remove spaces from the response
+                return response == 'true';
+            }).error(function() {
+                $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
+            });
         };
         
     });

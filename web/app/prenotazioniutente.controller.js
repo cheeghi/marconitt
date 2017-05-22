@@ -27,6 +27,7 @@ app.
          * makes http requests to populate 'prenotazioni' arrays
          */
         $scope.initializeHttpCalls = function() {
+
             $scope.isLoading = true;
 
             if ($scope.admin) {
@@ -151,7 +152,6 @@ app.
          * calls the server method for removing a 'prenotazione'
          */
         $scope.removePrenotazione = function(giorno, stanza, risorsa, ora) {
-            var giornoDate = new Date(giorno);
 
             var confirm = $mdDialog.confirm()
               .textContent('La prenotazione verrà rimossa per sempre. Continuare?')
@@ -180,9 +180,8 @@ app.
                         if (data) {
                             $scope.initializeHttpCalls();
                             $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                       
-                        } else {
-                            $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));                       
-                        }
+                        } else
+                            $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
                     }).error(function(err) {
                         $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                     });
@@ -212,9 +211,8 @@ app.
                     if (data) {
                         $scope.initializeHttpCalls();
                         $mdToast.show($mdToast.simple().textContent('Prenotazione approvata con successo'));      
-                    } else {
-                        $mdToast.show($mdToast.simple().textContent('Errore durante la approvazione'));      
-                    }             
+                    } else
+                        $mdToast.show($mdToast.simple().textContent('Errore durante la approvazione'));
                 }).error(function(err) {
                     $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                 });            
@@ -235,6 +233,7 @@ app.
          * removes an event
         */
         $scope.removeEvento = function(id) {
+
             var confirm = $mdDialog.confirm()
               .textContent("L'evento verrà rimosso per sempre. Continuare?")
               .ok('CONFERMA')
@@ -254,15 +253,13 @@ app.
                     data: data
                 };
 
-
                 $http(req)
                     .success(function(data) {
                         if (data) {
                             $scope.initializeHttpCalls();
                             $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                   
-                        } else {
-                            $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));                   
-                        }
+                        } else
+                            $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
                     }).error(function(err) {
                         $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                     });
@@ -274,6 +271,7 @@ app.
          * returns true if the given day is passed
         */
         $scope.isPassed = function(giorno) {
+
             var today = new Date();
             today.setHours(0); // we need to do these sets, otherwise the comparison doesnt work
             today.setMinutes(0);

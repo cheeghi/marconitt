@@ -1,15 +1,15 @@
 app
-    .controller('InsertCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, $q, $mdToast, $element, $rootScope, $httpParamSerializerJQLike, CONFIG) {
+    .controller('InsertCtrl', function($scope, $timeout, $http, $mdToast, $rootScope, CONFIG) {
 
-        $scope.teachers;
-        $scope.classes;
+        $scope.classes; // list of classes
+        $scope.rooms; // list of rooms
         $scope.event = {};
-        $scope.event.description;
-        $scope.event.day = new Date();
-        $scope.event.hourStart = new Date();
-        $scope.event.hourEnd = new Date();
-        $scope.event.classes = [];
-        $scope.event.rooms = [];
+        $scope.event.description; // description of the event
+        $scope.event.day = new Date(); // day of the event
+        $scope.event.hourStart = new Date(); // hour at which the event starts
+        $scope.event.hourEnd = new Date(); // hour at which the event ends
+        $scope.event.classes = []; // list of selected classes
+        $scope.event.rooms = []; // list of selected rooms
         $scope.isLoading = true; // used for loading circle
 
 
@@ -19,10 +19,14 @@ app
         var init = function() {
             $http.get('http://'+CONFIG.TIMETABLE)
                 .success(function(response) {
+
                     $scope.classes = response.classes;
                     $scope.teachers = response.teachers;
                     $scope.rooms = response.rooms;
-                    $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
+                    $timeout(function() {
+                        $scope.isLoading = false
+                    }, $rootScope.loadingTime);
+
                 }).error(function() {
                     $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                 });
@@ -32,16 +36,11 @@ app
         /**
          * since angular hour picker returns hours and minutes without leading zeros,
          * this methods adds them and returns the sanitized value
+         * @param value
+         * @returns boolean
          */        
         $scope.sanitize = function(value) {
-            var out = '';
-
-            if (value.toString().length == 1)
-                out = '0' + value;
-            else
-                out = value;
-
-            return out;
+            return value.toString().length == 1 ? '0' + value : value;
         };
 
 
@@ -49,6 +48,7 @@ app
          * sends event information to server
          */
         $scope.insert = function () {
+
             var oreStart = $scope.sanitize($scope.event.hourStart.getHours());
             var minutiStart = $scope.sanitize($scope.event.hourStart.getMinutes());
             var oreEnd = $scope.sanitize($scope.event.hourEnd.getHours());
@@ -58,10 +58,9 @@ app
             var day = $scope.event.day.getFullYear() + "-" + ($scope.event.day.getMonth()+1) + "-" + $scope.event.day.getDate();
             var hStart = oreStart + ":" + minutiStart;
             var hEnd = oreEnd + ":" + minutiEnd;
-            var sClasses = $scope.event.classes; //$scope.event.classes.toString().replace(/,(?=[^\s])/g, ", ");
-            var sRooms = $scope.event.rooms; //$scope.event.rooms.toString().replace(/,(?=[^\s])/g, ", ");
-            var data = "descrizione="+desc+"&day="+day+"&oraInizio="+hStart+"&oraFine="+hEnd+"&classi="
-                +sClasses+"&stanze="+sRooms+"&token="+sessionStorage.token;
+            var sClasses = $scope.event.classes;
+            var sRooms = $scope.event.rooms;
+            var data = "descrizione="+desc+"&day="+day+"&oraInizio="+hStart+"&oraFine="+hEnd+"&classi="+sClasses+"&stanze="+sRooms+"&token="+sessionStorage.token;
 
             var req = {
                 method: 'POST',

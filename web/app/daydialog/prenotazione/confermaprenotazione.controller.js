@@ -1,11 +1,11 @@
 app.
-    controller("ConfermaPrenotazioneCtrl", function($scope, $http, $window, CONFIG, $mdDialog, $mdToast, $rootScope) {
+    controller("ConfermaPrenotazioneCtrl", function($scope, $http, CONFIG, $mdDialog, $mdToast, $rootScope) {
 
-        $scope.prenotazioneString = $rootScope.prenotazioneString;
-        $scope.classes;
-        $scope.rooms;
-        $scope.teachers;
-        $scope.progetti;
+        $scope.prenotazioneString = $rootScope.prenotazioneString; // string displayed at the top of the dialog
+        $scope.classes; // array of classes
+        $scope.rooms; // array of rooms
+        $scope.teachers; // array of teachers
+        $scope.progetti; // array of projects
         $scope.admin = $rootScope.admin; // is admin or not
         $scope.tipoPrenotazione; // tipo di prenotazione (ex. classe, consiglio di classe, progetto, ecc...)
         $scope.sProgetto; // progetto selezionato
@@ -13,12 +13,12 @@ app.
         $scope.sTeacher; // selected teacher
         $scope.sDescrizione; // descrizione inserita
         $scope.disabled; // boolean for confirm button disabling
-        $scope.teacherClasses; // list of logged teacher's classes
+        $scope.teacherClasses; // list of teacher's classes (classes of the teacher logged in)
         $scope.sTeacherClass; // selected teacher class
 
 
         /**
-         * initialize method
+         * initialization method
          */
         $scope.init = function() {
             $scope.initializeHttpCalls();
@@ -29,19 +29,19 @@ app.
          * makes http requests to populate classes, rooms, teachers, progetti arrays
          */
         $scope.initializeHttpCalls = function() {
+
             $http.get('http://'+CONFIG.TIMETABLE)
                 .success(function(response) {
                     $scope.classes = response.classes;
                     $scope.teachers = response.teachers;
                     $scope.progetti = response.projects;
                 }).error(function() {
-                    $mdToast.show($mdToast.simple().textContent("Errore di rete"));
+                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                 });
             
             if (!$rootScope.admin) {
                 $http.get('http://'+CONFIG.TIMETABLE, {
                     params: {
-                        //classesbyteacher: 'gbellini'
                         classesbyteacher: $rootScope.username
                     }
                 }).success(function(response) {
@@ -57,13 +57,13 @@ app.
          * makes a 'prenotazione' request to the server
          */
         $scope.prenota = function() {
+
             $scope.disabled = true;
-            var risorsa;
+            var risorsa = '';
             var isClasse = false;
             var classe = $scope.sClass == undefined ? $scope.sTeacherClass : $scope.sClass;
             
             if ($scope.admin) {
-                
                 switch ($scope.tipoPrenotazione) {
                     case "Classe":
                         risorsa = classe;
@@ -113,7 +113,6 @@ app.
                 }).error(function(err) {
                     $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                 });
-
         };
 
 
