@@ -1,6 +1,6 @@
 {
   "name": "marconi-tt",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "main": "config.js",
   "dependencies": {
     "accepts": "^1.2.13",
@@ -60,9 +60,6 @@
     "mime-db": "^1.22.0",
     "mime-types": "^2.1.10",
     "minimist": "^1.2.0",
-    "mongodb": "^2.2.22",
-    "mongodb-core": "^1.3.16",
-    "mongoose": "^4.4.12",
     "morgan": "^1.7.0",
     "mpath": "^0.2.1",
     "mpromise": "^0.5.5",
@@ -108,10 +105,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marconivr/marconitt.git"
+    "url": "https://github.com/righe98/marconitt"
   },
-  "author": "Diego Dal Bosco",
+  "author": "Semprebon Elia, Righetti Michele, Fedrigo Yuri, Tanello Giuseppe, Berrighi Leonardo",
   "license": "GNU GPLv3",
-  "homepage": "https://github.com/marconivr/marconitt",
+  "homepage": "https://github.com/righe98/marconitt",
   "description": "Marconi Time Table is a calendar with the aim of joyng data from school time table and online school register in the same place"
 }

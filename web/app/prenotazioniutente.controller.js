@@ -166,7 +166,7 @@ app.
                         + "&risorsa="+ risorsa;
                 
                 var req = {
-                    method: 'POST',
+                    method: 'DELETE',
                     url: 'http://'+CONFIG.HOST+':8080/api/cancellaPrenotazione',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -246,7 +246,7 @@ app.
 
                 var data = "token="+sessionStorage.token+"&id="+id;
                 var req = {
-                    method: 'POST',
+                    method: 'DELETE',
                     url: 'http://'+CONFIG.HOST+':8080/api/cancellaEvento',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
