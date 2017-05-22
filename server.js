@@ -57,21 +57,6 @@ app.get('/', function(req, res) {
 });
 
 
-app.get('/sendMail',function(req,res) {
-	sendmail({
-	  from: 'marconiTT@marconivr.com',
-	  to: 'fedrigo22@gmail.com',
-	  replyTo: 'giuseppe.tanello@gmail.com',
-	  subject: 'Email prova',
-	  html: 'Questa è di prova'
-	}, function (err, reply) {
-	  console.log(err && err.stack)
-	  console.dir(reply)
-	});
-	res.send("ok");
-});
-
-
 // =======================
 // API ROUTES -------------------
 // =======================
@@ -774,7 +759,7 @@ function cancellaPrenotazione(stanza, giorno, ora, res) {
         if(!err) {
             selectId(giorno, stanza, ora, function(id) {
                 sql_stmt = "DELETE FROM prenotazioni WHERE id = " + id;
-
+                console.log(sql_stmt);
                 connection.query(sql_stmt, function(err) {
                     if(!err) {
                         res(true);
@@ -1008,8 +993,8 @@ function liberazione(id, classe, ora, giorno) {
                         connection.query(sql_stmt);
 
                         for(i in vett) {
-                            cancellaPrenotazione(stanza, giorno, ora, function(response) {
-                                //console.log("liberata");
+                            cancellaPrenotazione(stanza, giorno, ora, function() {
+                                //Prenotazione cancellata
                             });
                         }
                     } catch(e) {
@@ -1021,8 +1006,8 @@ function liberazione(id, classe, ora, giorno) {
                         connection.query(sql_stmt);
 
                         for(i in vett) {
-                            cancellaPrenotazione(stanza, giorno, ora, function(response) {
-                                //console.log("liberata");
+                            cancellaPrenotazione(stanza, giorno, ora, function() {
+                                //Prenotazione cancellata
                             });
                         }
                     }
@@ -1030,4 +1015,19 @@ function liberazione(id, classe, ora, giorno) {
             });
         }
     });
+}
+
+
+function sendMail() {
+    sendmail({
+	  from: 'marconiTT@marconivr.com',
+	  to: 'fedrigo22@gmail.com',
+	  replyTo: 'giuseppe.tanello@gmail.com',
+	  subject: 'Email prova',
+	  html: 'Questa è di prova'
+	}, function (err, reply) {
+	  console.log(err && err.stack)
+	  console.dir(reply)
+	});
+	res.send("ok");
 }
