@@ -321,3 +321,6 @@ md-fab {
         overflow-y: auto;
     }
 }
+.border_prenotazionitable {
+    border: 0.5px solid white;
+}

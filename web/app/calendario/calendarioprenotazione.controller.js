@@ -1,8 +1,8 @@
 app
-    .controller('CalendarioPrenotazioneCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, MaterialCalendarData, $q, $mdToast, $mdDialog, CONFIG, $rootScope) {
+    .controller('CalendarioPrenotazioneCtrl', function($scope, $timeout, MaterialCalendarData, $mdToast, $mdDialog, $rootScope) {
 
-        $scope.direction = "horizontal";
-        $scope.selectedDate;
+        $scope.direction = "horizontal"; // calendar direction
+        $scope.selectedDate; // selected day in the calendar
         $scope.isLoading = true; // used for isLoading circle
         $scope.calendar = '';
         $scope.currentMonth = new Date().getMonth() + 1;
@@ -12,26 +12,26 @@ app
         /**
          * initialization method
          */
-        $scope.init = function () {
+        $scope.init = function() {
             $scope.resetCalendar(); // i need to clear the calendar because 'visualizza' and 'prenotazione' share the same calendar data
-            $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
+            $timeout(function() {
+                $scope.isLoading = false;
+            }, $rootScope.loadingTime);
         };
 
 
         /**
          * clears calendar content
          */
-        $scope.resetCalendar = function () {
+        $scope.resetCalendar = function() {
+
             // we need to do clear the current, the previous and the next month 
-            for (i = 1; i <= 31; i++) {
+            for (i = 1; i <= 31; i++)
                 MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + ($scope.currentMonth) + '-' + i), ' ');
-            }  
-            for (i = 1; i <= 31; i++) {
+            for (i = 1; i <= 31; i++)
                 MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + ($scope.currentMonth+1) + '-' + i), ' ');
-            }    
-            for (i = 1; i <= 31; i++) {
+            for (i = 1; i <= 31; i++)
                 MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + ($scope.currentMonth-1) + '-' + i), ' ');
-            }
         };
 
 
@@ -40,7 +40,8 @@ app
          * @param date
          */
         $scope.dayClick = function(date) {
-            var tplUrl = 'tpl/daydialog/daydialogprenotazione.tpl.html';
+
+            var tplUrl = 'tpl/daydialog/daydialogprenotazione.tpl.html'; // html code to insert into the dialog
             $scope.day = new Date(date);
             var today = new Date();
             var limitDay = new Date();
@@ -50,11 +51,11 @@ app
             today.setMilliseconds(0);
             limitDay.setDate(limitDay.getDate() + $rootScope.giorniLimite);
 
-            if ($scope.day > limitDay && !$rootScope.admin) {
+            if ($scope.day > limitDay && !$rootScope.admin)
                 $mdToast.show($mdToast.simple().textContent("Seleziona una data più vicina"));
-            } else if ($scope.day < today) {
+            else if ($scope.day < today)
                 $mdToast.show($mdToast.simple().textContent("Non puoi prenotare per un giorno passato"));
-            } else {
+            else {
                 $mdDialog.show({
                     templateUrl: tplUrl,
                     controller: 'DayDialogPrenotazioneCtrl',
@@ -75,7 +76,7 @@ app
             $scope.currentMonth = date.month;
             $scope.currentYear = date.year;
             $scope.resetCalendar();
-        }
+        };
 
 
         /**
@@ -86,6 +87,6 @@ app
             $scope.currentMonth = date.month;
             $scope.currentYear = date.year;
             $scope.resetCalendar();
-        }
+        };
 
     });

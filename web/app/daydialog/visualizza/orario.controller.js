@@ -3,9 +3,7 @@ app.
 
         $scope.day;
         $scope.currentItem = '';
-        $scope.viewPlani = false;
         $scope.classes = [];
-        //$scope.isSunday = true;
         $scope.isHoliday = true;
         $scope.htmlTable = "";
         $scope.all = false;
@@ -13,12 +11,15 @@ app.
         $scope.type;
         $scope.selected = false;
         
-        
-        $http.get("http://" + CONFIG.TIMETABLE, {
+
+        /**
+        * chiamata per riempire gli md-select in HTML
+        */
+        $http.get ("http://" + CONFIG.TIMETABLE, {
             params: {
                 search: ""
             }
-        }).success(function(response) {
+        }).success (function(response) {
             $scope.classes = response.classes;        
             $scope.rooms = response.rooms;
             $scope.teachers = response.teachers;
@@ -26,26 +27,30 @@ app.
         })
 
 
+        /**
+        * chiamata per iniziallizare il controller, il giorno e stabilire se c'è scuola
+        */
         $scope.init = function(date) {
             $scope.day = new Date(date);
-            //$scope.isSunday = $scope.day.getDay() == 0;
             $scope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1) + "-" + $scope.day.getDate();
             
-            $http.get('http://'+CONFIG.TIMETABLE, {
+            $http.get ('http://'+CONFIG.TIMETABLE, {
                     cache: false,
                     params: {
                         isholiday: $scope.giornoSelezionato
                     }
-                }).success(function(response) {
+
+                }).success (function(response) {
                     response = response.replace(/\s/g, '');
                     $scope.isHoliday = response == 'true';
                     $scope.htmlTable = ($scope.isHoliday) ? "<p>Non c'è scuola oggi, prenditi una pausa!</p>" : "";
-                    if(!$scope.isHoliday){
+
+                    if (!$scope.isHoliday){
                         if ($scope.sClass != undefined){
                             $scope.getOrarioClass($scope.sClass);
-                        }else if($scope.sTeacher != undefined){
+                        } else if ($scope.sTeacher != undefined){
                             $scope.getOrarioTeacher($scope.sTeacher);
-                        }else if($scope.sRoom != undefined){
+                        } else if ($scope.sRoom != undefined){
                              $scope.getOrarioRoom($scope.sRoom);
                         }
                     }                
@@ -57,48 +62,53 @@ app.
 
 
         /**
-         * called by other controllers in order to re-initialize the controller
+         * funzione per ri-inizializzare il controller
          */
         $scope.$on("reInitVisualizza", function (event, args) {
             $scope.init(args.day);
-            if(!$scope.isHoliday){
+
+            if (!$scope.isHoliday){
+
                 if ($scope.sClass != undefined){
                     $scope.getOrarioClass($scope.sClass);
-                }else if($scope.sTeacher != undefined){
+                } else if ($scope.sTeacher != undefined){
                     $scope.getOrarioTeacher($scope.sTeacher);
-                }else if($scope.sRoom != undefined){
-                     $scope.getOrarioRoom($scope.sRoom);
+                } else if ($scope.sRoom != undefined){
+                    $scope.getOrarioRoom($scope.sRoom);
                 }
             }
         });
 
-        $scope.getOrarioRoom = function() {
 
+        /**
+        * chiamata per ottenere l'orario di una stanza una volta premuta dall' md-select
+        */
+        $scope.getOrarioRoom = function() {
             $scope.selected = true;
             $scope.sTeacher = undefined;
             $scope.sClass = undefined;
             $scope.htmlTable = '<p><div layout="row" layout-sm="column" layout-align="center center" layout-fill>\
                                 <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>\
                                 </div></p>';
-            /*$scope.query = "select * from timetable where stanza = '" + $scope.sRoom + "' and\
-                            giorno = '" + $scope.giornoSelezionato + "' order by ora";*/
-
-            $http.get("http://" + CONFIG.TIMETABLE, {
+            $http.get ("http://" + CONFIG.TIMETABLE, {
                 cache: false,
                 params: {
                     ttroombyday: '',
                     stanza: $scope.sRoom,
                     day: $scope.giornoSelezionato
                 }
-            }).success(function(response) {
+            }).success (function(response) {
 
             $scope.genTable(response, 'aula');
                 
             });
         }
 
-         $scope.getOrarioTeacher = function() {
 
+        /**
+        * chiamata per ottenere l'orario di un professore una volta premuto dall' md-select
+        */
+        $scope.getOrarioTeacher = function() {
             $scope.selected = true; 
             $scope.sRoom = undefined; 
             $scope.sClass = undefined;        
@@ -107,33 +117,28 @@ app.
                                 </div></p>';
 
             var orarioTeacher = {};
-
-            /*$scope.queryTimetable = "select * from timetable where (professore1 = '" + $scope.sTeacher + "' or professore2 = '" + $scope.sTeacher + "' or professoreS = '" + $scope.sTeacher + "') and\
-                            giorno = '" + $scope.giornoSelezionato + "' order by ora";
-            $scope.queryEventi = "select distinct eventi.descrizione, eventi.stanze, prof_eventi.ora from eventi inner join prof_eventi\
-            on eventi.id = prof_eventi.id where eventi.giorno = '" + $scope.giornoSelezionato + "' and prof_eventi.professori like '%" + $scope.sTeacher + "%' order by oraInizio";             */
-
-            $http.get("http://" + CONFIG.TIMETABLE, {
+            $http.get ("http://" + CONFIG.TIMETABLE, {
                 cache: false,
                 params: {
                     ttteacherbyday: '',
                     prof: $scope.sTeacher,
                     day: $scope.giornoSelezionato
                 }
-            }).success(function(response) {
+            }).success (function(response) {
 
                 response.forEach (function (response){
                     orarioTeacher[response.ora] = response;
                 });
 
-                $http.get("http://" + CONFIG.TIMETABLE, {
+                $http.get ("http://" + CONFIG.TIMETABLE, {
                         cache: false,
                         params: {
                             teachereventsbyday: '',
                             prof: $scope.sTeacher,
                             day: $scope.giornoSelezionato
                         }
-                    }).success(function(response2) {
+                    }).success (function(response2) {
+
                         response2.forEach (function (response2){
                             orarioTeacher[response2.ora] = response2;                
                         });
@@ -143,6 +148,10 @@ app.
             })
         }
 
+
+        /**
+        * chiamata per ottenere l'orario di una classe una volta premuta dall' md-select
+        */
         $scope.getOrarioClass = function() {
 
             $scope.selected = true;
@@ -151,48 +160,43 @@ app.
             $scope.htmlTable = '<p><div layout="row" layout-sm="column" layout-align="center center" layout-fill>\
                                 <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>\
                                 </div></p>';
-            
             var orarioClass = {};
 
-            /*$scope.queryLiberazione = "select liberazione.descrizione, prof_liberazione.professori, prof_liberazione.ora from liberazione inner join prof_liberazione on\
-             liberazione.id = prof_liberazione.liberazione where liberazione.classe = '" + $scope.sClass + "' and giorno = '" + $scope.giornoSelezionato + "' order by ora";
-            $scope.queryTimetable = "select * from timetable where risorsa = '" + $scope.sClass + "' and giorno = '" + $scope.giornoSelezionato + "' order by ora";
-            $scope.queryEventi = "select eventi.descrizione, eventi.stanze, prof_eventi.ora, prof_eventi.professori from eventi inner join prof_eventi\
-            on eventi.id = prof_eventi.id where eventi.giorno = '" + $scope.giornoSelezionato + "' and eventi.classi like '%" + $scope.sClass + "%' order by oraInizio;"*/
-
-            $http.get("http://" + CONFIG.TIMETABLE, {
+            $http.get ("http://" + CONFIG.TIMETABLE, {
                 cache: false,
                 params: {
                     liberazioniclassbyday: '',
                     classe: $scope.sClass,
                     day: $scope.giornoSelezionato
                 }
-            }).success(function(response) {
+            }).success (function(response) {
 
                 response.forEach (function (response){
                     orarioClass[response.ora] = response;
                 });      
 
-                $http.get("http://" + CONFIG.TIMETABLE, {
+                $http.get ("http://" + CONFIG.TIMETABLE, {
                     cache: false,
                     params: {
                         ttclassbyday: '',
                         classe: $scope.sClass,
                         day: $scope.giornoSelezionato
                     }
-                }).success(function(response2) {
+                }).success (function(response2) {
+
                     response2.forEach (function (response2){
                         orarioClass[response2.ora] = response2;
                     });
 
-                $http.get("http://" + CONFIG.TIMETABLE, {
+                $http.get ("http://" + CONFIG.TIMETABLE, {
                         cache: false,
                         params: {
-                            eventiclassbyday: '',
+                            classeventsbyday: '',
                             classe: $scope.sClass,
                             day: $scope.giornoSelezionato
                         }
-                    }).success(function(response3) {
+                    }).success (function(response3) {
+
                         response3.forEach (function (response3){
                             orarioClass[response3.ora] = response3;
                         });
@@ -203,11 +207,13 @@ app.
             })
         }
 
+
+        /**
+        * chiamata per generare la tabella html dell'orario prendendo in input gli orari dei diversi tipi di elementi
+        */
         $scope.genTable = function(data, tipo) {
             var days = $mdDateLocale.days;
-
             if (tipo == 'classe'){
-
             var x = "<table class=\"table\">\
                     <thead><tr>\
                         <th>1<md-tooltip md-direction='top'>8:00 - 9:00</md-tooltip></th>\
@@ -225,39 +231,36 @@ app.
 
             for (var i = 1; i <= 10; i++) {
 
-                try{
+                try {
                    
                     if (data[i].descrizione != undefined && data[i].stanze != undefined){                  
                         x += "<td>" + data[i].descrizione  + "<br>" + data[i].stanze + "</td>";
 
-                    }else if(data[i].descrizione != undefined && data[i].stanze == undefined){
+                    } else if(data[i].descrizione != undefined && data[i].stanze == undefined){
                         x += "<td>" + data[i].descrizione.toLowerCase()  + "</td>";
 
-                    }else{
+                    } else {
 
                         if (data[i].risorsa == undefined || data[i].risorsa == null){
                             x += "<td>&nbsp;</td>";
-                        }else if (data[i].professore2 == null && data[i].professoreS == null){
+                        } else if (data[i].professore2 == null && data[i].professoreS == null){
                             x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
-                        }else if (data[i].professoreS == null && data[i].professore2 != null){
+                        } else if (data[i].professoreS == null && data[i].professore2 != null){
                             x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
-                        }else if (data[i].professore1 == null && data[i].professore2 != null && data[i].professoreS != null){
+                        } else if (data[i].professore1 == null && data[i].professore2 != null && data[i].professoreS != null){
                             x += "<td><span class='nome'>" + data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
                         }       
                     }
 
-                }catch(e){
+                } catch (e){
                     x += "<td>&nbsp;</td>";
-
                 }
-
             }               
-            
             x += "</tbody>";
             x += "</table>";
             $scope.htmlTable = x;
 
-        }else if (tipo == 'prof'){
+        } else if (tipo == 'prof'){
             var x = "<table class=\"table\">\
                     <thead><tr>\
                         <th>1<md-tooltip md-direction='top'>8:00 - 9:00</md-tooltip></th>\
@@ -275,7 +278,7 @@ app.
 
             for (var i = 1; i <= 10; i++) {
 
-                try{
+                try {
                    
                     if (data[i].descrizione != undefined && data[i].stanze != undefined){
                         
@@ -295,10 +298,9 @@ app.
                         
                     }
 
-                }catch(e){
+                } catch (e){
 
                     x += "<td>&nbsp;</td>";
-
                 }
 
             }               
@@ -307,7 +309,7 @@ app.
             x += "</table>";
             $scope.htmlTable = x;
 
-        }else if(tipo == 'aula'){
+        } else if (tipo == 'aula'){
                var x = "<table class=\"table\">\
                         <thead><tr>\
                         <th>1<md-tooltip md-direction='top'>8:00 - 9:00</md-tooltip></th>\
@@ -325,23 +327,23 @@ app.
 
             for (var i = 0; i < 10; i++) {
 
-                try{
+                try {
 
                     if (data[i].risorsa == null) {
                         x += "<td>&nbsp;</td>";
-                    }else if(data[i].professore2 == null && data[i].professoreS == null && data[i].professore1 != null){
+                    } else if (data[i].professore2 == null && data[i].professoreS == null && data[i].professore1 != null){
                         x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].risorsa + " </td>";
-                    }else if(data[i].professore1 == null && data[i].professore2 == null && data[i].professoreS == null){
+                    } else if (data[i].professore1 == null && data[i].professore2 == null && data[i].professoreS == null){
                         x += "<td>" + data[i].risorsa + " </td>";
-                    }else if(data[i].professore2 == null && data[i].professoreS == null && data[i].professore1 != null){
+                    } else if (data[i].professore2 == null && data[i].professoreS == null && data[i].professore1 != null){
                         x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].risorsa + " </td>";
-                    }else if(data[i].professoreS == null && data[i].professore1 != null && data[i].professore2 != null){
+                    } else if (data[i].professoreS == null && data[i].professore1 != null && data[i].professore2 != null){
                         x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() +"<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].risorsa + " </td>";
-                    }else{
+                    } else {
                         x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].risorsa + " </td>";
                     }
 
-                }catch(e){
+                } catch (e){
                     x += "<td>&nbsp;</td>";
                 }
 

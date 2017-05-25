@@ -1,14 +1,14 @@
 app
     .controller('MainCtrl', function ($scope, $timeout, $mdSidenav, $log, $filter, $http, $mdToast, CONFIG, $rootScope) {
       
-        $rootScope.logged;
-        $rootScope.admin;
-        $scope.admin;
-        $scope.logged;
+        $rootScope.logged; // user is logged or not (visible in all controllers)
+        $rootScope.admin; // user is admin or not (visible in all controllers)
+        $scope.admin; // user is admin or not
+        $scope.logged; // user is logged or not
         $scope.toggleLeft = buildDelayedToggler('left');
-        $scope.mainHtml;
-        $scope.logindata = {};
-        $scope.customStyle = {};
+        $scope.mainHtml; // main content inside the page
+        $scope.logindata = {}; // user data for login
+        $scope.customStyle = {}; // css properties to highilight the current section in the sidenav
         $rootScope.loadingTime = 300; // loading circle time
         $scope.isLoading;
         $rootScope.giorniLimite = 14; // range di prenotazione per un professore
@@ -19,15 +19,11 @@ app
          */
         $scope.init = function() {
             $scope.verifyToken();
-            //PRESUMO CHE L'INIT SIA IL MOMENTO GIUSTO IN OGNI CASO PER EFFETTUARE IL SETUP, ALTRIMENTI CAMBIA METODO
-            var a = $http.get('http://'+CONFIG.HOST+':8080/setup'); //AVVIAMENTO AUTOMATICO DEL SETUP INIZIALE
-            a.error(function(response) {console.log('fallisce il setup')});
-            a.success(function(response) {console.log('va il setup')});
         };
 
 
         /**
-        * checkLogin: if session is active --> logged = true
+        * checks if the user is still logged
         */
         $scope.verifyToken = function() {
             var data = "token="+sessionStorage.token;
@@ -97,10 +93,7 @@ app
          * closes side bar
          */
         $scope.close = function () {
-            $mdSidenav('left').close()
-                .then(function () {
-                //$log.debug("close LEFT is done");
-                });
+            $mdSidenav('left').close();
         };
 
 
@@ -108,6 +101,7 @@ app
          * performs login
          */
         $scope.login = function() {
+
             $scope.isLoading = true;
             
             //chiamata http che ritorna il token da utilizzare nelle prossime chiamate
@@ -134,18 +128,15 @@ app
 
                             $mdToast.show($mdToast.simple().textContent('Login avvenuto con successo!'));
                             $scope.highlight(1);
-                          } else {
+                          } else
                               $mdToast.show($mdToast.simple().textContent('Errore! '+data.data.message));
-                          }
                       },
                       function(err) {
                           $scope.isLoading = false;
                           $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                       }
                 );
-            
-            //$mdSidenav('left').close();
-        }
+        };
 
 
         /**
@@ -157,35 +148,34 @@ app
             $rootScope.logged = false;
             $scope.logged = false;
             $scope.setView('calendario/calendariovisualizza');
-        }
+        };
 
 
         /**
          * closes side bar and calls setView method
+         * @param tplName
          */
         $scope.view = function(tplName) {
             $mdSidenav('left').close();
             $scope.setView(tplName);
-        }
+        };
 
 
         /**
          * sets the view (the middle content of the page)
+         * @param tplName
          */
         $scope.setView = function(tplName) {
-            $scope.cambiaSchermata = true;
-           
             $http
                 .get('tpl/'+tplName+'.tpl.html')
                     .then(
                         function(res) {
                             $scope.mainHtml = res.data;
-                            $scope.cambiaSchermata = false;
                         }, function(err) {
                             $mdToast.show($mdToast.simple().textContent('Errore!'));
                         }
                     );
-        }
+        };
 
 
         /**

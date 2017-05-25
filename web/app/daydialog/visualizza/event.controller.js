@@ -10,45 +10,62 @@ app.
         $scope.isEmpty;
         $scope.listItem = "";
         
-        //$scope.test == $rootScope.selectedDate;
-        
 
+        /**
+        * chiamata per iniziallizare il controller e iniziare il retrieve degli eventi
+        */
         $scope.init = function() {
+
             $scope.eventsArray = [];
             $scope.isEmpty = false;
             $scope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1) + "-" + $scope.day.getDate();
-            console.log($scope.giornoSelezionato);
             $scope.fillEvents($scope.giornoSelezionato);
+
         };
 
+
+        /**
+        * chiamata per re-iniziallizare il controller
+        */
         $scope.$on("reInitEvents", function () {
+
             $scope.init();
+
         });
 
+
+        /**
+        * chiamata per recuperare gli eventi dal DB
+        */
         $scope.fillEvents = function(giorno) {
-            $http.get('http://' + CONFIG.TIMETABLE, {
+            $http.get ('http://' + CONFIG.TIMETABLE, {
                 cache: false,
                 params: {
                     eventsbyday: giorno
                 }
-            }).success(function(response) {
+
+            }).success (function(response) {
                 $scope.genArrayEvents(response);
                 
             });
     }
+
+
+        /**
+        *  chiamata per riempire l'array di eventi per il giorno selezionato
+        */
         $scope.genArrayEvents = function(response){
 
             if (response.length == 0) {
                 $scope.isEmpty = true;
 
-            }else{
+            } else {
+
                 response.forEach(function(evento){
-                var a = {descrizione: evento.descrizione, classi: evento.classi, orainizio: evento.oraInizio, orafine:evento.oraFine, stanze:evento.stanze};
-                //console.log(a);
-                $scope.eventsArray.push(a);
-            });
+                    var a = {descrizione: evento.descrizione, classi: evento.classi, orainizio: evento.oraInizio, orafine:evento.oraFine, stanze:evento.stanze};
+                    $scope.eventsArray.push(a);
+                });
             }
         }
-
 
     });

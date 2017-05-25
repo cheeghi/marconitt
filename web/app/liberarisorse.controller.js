@@ -1,13 +1,12 @@
 app
-    .controller('LiberaRisorseCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, $q, $mdToast, $element, $rootScope, $httpParamSerializerJQLike, CONFIG, $mdDialog) {
+    .controller('LiberaRisorseCtrl', function($scope, $timeout, $http, $mdToast, $rootScope, CONFIG, $mdDialog) {
 
-        $scope.teachers;
-        $scope.classes;
+        $scope.classes; // list of classes
         $scope.event = {};
-        $scope.event.description;
-        $scope.event.day = new Date();
-        $scope.event.class;
-        $scope.event.ore;
+        $scope.event.description; // description of the event
+        $scope.event.day = new Date(); // day of the event
+        $scope.event.class; // selected class of the event
+        $scope.event.ore; // selected hours of the event
         $scope.isLoading = true; // used for loading circle
 
 
@@ -17,10 +16,12 @@ app
         var init = function() {
             $http.get('http://'+CONFIG.TIMETABLE)
                 .success(function(response) {
+
                     $scope.classes = response.classes;
-                    $scope.teachers = response.teachers;
-                    $scope.ore = response.ore;
-                    $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
+                    $timeout(function() {
+                        $scope.isLoading = false;
+                    }, $rootScope.loadingTime);
+
                 }).error(function() {
                     $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                 });
@@ -31,6 +32,7 @@ app
          * sends event information to server
          */
         $scope.insert = function () {
+
             var confirm = $mdDialog.confirm()
               .textContent('La risorsa verrà liberata per sempre. Continuare?')
               .ok('CONFERMA')
@@ -39,10 +41,9 @@ app
             $mdDialog.show(confirm).then(function() {
                 var desc = $scope.event.description;
                 var day = $scope.event.day.getFullYear() + "-" + ($scope.event.day.getMonth()+1) + "-" + $scope.event.day.getDate();
-                var sClass = $scope.event.class; //$scope.event.class.toString().replace(/,(?=[^\s])/g, ", ");
-                var sOre = $scope.event.ore; //$scope.event.ore.toString().replace(/,(?=[^\s])/g, ", ");
-                var data = "descrizione="+desc+"&day="+day+"&classe="
-                    +sClass+"&ore="+sOre+"&token="+sessionStorage.token;
+                var sClass = $scope.event.class;
+                var sOre = $scope.event.ore;
+                var data = "descrizione="+desc+"&day="+day+"&classe="+sClass+"&ore="+sOre+"&token="+sessionStorage.token;
 
                 var req = {
                     method: 'POST',
@@ -60,16 +61,15 @@ app
                                 $mdToast.show($mdToast.simple().textContent("Risorsa liberata con successo"));
                                 $scope.event = {};
                                 $scope.event.day = new Date();   
-                            } else {
+                            } else
                                 $mdToast.show($mdToast.simple().textContent("Errore durante la liberazione"));
-                            }
                         },
                         function(err) {
                             $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                         }
                     );
             });    
-        }
+        };
 
 
         /**
