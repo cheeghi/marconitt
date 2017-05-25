@@ -69,14 +69,8 @@
                         <label>Aule</label>
                         <md-select ng-model="event.rooms" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona aule..">
                             <md-optgroup label="Aule">
-                                <md-option value="AULA MAGNA">
-                                    AULA MAGNA
-                                </md-option>
-                                <md-option value="L042">
-                                    L042
-                                </md-option>
-                                <md-option value="A304">
-                                    A304
+                                <md-option ng-repeat="room in specialRooms" value="{{room}}">
+                                            {{room}}
                                 </md-option>
                             </md-optgroup>
                         </md-select>

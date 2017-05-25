@@ -147,11 +147,6 @@ app.
         };
 
 
-        $scope.dim = function() {
-            $rootScope.$broadcast("dimension", {});
-        };
-
-
         /**
          * generates "prenotazioni" table
          */

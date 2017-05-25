@@ -54,6 +54,7 @@
             - classrooms (lista delle aule)
             - labs (lista dei laboratori)
             - projects (lista dei progetti)
+            - specialrooms (aule per eventi)
         @param $mysqli
         @return {object}
 	 */
@@ -117,6 +118,14 @@
 			}
 			$options->labs = $aule;
 		}
+        
+        if ($result = $mysqli->query("SELECT * FROM aule_speciali ORDER BY aula")) {
+			$aule = array();
+			while($c = $result->fetch_array()){			
+				array_push($aule,$c[0]);
+			}
+			$options->specialrooms = $aule;
+		}        
 		
 		return $options;
 	}    
