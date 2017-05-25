@@ -117,7 +117,6 @@ app.
                 }).error(function() {
                     $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                 });
-                $scope.dim(); //for scrollbar
 
             } else if ($scope.sRoomType == "AULA") {
                 $http.get('http://'+CONFIG.TIMETABLE, {
@@ -129,7 +128,6 @@ app.
                     
                     $scope.genTable(response.rooms);
                     $scope.isLoading = false;
-                    $scope.dim(); //for scrollbar (leo)
                     
                 }).error(function() {
                     $mdToast.show($mdToast.simple().textContent('Errore di rete!'));

@@ -3,5 +3,5 @@ CREATE TABLE prof_liberazione (
     ora INT NOT NULL,
     professori VARCHAR(500),
     PRIMARY KEY(liberazione, ora),
-    FOREIGN KEY(liberazione) REFERENCES liberazione(id)
+    CONSTRAINT lib_fk FOREIGN KEY(liberazione) REFERENCES liberazione(id) ON DELETE CASCADE
 );

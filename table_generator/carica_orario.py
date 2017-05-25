@@ -89,6 +89,8 @@ def fn_caricaorario():
             prof1 = True
             prof2 = False
 
+    query = "UPDATE timetable SET professore2 = NULL WHERE professore2 = professore1;"
+
     connessione2.commit()
     cursore.close()
     connessione.close()
