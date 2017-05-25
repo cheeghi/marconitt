@@ -1,6 +1,4 @@
 ##IMPORT
-import requests
-import json
 import datetime
 from datetime import date
 from datetime import datetime
@@ -21,44 +19,54 @@ boolD = True
 ##FUNZIONI
 
 
-def fn_getclassi(obj):
+def fn_getstanze():
     '''
-    Funzione che ritorna un vettore con le classi, prendendo l'oggetto in json
+    Funzione che carica su vettore le aule dal DataBase
     '''
-    classi = obj["classes"]
+    connessione = fn_generaconnessione()
+    cursore = connessione.cursor()
 
-    for i in classi:
-        if(i == "" or i == None):
-            classi.remove(i)
+    query = "SELECT * FROM aule;"
+    cursore.execute(query);
+    vett = []
 
-    classi.remove(classi[len(classi) - 1])
-    classi.remove(classi[len(classi) - 2])
-    classi.remove(classi[len(classi) - 3])
+    for i in cursore:
+        aula = str(i)
+        aula = aula.replace("(u'", "")
+        aula = aula.replace("',)", "")
+        vett.append(aula)
 
-    return classi
+    connessione.commit()
+    connessione.close()
 
-
-def fn_getstanze(obj):
-    '''
-    Funzione che ritorna un vettore con le stanze, prendendo l'oggetto in json
-    '''
-    stanze = obj["rooms"]
-
-    for i in stanze:
-        if(i == "" or i == None):
-            stanze.remove(i)
-        
-    stanze.append("Aula Magna")
-        
-    return stanze
+    return vett
 
 
 def fn_getgiorniscuola(nomefile):
     '''
     Funzione che genera i giorni di scuola, escludendo quindi le vacanze(prese da file), e li ritorna in un vettore
     '''
-    start = date(2017, 04, 01)
-    end = date(2017, 05, 31)
+    fileI = open("periodo.csv", "r")
+    line = fileI.readline()
+    line = fileI.readline()
+    giorni = line.split(";")
+    
+    data = giorni[0].split("-")
+    giorno = int(data[0])
+    mese = int(data[1])
+    anno = int(data[2])
+    start = date(anno, mese, giorno)
+
+    data = giorni[1].split("-")
+    giorno = int(data[0])
+    mese = int(data[1])
+    anno = int(data[2])
+    end = date(anno, mese, giorno)
+    
+    if boolD:
+        print(start)
+        print(end)
+        
     actual = start
     giorni = []
     ifile = open(nomefile, "r")
@@ -100,16 +108,52 @@ def fn_generaconnessione():
     '''
     connessione = mysql.connector.connect(user='root', password='',host='127.0.0.1',database='marconitt')
     return connessione
+
+
+def fn_truncate():
+    '''
+    Funzione che tronca le tabelle
+    '''
+    connessione = fn_generaconnessione()
+    cursore = connessione.cursor()
     
+    query = "TRUNCATE prenotazioni"
+    cursore.execute(query)
+    query = "TRUNCATE prof_eventi"
+    cursore.execute(query)
+    query = "TRUNCATE prof_liberazione"
+    cursore.execute(query)
+    query = "TRUNCATE users"
+    cursore.execute(query)
+    query = "ALTER TABLE prof_liberazione DROP FOREIGN KEY lib_fk"
+    cursore.execute(query)
+    query = "ALTER TABLE prof_eventi DROP FOREIGN KEY eventi_fk"
+    cursore.execute(query)
+    query = "ALTER TABLE prenotazioni DROP FOREIGN KEY id_fk"
+    cursore.execute(query)
+    query = "TRUNCATE liberazione"
+    cursore.execute(query)
+    query = "TRUNCATE eventi"
+    cursore.execute(query)
+    query = "TRUNCATE timetable"
+    cursore.execute(query)
+
+    query = "ALTER TABLE prenotazioni ADD CONSTRAINT id_fk FOREIGN KEY(id) REFERENCES timetable(id) ON DELETE CASCADE"
+    cursore.execute(query)
+    query = "ALTER TABLE prof_eventi ADD CONSTRAINT eventi_fk FOREIGN KEY(id) REFERENCES eventi(id) ON DELETE CASCADE"
+    cursore.execute(query)
+    query = "ALTER TABLE prof_liberazione ADD CONSTRAINT lib_fk FOREIGN KEY(liberazione) REFERENCES liberazione(id) ON DELETE CASCADE"
+    cursore.execute(query)
+    
+    connessione.commit()
+    connessione.close()
+
 
 def fn_generarighe():
     '''
-    Funzione che elimina, poi rigenera ed invia le righe al database mysql
+    Funzione che elimina, poi rigenera ed invia le righe della timetable al database mysql
     '''
-    req = requests.get("http://localhost:80/api.php")
-    obj = json.loads(req.text)
-    classi = fn_getclassi(obj)
-    stanze = fn_getstanze(obj)
+    stanze = fn_getstanze()
     nomefile = "vacanze.csv"
     giorni = fn_getgiorniscuola(nomefile)
     ore = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -117,9 +161,6 @@ def fn_generarighe():
     appo = 500
     connessione = fn_generaconnessione()
     cursore = connessione.cursor()
-    query = "DELETE FROM timetable;"
-    cursore.execute(query)
-    connessione.commit()
 
     if(boolD):
         print(len(ore))
@@ -146,83 +187,18 @@ def fn_generarighe():
                     connessione = fn_generaconnessione()
                     cursore = connessione.cursor()
                     
-
     #query = "DELETE FROM timetable WHERE stanza IS NULL or stanza = ''"
     cursore.close()
     connessione.commit()
     connessione.close()
 
 
-def fn_tablesToCsv():
-    '''
-    Funzione che prende i dati dalle tabelle Timetable, Prenotazioni, Eventi, Liberazioni e li mette in file csv
-    '''
-    anno = datetime.now().year
-    directory = "year_" + str(anno)
-    os.system("mkdir " + directory)
-    
-    #creating files
-    f1 = open(directory + "\\prenotazioni.csv", "w")
-    f2 = open(directory + "\\eventi.csv", "w")
-    f3 = open(directory + "\\liberazioni.csv", "w")
-
-    #creating the connection
-    connessione = fn_generaconnessione()
-    cursore = connessione.cursor()
-
-    #timetable and prenotazioni
-    f1.write("giorno;ora;stanza;risorsa;professore1;professore2;who;isSchoolHour;approvata\n")
-    query = "SELECT giorno, ora, stanza, risorsa, professore1, professore2, who, isSchoolHour, approvata" + " FROM timetable, prenotazioni WHERE timetable.id = prenotazioni.id;"
-    cursore.execute(query)
-
-    for c1, c2, c3, c4, c5, c6, c7, c8, c9 in cursore:
-        try:
-            riga = str(c1) + ";" + str(c2) + ";" + str(c3) + ";" + str(c4) + ";" + str(c5) + ";" + str(c6) + ";" + str(c7) + ";" + str(c8) + ";" + str(c9) + "\n"
-            f1.write(riga)
-        except:
-            continue
-
-    f1.close()
-
-    #eventi
-    f2.write("giorno;descrizione;oraInizio;oraFine;classi;stanze\n")
-    query = "SELECT giorno, descrizione, oraInizio, oraFine, classi, stanze FROM eventi;"
-    cursore.execute(query)
-
-    for c1, c2, c3, c4, c5, c6 in cursore:
-        try:
-            riga = str(c1) + ";" + str(c2) + ";" + str(c3) + ";" + str(c4) + ";" + str(c5) + ";" + str(c6) + "\n"
-            f2.write(riga)
-        except:
-            continue
-
-    f2.close()
-
-    #liberazioni
-    f3.write("giorno;descrizione;classe;ore\n")
-    query = "SELECT giorno, descrizione, classe, ore FROM liberazione;"
-    cursore.execute(query)
-
-    for c1, c2, c3, c4 in cursore:
-        try:
-            riga = str(c1) + ";" + str(c2) + ";" + str(c3) + ";" + str(c4) + "\n"
-            f3.write(riga)
-        except:
-            continue
-
-    f3.close()
-
-    #closing the connection
-    cursore.close()
-    connessione.close()
-    
-
 ##ELABORAZIONE
 if __name__ == "__main__":
     if(boolD):
         print("inizio programma")
-    
-    fn_tablesToCsv()
+
+    fn_truncate()
     fn_generarighe()
     
     if(boolD):
