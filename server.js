@@ -141,7 +141,6 @@ apiRoutes.post('/authenticate', function(req, res) {
 
 apiRoutes.post('/verifyToken', function(req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
     // decode token
     if (token) {
         // verifies secret and checks exp
@@ -777,7 +776,7 @@ function cancellaPrenotazione(stanza, giorno, ora, res) {
 
 /*
  * Funzione che fa tornare una classe nella sua stanza, secondo l'orario scolastico, se essa è libera
- * Altrimenti BISOGNA DECIDERE COSA FARE
+ * Altrimenti si invia la mail
  */
 function undoClasse(stanza, giorno, ora, risorsa, res) {
     var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
@@ -798,10 +797,12 @@ function undoClasse(stanza, giorno, ora, risorsa, res) {
                     
                     connection.query(sql_stmt, function(err, rows, fields) {
                         if (!err) {
-                            classe = rows[0].risorsa;
-
+                            var classe = rows[0].risorsa;
+                            var ora = rows[0].ora;
+                            var giorno = rows[0].giorno;
                             if(classe != null) {
-                                console.log("E' già occupata");
+console.log("E' già occupata");
+                                senzaAula(classe,ora,giorno);
                                 res(true);
                             } else {
                                 var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" +
@@ -1018,16 +1019,87 @@ function liberazione(id, classe, ora, giorno) {
 }
 
 
-function sendMail() {
+// quando la classe rimane senza aula
+function senzaAula(classe, giorno, ora) {
+    var sql_stmt = "SELECT professore1, professore2 FROM timetable WHERE risorsa = '" + classe +
+        "' AND giorno = '" + giorno + "' AND ora = " + ora;
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            var prof1 = rows[0].professore1;
+            var prof2 = rows[0].professore2;
+
+            sql_stmt = "SELECT `Column 0` AS username FROM GPU004 WHERE `Column 1` = '" + prof1 + "'";
+
+            connection.query(sql_stmt, function(err, rows, fields) {
+                if (!err) {
+                    var user1 = rows[0].username;
+                    sql_stmt = "SELECT mail FROM users WHERE username = '" + user1 +"'";
+
+                    connection.query(sql_stmt, function(err, rows, fields) {
+                        if (!err) {
+                            var testo = "Il giorno " + giorno + " alla " + ora + "° ora la sua classe " + classe +" è rimasta senza aula. La preghiamo di prenotarne un'altra.";
+                            var mailprof1 = rows[0].mail;
+
+                            sendMail(mailprof1,testo);
+
+                        } else {
+
+                        }
+
+                    });
+                    
+                } else {
+
+                }
+            });
+
+            if (prof2 != null ){
+                sql_stmt = "SELECT `Column 0` AS username FROM GPU004 WHERE `Column 1` = '" + prof2 + "'";
+
+                connection.query(sql_stmt, function(err, rows, fields) {
+
+                    if (!err) {
+                        var user2 = rows[0].username;
+                        sql_stmt = "SELECT mail FROM users WHERE username = '16435'";
+                        //sql_stmt = "SELECT mail FROM users WHERE username = '" + user2 +"'";
+
+                        connection.query(sql_stmt, function(err, rows, fields) {
+                            if (!err) {
+                                var testo = "Il giorno " + giorno + " alla " + ora + "° ora la sua classe " + classe +" è rimasta senza aula. La preghiamo di prenotarne un'altra.";
+                                var mailprof2 = rows[0].mail;
+
+                                sendMail(mailprof2,testo);
+
+                            } else {
+
+                            }
+
+                        });
+                    } else {
+
+                    }
+                });
+            }
+
+        } else {
+
+        }
+    });
+}
+
+
+
+//invia le email
+function sendMail(email,testo) {
     sendmail({
-	  from: 'marconiTT@marconivr.com',
-	  to: 'fedrigo22@gmail.com',
-	  replyTo: 'giuseppe.tanello@gmail.com',
-	  subject: 'Email prova',
-	  html: 'Questa è di prova'
+	  from: 'marconiTT@marconivr.it',
+	  to: email,
+	  subject: 'Esito prenotazione da lei richiesta',
+	  html: testo
 	}, function (err, reply) {
 	  console.log(err && err.stack)
 	  console.dir(reply)
 	});
-	res.send("ok");
+	//res.send("ok");
 }
