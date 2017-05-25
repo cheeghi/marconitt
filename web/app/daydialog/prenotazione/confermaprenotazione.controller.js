@@ -32,9 +32,11 @@ app.
 
             $http.get('http://'+CONFIG.TIMETABLE)
                 .success(function(response) {
+                
                     $scope.classes = response.classes;
                     $scope.teachers = response.teachers;
                     $scope.progetti = response.projects;
+                
                 }).error(function() {
                     $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                 });
@@ -45,7 +47,9 @@ app.
                         classesbyteacher: $rootScope.username
                     }
                 }).success(function(response) {
+                    
                     $scope.teacherClasses = response;
+                    
                 }).error(function() {
                     $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                 });
@@ -61,7 +65,7 @@ app.
             $scope.disabled = true;
             var risorsa = '';
             var isClasse = false;
-            var classe = $scope.sClass == undefined ? $scope.sTeacherClass : $scope.sClass;
+            var classe = !$scope.sClass ? $scope.sTeacherClass : $scope.sClass;
             
             if ($scope.admin) {
                 switch ($scope.tipoPrenotazione) {
@@ -121,7 +125,7 @@ app.
          */
         $scope.refresh = function() {
             $rootScope.$broadcast("refreshTable", {});
-        }
+        };
 
 
         /**

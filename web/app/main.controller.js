@@ -175,7 +175,7 @@ app
                             $mdToast.show($mdToast.simple().textContent('Errore!'));
                         }
                     );
-        }
+        };
 
 
         /**

@@ -3,19 +3,19 @@ app.
 
         $scope.admin = $rootScope.admin; // is admin or not
         $scope.miePrenotazioni; // array that contains logged user's reservations
+        $scope.fMiePrenotazioni = []; // filtered array of $scope.miePrenotazioni    
         $scope.altrePrenotazioni; // array that contains every user's reservations
-        $scope.isLoading; // used for loading circle
-        $scope.fMiePrenotazioni = []; // filtered array of $scope.miePrenotazioni
         $scope.fAltrePrenotazioni = []; // filtered array of $scope.altrePrenotazioni
+        $scope.events; // array that contains admin events
+        $scope.fEvents = []; // filtered array of $scope.events    
         $scope.passedMiePrenotazioni = false; // toggle for showing / not showing passed reservations
         $scope.passedAltrePrenotazioni = false; // toggle for showing / not showing passed reservations
         $scope.passedEventi = false; // toggle for showing / not showing passed reservations
-        $scope.events; // array that contains admin events
-        $scope.fEvents; // filtered array of $scope.events
+        $scope.isLoading; // used for loading circle
 
     
         /**
-         * initialize method
+         * initialization method
          */
         $scope.init = function() {
             $scope.isLoading = true;
@@ -37,6 +37,7 @@ app.
                         prenotazioniexceptadmin: ""
                     }
                 }).success(function(response) {
+
                     $scope.altrePrenotazioni = response;
                     $scope.altrePrenotazioni.forEach(function(prenotazione) {
                         var giorno = new Date(prenotazione.giorno);
@@ -44,6 +45,7 @@ app.
                         prenotazione.fgiorno = fgiorno;
                     });
                     $scope.fillsAltrePrenotazioni();
+
                 }).error(function() {
                     $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                 });    
@@ -54,6 +56,7 @@ app.
                         events: "" 
                     }
                 }).success(function(response) {
+
                     $scope.events = response;
                     $scope.events.forEach(function(prenotazione) {
                         var giorno = new Date(prenotazione.giorno);
@@ -61,6 +64,7 @@ app.
                         prenotazione.fgiorno = fgiorno;
                     });
                     $scope.fillsEventi();
+
                 }).error(function() {
                     $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                 });  
@@ -72,6 +76,7 @@ app.
                     prenotazioni: $rootScope.username
                 }
             }).success(function(response) {
+
                 $scope.miePrenotazioni = response;
                 $scope.miePrenotazioni.forEach(function(prenotazione) {
                     var giorno = new Date(prenotazione.giorno);
@@ -79,7 +84,11 @@ app.
                     prenotazione.fgiorno = fgiorno;
                 });
                 $scope.fillsMiePrenotazioni();
-                $timeout(function() { $scope.isLoading = false }, $rootScope.loadingTime);
+
+                $timeout(function() {
+                    $scope.isLoading = false;
+                }, $rootScope.loadingTime);
+
             }).error(function() {
                 $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
             });
@@ -119,7 +128,7 @@ app.
 
 
         /**
-         * populates the fAltrePrenotazioni with filtered values
+         * populates the fEvents with filtered values
          */
         $scope.fillsEventi = function () {
             if ($scope.passedEventi)
@@ -139,17 +148,25 @@ app.
          * @param type
          */
         $scope.toggle = function (type) {
-            if (type == 1)
-                $scope.passedMiePrenotazioni = $scope.passedMiePrenotazioni ? true : false;
-            else if (type == 2)
-                $scope.passedAltrePrenotazioni = $scope.passedAltrePrenotazioni ? false : true;
-            else if (type == 3)
-                $scope.passedEventi = $scope.passedEventi ? false : true;            
+            switch (type) {
+                case 1:
+                    $scope.passedMiePrenotazioni = $scope.passedMiePrenotazioni ? true : false;    
+                    break;
+                case 2:
+                    $scope.passedAltrePrenotazioni = $scope.passedAltrePrenotazioni ? false : true;
+                    break;
+                case 3:
+                    $scope.passedEventi = $scope.passedEventi ? false : true;
+            }   
         };
 
 
         /**
          * calls the server method for removing a 'prenotazione'
+         * @param giorno
+         * @param stanza
+         * @param risorsa
+         * @param ora
          */
         $scope.removePrenotazione = function(giorno, stanza, risorsa, ora) {
 
@@ -192,6 +209,9 @@ app.
 
         /**
          * approves a request of 'prenotazione'
+         * @param giorno
+         * @param stanza
+         * @param ora
          */
         $scope.approva = function(giorno, stanza, ora) {
             var data = "token="+sessionStorage.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno;
@@ -221,6 +241,10 @@ app.
 
         /**
          * denies a request of 'prenotazione'
+         * @param giorno
+         * @param stanza
+         * @param risorsa
+         * @param ora
          */
         $scope.nonApprova = function(giorno, stanza, risorsa, ora) {
             //send email to...
@@ -231,6 +255,7 @@ app.
 
         /**
          * removes an event
+         * @param id
         */
         $scope.removeEvento = function(id) {
 
@@ -269,17 +294,17 @@ app.
 
         /**
          * returns true if the given day is passed
+         * @param giorno
+         * @return boolean
         */
         $scope.isPassed = function(giorno) {
-
             var today = new Date();
             today.setHours(0); // we need to do these sets, otherwise the comparison doesnt work
             today.setMinutes(0);
             today.setSeconds(0);
             today.setMilliseconds(0);
 
-            if (today > new Date(giorno))
-                return true;            
+            return today > new Date(giorno);
         };
 
     });

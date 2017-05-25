@@ -191,7 +191,7 @@ app.
                 $http.get ("http://" + CONFIG.TIMETABLE, {
                         cache: false,
                         params: {
-                            eventiclassbyday: '',
+                            classeventsbyday: '',
                             classe: $scope.sClass,
                             day: $scope.giornoSelezionato
                         }
