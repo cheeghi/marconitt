@@ -285,13 +285,12 @@ md-fab {
 }
 
 #footer {
-    background-color: #0066ff; /*#0000ff*/
+    background-color: #2196F3; /*#0000ff*/
     color: white;
     display: inline-flex;
     width: 100%;
     min-height: 120px;
-
-    position: relative;
+    position: fixed;
     bottom: 0px;
 }
 

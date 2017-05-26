@@ -197,8 +197,10 @@ app.
                         if (data) {
                             $scope.initializeHttpCalls();
                             $mdToast.show($mdToast.simple().textContent('Prenotazione rimossa con successo'));                       
-                        } else
+                        } else {
                             $mdToast.show($mdToast.simple().textContent('Errore durante l\'eliminazione della prenotazione'));
+                            $scope.isLoading = false;
+                        }
                     }).error(function(err) {
                         $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                     });
@@ -214,6 +216,8 @@ app.
          * @param ora
          */
         $scope.approva = function(giorno, stanza, ora) {
+            $scope.isLoading = true;
+            
             var data = "token="+sessionStorage.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno;
             
             var req = {
@@ -231,8 +235,10 @@ app.
                     if (data) {
                         $scope.initializeHttpCalls();
                         $mdToast.show($mdToast.simple().textContent('Prenotazione approvata con successo'));      
-                    } else
+                    } else {
                         $mdToast.show($mdToast.simple().textContent('Errore durante la approvazione'));
+                        $scope.isLoading = false;
+                    }
                 }).error(function(err) {
                     $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                 });            
@@ -283,8 +289,10 @@ app.
                         if (data) {
                             $scope.initializeHttpCalls();
                             $mdToast.show($mdToast.simple().textContent('Evento rimosso con successo'));                   
-                        } else
+                        } else {
                             $mdToast.show($mdToast.simple().textContent('Errore durante l\'eliminazione dell\'evento'));
+                            $scope.isLoading = false;
+                        }
                     }).error(function(err) {
                         $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                     });
