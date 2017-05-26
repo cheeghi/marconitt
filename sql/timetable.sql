@@ -7,5 +7,5 @@ CREATE TABLE timetable (
 	risorsa VARCHAR(150) DEFAULT NULL,
 	giorno_settimana INT,
 	professore1 VARCHAR(250) DEFAULT NULL,
-	professore2 VARCHAR(250) DEFAULT NULL,
+	professore2 VARCHAR(250) DEFAULT NULL
 );

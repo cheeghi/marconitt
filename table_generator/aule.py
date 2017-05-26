@@ -53,7 +53,7 @@ def fn_tabaule():
     cursore.execute(query)
     
     for i in aule:
-        if(i[0] != "P" and i[0] != "D" and i[1] != "G"):
+        if(i[1] != "P" and i[0] != "D" and i[1] != "G"):
             query =  "INSERT INTO aule VALUES('" + i + "')"
             cursore.execute(query)
 
