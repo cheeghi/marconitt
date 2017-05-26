@@ -216,16 +216,16 @@ app.
             if (tipo == 'classe'){
             var x = "<table class=\"table\">\
                     <thead><tr>\
-                        <th>1<md-tooltip md-direction='top'>8:00 - 9:00</md-tooltip></th>\
-                        <th>2<md-tooltip md-direction='top'>9:00 - 9:50</md-tooltip></th>\
-                        <th>3<md-tooltip md-direction='top'>10:00 - 11:00</md-tooltip></th>\
-                        <th>4<md-tooltip md-direction='top'>11:00 - 11:50</md-tooltip></th>\
-                        <th>5<md-tooltip md-direction='top'>12:00 - 12:55</md-tooltip></th>\
-                        <th>6<md-tooltip md-direction='top'>12:55 - 13:50</md-tooltip></th>\
-                        <th>7<md-tooltip md-direction='top'>14:30 - 15:30</md-tooltip></th>\
-                        <th>8<md-tooltip md-direction='top'>15:30 - 16:30</md-tooltip></th>\
-                        <th>9<md-tooltip md-direction='top'>16:30 - 17:30</md-tooltip></th>\
-                        <th>10<md-tooltip md-direction='top'>17:30 - 18:30</md-tooltip></th>\
+                        <th>1°<md-tooltip md-direction='top'>8:00 - 9:00</md-tooltip></th>\
+                        <th>2°<md-tooltip md-direction='top'>9:00 - 9:50</md-tooltip></th>\
+                        <th>3°<md-tooltip md-direction='top'>10:00 - 11:00</md-tooltip></th>\
+                        <th>4°<md-tooltip md-direction='top'>11:00 - 11:50</md-tooltip></th>\
+                        <th>5°<md-tooltip md-direction='top'>12:00 - 12:55</md-tooltip></th>\
+                        <th>6°<md-tooltip md-direction='top'>12:55 - 14:30</md-tooltip></th>\
+                        <th>7°<md-tooltip md-direction='top'>14:30 - 15:30</md-tooltip></th>\
+                        <th>8°<md-tooltip md-direction='top'>15:30 - 16:30</md-tooltip></th>\
+                        <th>9°<md-tooltip md-direction='top'>16:30 - 17:30</md-tooltip></th>\
+                        <th>10°<md-tooltip md-direction='top'>17:30 - 18:30</md-tooltip></th>\
                     </tr></thead>\
                     <tbody>";
 
@@ -263,16 +263,16 @@ app.
         } else if (tipo == 'prof'){
             var x = "<table class=\"table\">\
                     <thead><tr>\
-                        <th>1<md-tooltip md-direction='top'>8:00 - 9:00</md-tooltip></th>\
-                        <th>2<md-tooltip md-direction='top'>9:00 - 9:50</md-tooltip></th>\
-                        <th>3<md-tooltip md-direction='top'>10:00 - 11:00</md-tooltip></th>\
-                        <th>4<md-tooltip md-direction='top'>11:00 - 11:50</md-tooltip></th>\
-                        <th>5<md-tooltip md-direction='top'>12:00 - 12:55</md-tooltip></th>\
-                        <th>6<md-tooltip md-direction='top'>12:55 - 13:50</md-tooltip></th>\
-                        <th>7<md-tooltip md-direction='top'>14:30 - 15:30</md-tooltip></th>\
-                        <th>8<md-tooltip md-direction='top'>15:30 - 16:30</md-tooltip></th>\
-                        <th>9<md-tooltip md-direction='top'>16:30 - 17:30</md-tooltip></th>\
-                        <th>10<md-tooltip md-direction='top'>17:30 - 18:30</md-tooltip></th>\
+                        <th>1°<md-tooltip md-direction='top'>8:00 - 9:00</md-tooltip></th>\
+                        <th>2°<md-tooltip md-direction='top'>9:00 - 9:50</md-tooltip></th>\
+                        <th>3°<md-tooltip md-direction='top'>10:00 - 11:00</md-tooltip></th>\
+                        <th>4°<md-tooltip md-direction='top'>11:00 - 11:50</md-tooltip></th>\
+                        <th>5°<md-tooltip md-direction='top'>12:00 - 12:55</md-tooltip></th>\
+                        <th>6°<md-tooltip md-direction='top'>12:55 - 14:30</md-tooltip></th>\
+                        <th>7°<md-tooltip md-direction='top'>14:30 - 15:30</md-tooltip></th>\
+                        <th>8°<md-tooltip md-direction='top'>15:30 - 16:30</md-tooltip></th>\
+                        <th>9°<md-tooltip md-direction='top'>16:30 - 17:30</md-tooltip></th>\
+                        <th>10°<md-tooltip md-direction='top'>17:30 - 18:30</md-tooltip></th>\
                     </tr></thead>\
                     <tbody>";
 
@@ -312,16 +312,16 @@ app.
         } else if (tipo == 'aula'){
                var x = "<table class=\"table\">\
                         <thead><tr>\
-                        <th>1<md-tooltip md-direction='top'>8:00 - 9:00</md-tooltip></th>\
-                        <th>2<md-tooltip md-direction='top'>9:00 - 9:50</md-tooltip></th>\
-                        <th>3<md-tooltip md-direction='top'>10:00 - 11:00</md-tooltip></th>\
-                        <th>4<md-tooltip md-direction='top'>11:00 - 11:50</md-tooltip></th>\
-                        <th>5<md-tooltip md-direction='top'>12:00 - 12:55</md-tooltip></th>\
-                        <th>6<md-tooltip md-direction='top'>12:55 - 13:50</md-tooltip></th>\
-                        <th>7<md-tooltip md-direction='top'>14:30 - 15:30</md-tooltip></th>\
-                        <th>8<md-tooltip md-direction='top'>15:30 - 16:30</md-tooltip></th>\
-                        <th>9<md-tooltip md-direction='top'>16:30 - 17:30</md-tooltip></th>\
-                        <th>10<md-tooltip md-direction='top'>17:30 - 18:30</md-tooltip></th>\
+                        <th>1°<md-tooltip md-direction='top'>8:00 - 9:00</md-tooltip></th>\
+                        <th>2°<md-tooltip md-direction='top'>9:00 - 9:50</md-tooltip></th>\
+                        <th>3°<md-tooltip md-direction='top'>10:00 - 11:00</md-tooltip></th>\
+                        <th>4°<md-tooltip md-direction='top'>11:00 - 11:50</md-tooltip></th>\
+                        <th>5°<md-tooltip md-direction='top'>12:00 - 12:55</md-tooltip></th>\
+                        <th>6°<md-tooltip md-direction='top'>12:55 - 14:30</md-tooltip></th>\
+                        <th>7°<md-tooltip md-direction='top'>14:30 - 15:30</md-tooltip></th>\
+                        <th>8°<md-tooltip md-direction='top'>15:30 - 16:30</md-tooltip></th>\
+                        <th>9°<md-tooltip md-direction='top'>16:30 - 17:30</md-tooltip></th>\
+                        <th>10°<md-tooltip md-direction='top'>17:30 - 18:30</md-tooltip></th>\
                     </tr></thead>\
                     <tbody>";
 

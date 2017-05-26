@@ -25,7 +25,8 @@ app
 
                     data.data.forEach(function(entry) {
                         var d = new Date(entry.giorno);
-                        MaterialCalendarData.setDayContent(d, '<md-button class="md-fab md-mini md-tiny type">' + entry.quantity + '</md-button>');
+                        var evento_or_eventi = parseInt(entry.quantity) > 1 ? 'eventi' : 'evento';
+                        MaterialCalendarData.setDayContent(d, '<md-button class="md-fab md-mini md-tiny type">' + entry.quantity + '<md-tooltip md-direction="top">' + entry.quantity + ' ' + evento_or_eventi + '</md-tooltip></md-button>');
                     }, this);
 
                     $timeout(function() {

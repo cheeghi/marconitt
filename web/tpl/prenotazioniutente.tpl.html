@@ -19,7 +19,7 @@
             <md-tab label="LE MIE PRENOTAZIONI">
                 <div style="">
                     <div style="margin-left: auto;margin-right: 2%;width: 6em">
-                        <md-switch ng-model="passedMiePrenotazioni" ng-change="toggle(1);fillsMiePrenotazioni();" aria-label="Switch 1">Passate</md-switch>
+                        <md-tooltip md-direction='bottom'>Vedi prenotazioni passate</md-tooltip><md-switch ng-model="passedMiePrenotazioni" ng-change="toggle(1);fillsMiePrenotazioni();" aria-label="Switch 1">Passate</md-switch>
                     </div>
                 </div>
                 <md-list style="">
@@ -45,6 +45,7 @@
             <md-tab ng-if="admin" label="PRENOTAZIONI PROFESSORI">
                 <div style="">
                     <div style="margin-left: auto;margin-right: 2%;width: 6em">
+                        <md-tooltip md-direction='bottom'>Vedi prenotazioni passate</md-tooltip>
                         <md-switch ng-model="passedAltrePrenotazioni" ng-change="toggle(2);fillsAltrePrenotazioni()" aria-label="Switch 1">Passate</md-switch>
                     </div>
                 </div>
@@ -59,7 +60,7 @@
                         <md-button ng-disabled="isPassed(prenotazione.giorno)"  ng-hide='prenotazione.approvata==1||isPassed(prenotazione.giorno)' style="color:#2196F3; margin-right: 1%; margin-top: 2.5%" class="md-raised" ng-click="approva(prenotazione.giorno, prenotazione.stanza, prenotazione.ora)" class="md-block" >
                             APPROVA
                         </md-button>
-                        <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!isPassed(prenotazione.giorno)" class="material-icons">done</i>
+                        <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!isPassed(prenotazione.giorno)" class="material-icons">done<md-tooltip md-direction='bottom'>Approvato</md-tooltip></i>
                         <md-button ng-hide="isPassed(prenotazione.giorno)" style=" color:#2196F3; margin-right: 2%; margin-top: 2.5%" class="md-raised" ng-click="nonApprova(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)" class="md-block" >
                             NON APPROVA
                         </md-button>
@@ -71,6 +72,7 @@
             <md-tab ng-if="admin" label="EVENTI">
                 <div style="">
                     <div style="margin-left: auto;margin-right: 2%;width: 6em">
+                        <md-tooltip md-direction='bottom'>Vedi eventi passati</md-tooltip>
                         <md-switch ng-model="passedEventi" ng-change="toggle(3);fillsEventi()" aria-label="Switch 1">Passati</md-switch>
                     </div>
                 </div>

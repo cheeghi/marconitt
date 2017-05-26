@@ -84,7 +84,7 @@ app.
                 $scope.isHoliday = response == 'true';
                 if ($scope.isHoliday)
                      $scope.htmlTable = "<p>Non c'è scuola oggi, prenditi una pausa!</p>";
-                else if($scope.sRoomType == undefined || $scope.isLoading)
+                else if(!$scope.sRoomType || $scope.isLoading)
                     $scope.htmlTable = "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
                 else
                     $scope.getPrenotazioni();
@@ -249,7 +249,7 @@ app.
         $scope.prenotaClick = function(stanza, ora) {
             $rootScope.stanzaPrenotata = stanza;
             $rootScope.oraPrenotata = ora;
-            $rootScope.prenotazioneString = stanza + ' ' + (ora) + '°ora';
+            $rootScope.prenotazioneString = stanza + ' - ' + (ora) + '°ora';
             $mdDialog.show({
                 templateUrl: 'tpl/daydialog/confermaprenotazione.tpl.html',
                 controller: 'ConfermaPrenotazioneCtrl',

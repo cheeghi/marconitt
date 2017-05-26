@@ -48,7 +48,7 @@ app.
                 $scope.genArrayEvents(response);
                 
             });
-    }
+        }
 
 
         /**
