@@ -142,7 +142,7 @@ apiRoutes.post('/authenticate', function(req, res) {
 apiRoutes.post('/verifyToken', function(req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
     // decode token
-    senzaAula('5ci', '2017-05-30', 4);
+    //senzaAula('5ci', '2017-05-30', 4);
     if (token) {
         // verifies secret and checks exp
         jwt.verify(token, app.get('secret'), function(err, decoded) {
