@@ -196,9 +196,9 @@ app.
                     .success(function(data) {
                         if (data) {
                             $scope.initializeHttpCalls();
-                            $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                       
+                            $mdToast.show($mdToast.simple().textContent('Prenotazione rimossa con successo'));                       
                         } else
-                            $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
+                            $mdToast.show($mdToast.simple().textContent('Errore durante l\'eliminazione della prenotazione'));
                     }).error(function(err) {
                         $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                     });
@@ -282,9 +282,9 @@ app.
                     .success(function(data) {
                         if (data) {
                             $scope.initializeHttpCalls();
-                            $mdToast.show($mdToast.simple().textContent('Cancellazione avvenuta con successo'));                   
+                            $mdToast.show($mdToast.simple().textContent('Evento rimosso con successo'));                   
                         } else
-                            $mdToast.show($mdToast.simple().textContent('Errore durante la cancellazione'));
+                            $mdToast.show($mdToast.simple().textContent('Errore durante l\'eliminazione dell\'evento'));
                     }).error(function(err) {
                         $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
                     });

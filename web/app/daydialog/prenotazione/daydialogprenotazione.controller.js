@@ -14,9 +14,10 @@ app
             var limitDay = new Date();
             limitDay.setDate(limitDay.getDate() + $rootScope.giorniLimite);
 
-            if (day > limitDay && !$rootScope.admin)
+            if (day > limitDay && !$rootScope.admin) {
                 $mdToast.show($mdToast.simple().textContent('Seleziona una data più vicina'));
-            else {
+                day.setDate(day.getDate() - 1);
+            } else {
                 $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
                 $rootScope.$broadcast('reInitPrenota', {
                     day: day
@@ -37,9 +38,10 @@ app
             today.setSeconds(0);
             today.setMilliseconds(0);
 
-            if (day < today  && !$rootScope.admin)
+            if (day < today  && !$rootScope.admin) {
                 $mdToast.show($mdToast.simple().textContent('Non puoi prenotare per un giorno passato'));
-            else {
+                day.setDate(day.getDate() + 1);
+            } else {
                 $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
                 $rootScope.$broadcast('reInitPrenota', {
                     day: day

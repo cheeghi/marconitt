@@ -1,18 +1,15 @@
 app
-    .controller('DayDialogVisualizzaCtrl', function($scope, $timeout, $mdSidenav, $log, $filter, $http, MaterialCalendarData, $q, $mdToast, $mdDialog, $mdDateLocale, $rootScope, $httpParamSerializerJQLike, CONFIG, day) {
+    .controller('DayDialogVisualizzaCtrl', function($scope, $mdDialog, $mdDateLocale, $rootScope, day) {
 
-        $scope.day = day;
-        $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();
-        var giorniLimite = 14; // range di prenotazione per un professore;
+        $scope.day = day; // selected day
+        $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear(); // day string displayed at the top of the dialog
 
 
         /**
          * increases the day
-         * @param inPrenotazione
          */
         $scope.nextDay = function() {
-            day.setDate(day.getDate() + 1);    
-    
+            day.setDate(day.getDate() + 1);        
             $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
             $rootScope.$broadcast('reInitVisualizza',{day:day});
             $rootScope.$broadcast('reInitEvents');
@@ -21,11 +18,9 @@ app
 
         /**
          * decreases the day
-         * @param inPrenotazione
          */
         $scope.previousDay = function() {
             day.setDate(day.getDate() - 1);
-            
             $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
             $rootScope.$broadcast('reInitVisualizza',{day:day});
             $rootScope.$broadcast('reInitEvents');
@@ -49,7 +44,7 @@ app
 
 
         /**
-         *
+         * I dont know what this method does
          * @param answer
          */
         $scope.answer = function(answer) {

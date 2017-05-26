@@ -74,8 +74,8 @@
                                 <md-input-container>
                                     <div layout="row" layout-align="space-between center">
                                         <md-button class="md-raised md-primary" ng-disabled="
-                                        (sClass==undefined||sClass=='')&&(sProgetto==undefined)&&(sDescrizione==undefined||sDescrizione=='')
-                                        &&(tipoPrenotazione!='Tutoraggio/Studio')&&(sTeacher==undefined)||disabled
+                                        (!sClass)&&(!sProgetto)&&(!sDescrizione)
+                                        &&(tipoPrenotazione!='Tutoraggio/Studio')&&(!sTeacher)||disabled
                                         " ng-click="prenota()" class="md-block" flex >
                                             CONFERMA
                                         </md-button>
@@ -101,7 +101,7 @@
                                 </md-input-container>                                                                 
                                 <md-input-container>
                                     <div layout="row" layout-align="space-between center">
-                                        <md-button class="md-raised md-primary" ng-disabled="(sClass==undefined&&sTeacherClass==undefined)||disabled" ng-click="prenota()" class="md-block" flex >
+                                        <md-button class="md-raised md-primary" ng-disabled="(!sClass&&!sTeacherClass)||disabled" ng-click="prenota()" class="md-block" flex >
                                             CONFERMA
                                         </md-button>
                                     </div>

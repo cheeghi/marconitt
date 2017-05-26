@@ -3,7 +3,7 @@ app
 
         $scope.classes; // list of classes
         $scope.rooms; // list of rooms
-        $scope.specialRooms; // list of special rooms
+        $scope.eventsRooms; // list of special rooms
         $scope.event = {};
         $scope.event.description; // description of the event
         $scope.event.day = new Date(); // day of the event
@@ -23,7 +23,7 @@ app
 
                     $scope.classes = response.classes;
                     $scope.rooms = response.rooms;
-                    $scope.specialRooms = response.specialrooms;
+                    $scope.eventsRooms = response.eventsrooms;
                 
                     $timeout(function() {
                         $scope.isLoading = false

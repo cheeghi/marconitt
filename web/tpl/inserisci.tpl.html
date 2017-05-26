@@ -69,14 +69,14 @@
                         <label>Aule</label>
                         <md-select ng-model="event.rooms" data-md-container-class="selectdemoSelectHeader" multiple placeholder="Seleziona aule..">
                             <md-optgroup label="Aule">
-                                <md-option ng-repeat="room in specialRooms" value="{{room}}">
+                                <md-option ng-repeat="room in eventsRooms" value="{{room}}">
                                             {{room}}
                                 </md-option>
                             </md-optgroup>
                         </md-select>
                     </md-input-container>
                 </div>
-                <md-button class="md-raised md-primary" ng-click="insert()" ng-disabled="event.description==undefined||event.description==''||event.rooms.length==0">Inserisci</md-button>
+                <md-button class="md-raised md-primary" ng-click="insert()" ng-disabled="!event.description||event.rooms.length==0">Inserisci</md-button>
             </div>
         </form>
     </md-content>
