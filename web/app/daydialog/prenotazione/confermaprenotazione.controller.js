@@ -113,6 +113,7 @@ app.
                         $mdToast.show($mdToast.simple().textContent('Prenotazione avvenuta con successo!'));   
                     } else {
                         $mdToast.show($mdToast.simple().textContent("Errore durante la prenotazione"));
+                        $scope.cancel();
                     }
                 }).error(function(err) {
                     $mdToast.show($mdToast.simple().textContent('Errore di rete!'));

@@ -243,12 +243,12 @@ app.
 
                         if (data[i].risorsa == undefined || data[i].risorsa == null){
                             x += "<td>&nbsp;</td>";
-                        } else if (data[i].professore2 == null && data[i].professoreS == null){
+                        } else if (data[i].professore2 == null){
                             x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
-                        } else if (data[i].professoreS == null && data[i].professore2 != null){
+                        } else if (data[i].professore2 != null){
                             x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
-                        } else if (data[i].professore1 == null && data[i].professore2 != null && data[i].professoreS != null){
-                            x += "<td><span class='nome'>" + data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
+                        } else if (data[i].professore1 == null && data[i].professore2 != null){
+                            x += "<td><span class='nome'>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].stanza + "</td>";
                         }       
                     }
 
@@ -331,16 +331,14 @@ app.
 
                     if (data[i].risorsa == null) {
                         x += "<td>&nbsp;</td>";
-                    } else if (data[i].professore2 == null && data[i].professoreS == null && data[i].professore1 != null){
+                    } else if (data[i].professore2 == null && data[i].professore1 != null){
                         x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].risorsa + " </td>";
-                    } else if (data[i].professore1 == null && data[i].professore2 == null && data[i].professoreS == null){
+                    } else if (data[i].professore1 == null && data[i].professore2 == null){
                         x += "<td>" + data[i].risorsa + " </td>";
-                    } else if (data[i].professore2 == null && data[i].professoreS == null && data[i].professore1 != null){
-                        x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "</span><br>" + data[i].risorsa + " </td>";
                     } else if (data[i].professoreS == null && data[i].professore1 != null && data[i].professore2 != null){
                         x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() +"<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].risorsa + " </td>";
                     } else {
-                        x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "<br>" + data[i].professoreS.toLowerCase() + "</span><br>" + data[i].risorsa + " </td>";
+                        x += "<td><span class='nome'>" + data[i].professore1.toLowerCase() + "<br>" + data[i].professore2.toLowerCase() + "</span><br>" + data[i].risorsa + " </td>";
                     }
 
                 } catch (e){
