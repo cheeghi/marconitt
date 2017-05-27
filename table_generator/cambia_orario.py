@@ -2,7 +2,8 @@
 ##IMPORT
 import mysql.connector
 import os
-from datetime import datetime
+import smtplib
+from email.MIMEText import MIMEText
 
 
 ##DOC
@@ -29,76 +30,81 @@ def fn_generaconnessione():
 def fn_cambiaOrario():
     connessione = fn_generaconnessione()
     cursore = connessione.cursor()
-    connessione1 = fn_generaconnessione()
-    cursore1 = connessione1.cursor()
-    
+
+    fout = open("appoggio.csv", "w")
 
     query = "SELECT giorno, ora, stanza, risorsa, professore1, professore2, who, isSchoolHour, approvata FROM timetable INNER JOIN prenotazioni ON timetable.id = prenotazioni.id"
     cursore.execute(query)
-    query = "UPDATE timetable SET giorno = Null, stanza = Null, risorsa = Null, ora = Null, professore1 = Null, professore2 = Null"
-    cursore1.execute(query)
-    query = "ALTER TABLE prenotazioni DROP FOREIGN KEY id_fk"
-    cursore1.execute(query)
-    query = "TRUNCATE prenotazioni"
-    cursore1.execute(query)
-    query = "ALTER TABLE prenotazioni ADD CONSTRAINT id_fk FOREIGN KEY(id) REFERENCES timetable(id) ON DELETE CASCADE"
-    
-    print("carica_orario.py")
-    os.system("C:\Python27\python.exe carica_orario.py\nPAUSE")
-    
+
     for giorno, ora, stanza, risorsa, professore1, professore2, who, isSchoolHour, approvata in cursore:
+        print(str(giorno) + ";" + str(ora) + ";" + str(stanza) + ";" + str(risorsa) + ";" + str(professore1) + ";" + str(professore2) + ";" + str(who) + ";" + str(isSchoolHour) + ";" + str(approvata))
+        fout.write(str(giorno) + ";" + str(ora) + ";" + str(stanza) + ";" + str(risorsa) + ";" + str(professore1) + ";" + str(professore2) + ";" + str(who) + ";" + str(isSchoolHour) + ";" + str(approvata) + "\n")
+
+    fout.close()
+
+    query = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null"
+    cursore.execute(query)
+    query = "ALTER TABLE prenotazioni DROP FOREIGN KEY id_fk"
+    cursore.execute(query)
+    query = "TRUNCATE prenotazioni"
+    cursore.execute(query)
+    query = "ALTER TABLE prenotazioni ADD CONSTRAINT id_fk FOREIGN KEY(id) REFERENCES timetable(id) ON DELETE CASCADE"
+    cursore.execute(query)
+    connessione.commit()
+
+    print("carica_orario.py")
+    os.system("C:\Python27\python.exe carica_orario.py")
+
+    fin = open("appoggio.csv", "r")
+    line = fin.readline()
+
+    while(line != ""):
+        vett = line.split(";")
+        giorno = vett[0]
+        ora = vett[1]
+        stanza = vett[2]
+        risorsa = vett[3]
+        who = vett[6]
+        isSchoolHour = vett[7]
+        approvata = vett[8]
+
         query = "SELECT risorsa FROM timetable WHERE giorno ='" + str(giorno) + "' AND ora = " + str(ora) + " AND stanza ='" + str(stanza) + "'"
-        cursore1.execute(query)
-        row = cursore1.fetchone()
-          
-        if(row == None):
+        cursore.execute(query)
+        row = cursore.fetchone()
+        row = str(row).replace("(", "")
+        row = str(row).replace(",)", "")
+        print("RISORSA = " + str(row))
+
+        if(row == "None"):
             query = "SELECT id FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + str(giorno) + "' AND ora = " + str(ora)
-            cursore1.execute(query)
-            _id = str(cursore1.fetchone())
+            cursore.execute(query)
+            _id = str(cursore.fetchone())
             _id = _id.replace("(", "")
             _id = _id.replace(",)", "")
-            
-            if(str(isSchoolHour) == "0"):
-                #è ora di scuola, tolgo la classe e sposto i professori
-                try:
-                    query = "SELECT professore1, professore2 FROM timetable WHERE giorno ='" + str(giorno) + "' AND ora = " + str(ora) + " AND risorsa = '" + risorsa + "'"
-                    cursore1.execute(query)
-                    
-                    for prof1, prof2 in cursore1:
-                        prof1 = prof1.replace("(", "")
-                        prof1 = prof1.replace(",)", "")
-                        prof2 = prof2.replace("(", "")
-                        prof2 = prof2.replace(",)", "")
-                        query = "UPDATE timetable SET professore1 = '" + prof1 + "', professore2 = '" + prof2 + "' WHERE id = " + _id
-                        cursore1.execute(query)
-                except:
-                    query = "SELECT professore1 FROM timetable WHERE giorno ='" + str(giorno) + "' AND ora = " + str(ora) + " AND risorsa = '" + risorsa + "'"
-                    cursore1.execute(query)
-                    prof1 = str(cursore1.fetchone())
-                    prof1 = prof1.replace("(", "")
-                    prof1 = prof1.replace(",)", "")
-                    
-                    query = "UPDATE timetable SET professore1 = '" + prof1 + "', professore2 = Null WHERE id = " + _id
-                    cursore1.execute(query)
-                    
-                query = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null WHERE giorno ='" + str(giorno) + "' AND ora = " + str(ora) + " AND risorsa = '" + risorsa + "'"
-                cursore1.execute(query)
+            print("ID: " + str(_id))
 
-            query = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE id = " + _id
-            cursore1.execute(query)
-            
-            query = "INSERT INTO prenotazioni VALUES(" + _id + ", '" + who + "', " + str(isSchoolHour) + ", " + str(approvata) + ")"
-            cursore1.execute(query)
-            print(query)
+            if(str(isSchoolHour) == "1"):
+                if(boolD):
+                    print("isSchoolHour")
+                fn_sendMail(giorno, ora, stanza, who)
+            else:
+                query = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE id = " + _id
+                cursore.execute(query)
+
+                query = "INSERT INTO prenotazioni VALUES(" + _id + ", '" + who + "', " + str(isSchoolHour) + ", " + str(approvata) + ")"
+                cursore.execute(query)
+                print(query)
         else:
-            print("è occupata")
-            #inviare la mail
-            
+            if(boolD):
+                print("occupata")
+            fn_sendMail(giorno, ora, stanza, who)
+
+        line = fin.readline()
+    fin.close()
+
     cursore.close()
     connessione.commit()
     connessione.close()
-    connessione1.commit()
-    connessione1.close()
 
 
 def fn_liberaRisorse():
@@ -121,13 +127,18 @@ def fn_liberaRisorse():
     connessione1.commit()
     connessione1.close()
 
-    
+
+def fn_sendMail(giorno, ora, stanza, who):
+    print("Invio la mail")
+    text = "La sua prenotazione del giorno..."
+
 ##ELABORAZIONE
 
 if __name__ == "__main__":
     if(boolD):
         print("inizio programma")
 
+    fn_cambiaOrario()
     fn_liberaRisorse()
     
     if(boolD):

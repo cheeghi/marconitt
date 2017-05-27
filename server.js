@@ -412,6 +412,23 @@ apiRoutes.post('/liberaRisorse', function(req, res) {
 });
 
 
+apiRoutes.post('/mailsender', function(req, res) {
+    var user = req.body.username;
+    var text = req.body.text;
+    sql_stmt = "SELECT mail FROM users WHERE username = '" + user + "'";
+
+    connection.query(sql_stmt, function(err) {
+        if (!err) {
+            mail = rows[0].mail;
+            console.log(mail);
+            sendmail(mail, text, "MARCONI TT: prenotazione cancellata");
+        } else {
+            res(false);
+        }
+    });
+});
+
+
 // apply the routes to our application with the prefix /api
 app.use('/api', apiRoutes);
 
