@@ -378,7 +378,7 @@
         @return {array}
      */
     function getTTTeacherByDay($mysqli, $teacher, $day) {
-        $query = "select * from timetable where (professore1 = '$teacher' or professore2 = '$teacher' or professoreS = '$teacher') and giorno = '$day' order by ora";
+        $query = "select * from timetable where (professore1 = '$teacher' or professore2 = '$teacher') and giorno = '$day' order by ora";
 		$celle = array();
         
 		if ($result = $mysqli->query($query)) {
