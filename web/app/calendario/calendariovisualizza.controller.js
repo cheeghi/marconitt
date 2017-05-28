@@ -13,7 +13,8 @@ app
          * retrieves events data and fills the calendar
          */
         $scope.getData = function() {
-
+            $scope.resetCalendar();
+            
             var req = {
                 method: 'GET',
                 url: 'http://'+CONFIG.TIMETABLE+'?eventscountbymonth='+ ($scope.currentMonth),
@@ -77,6 +78,21 @@ app
             $scope.currentMonth = date.month;
             $scope.currentYear = date.year;
             $scope.getData();
+        };
+    
+    
+        /**
+         * clears calendar content
+         */
+        $scope.resetCalendar = function() {
+
+            // we need to clear the current, the previous and the next month 
+            for (i = 1; i <= 31; i++)
+                MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + ($scope.currentMonth) + '-' + i), ' ');
+            for (i = 1; i <= 31; i++)
+                MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + ($scope.currentMonth+1) + '-' + i), ' ');
+            for (i = 1; i <= 31; i++)
+                MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + ($scope.currentMonth-1) + '-' + i), ' ');
         };
 
     });

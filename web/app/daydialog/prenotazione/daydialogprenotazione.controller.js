@@ -38,7 +38,7 @@ app
             today.setSeconds(0);
             today.setMilliseconds(0);
 
-            if (day < today  && !$rootScope.admin) {
+            if (day < today) {
                 $mdToast.show($mdToast.simple().textContent('Non puoi prenotare per un giorno passato'));
                 day.setDate(day.getDate() + 1);
             } else {

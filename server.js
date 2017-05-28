@@ -75,58 +75,58 @@ apiRoutes.post('/authenticate', function(req, res) {
             try {
                 var adm = rows[0].admin;
                 var admin = adm === 0 ? false : true;
-                var user = { 
+                var user = {
                     username: req.body.name,
                     password: req.body.password,
                     admin: admin
                 };
-                
+
                 const postData = querystring.stringify({
                     'username': req.body.name,
                     'password': req.body.password
                 });
 
                 const options = {
-                hostname: config.webserver,
-                port: 80,
-                path: '/ldap/login/loginldap_marconitt.php',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Content-Length': Buffer.byteLength(postData)
+                    hostname: config.webserver,
+                    port: 80,
+                    path: '/ldap/login/loginldap_marconitt.php',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Content-Length': Buffer.byteLength(postData)
                     }
                 };
 
                 const request = http.request(options, (result) => {
-                    console.log(`STATUS: ${res.statusCode}`);
-                    console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-                    result.setEncoding('utf8');
-                    result.on('data', (chunk) => {
-                        console.log(`BODY: ${chunk}`);
-                        if (chunk == 'true') {
-                            var token = jwt.sign(user, app.get('secret'), { 
-                                expiresInMinutes: 1440 // expires in 24 hours 
-                            }); 
+                        console.log(`STATUS: ${res.statusCode}`);
+                console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+                result.setEncoding('utf8');
+                result.on('data', (chunk) => {
+                    console.log(`BODY: ${chunk}`);
+                if (chunk == 'true') {
+                    var token = jwt.sign(user, app.get('secret'), {
+                        expiresInMinutes: 1440 // expires in 24 hours
+                    });
 
-                            // return the information including token as JSON 
-                            res.json({ 
-                                success: true, 
-                                message: 'Enjoy your token!', 
-                                token: token, 
-                                username: user.username, 
-                                admin: user.admin 
-                            }); 
-                        } else {
-                            res.json({ success: false, message: 'Credenziali errate.' });
-                        }
+                    // return the information including token as JSON
+                    res.json({
+                        success: true,
+                        message: 'Enjoy your token!',
+                        token: token,
+                        username: user.username,
+                        admin: user.admin
                     });
-                    result.on('end', () => {
-                        console.log('No more data in response.');
-                    });
-                });
+                } else {
+                    res.json({ success: false, message: 'Credenziali errate.' });
+                }
+            });
+                result.on('end', () => {
+                    console.log('No more data in response.');
+            });
+            });
                 request.on('error', (e) => {
-                console.error(`problem with request: ${e.message}`);
-                });
+                    console.error(`problem with request: ${e.message}`);
+            });
 
                 // write data to request body
                 request.write(postData);
@@ -179,7 +179,7 @@ apiRoutes.post('/verifyToken', function(req, res, next) {
                 // if everything is good, save to request for use in other routes
                 req.decoded = decoded;
                 res.json({
-                    success: true, 
+                    success: true,
                     username: decoded.username,
                     admin: decoded.admin
                 });
@@ -204,7 +204,7 @@ apiRoutes.get('/', function(req, res) {
 
 
 // route middleware to verify a token
-// methods declared after this call require token has to be passed 
+// methods declared after this call require token has to be passed
 apiRoutes.use(function(req, res, next) {
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
@@ -233,11 +233,11 @@ apiRoutes.use(function(req, res, next) {
 
 
 apiRoutes.post('/prenota', function(req, res) {
-	var stanza = req.body.stanza;
-	var giorno = req.body.giorno;
-	var ora = req.body.ora;
-	var risorsa = req.body.risorsa;
-	var isClasse = (req.body.isclasse == "true");
+    var stanza = req.body.stanza;
+    var giorno = req.body.giorno;
+    var ora = req.body.ora;
+    var risorsa = req.body.risorsa;
+    var isClasse = (req.body.isclasse == "true");
     var user = req.body.user;
     var admin = req.body.admin;
 
@@ -263,8 +263,11 @@ apiRoutes.post('/prenota', function(req, res) {
 
 apiRoutes.post('/approva', function(req, res) {
     var stanza = req.body.stanza;
-	var giorno = req.body.giorno;
-	var ora = req.body.ora;
+    var giorno = req.body.giorno;
+    var ora = req.body.ora;
+    var username = req.body.username;
+    var classe = req.body.classe;
+    console.log(stanza, giorno, ora, username, classe);
     var id;
 
     selectId(giorno, stanza, ora, function(response) {
@@ -273,7 +276,7 @@ apiRoutes.post('/approva', function(req, res) {
 
         connection.query(sql_stmt, function(err) {
             if (!err) {
-                prenotazioneApprovata(id);
+                sendMailPrenotazioneApprovata(stanza, giorno, ora, username, classe);
                 res.json(true);
             } else {
                 res.json(false);
@@ -285,10 +288,11 @@ apiRoutes.post('/approva', function(req, res) {
 
 apiRoutes.delete('/cancellaPrenotazione', function(req, res) {
     var stanza = req.body.stanza;
-	var giorno = req.body.giorno;
-	var ora = req.body.ora;
+    var giorno = req.body.giorno;
+    var ora = req.body.ora;
     var risorsa = req.body.risorsa;
-
+    var username = req.body.username;
+    console.log("##################", username, stanza, giorno, ora, risorsa);
     selectId(giorno, stanza, ora, function(response) {
         var id = response;
         sql_stmt = "SELECT isSchoolHour FROM prenotazioni WHERE id = " + id;
@@ -298,9 +302,9 @@ apiRoutes.delete('/cancellaPrenotazione', function(req, res) {
                 var isSOur = rows[0].isSchoolHour;
 
                 if(isSOur) {
-                    undoClasse(stanza, giorno, ora, risorsa, function(response2) {
+                    undoClasse(stanza, giorno, ora, risorsa, username, function(response2) {
                         if(response2) {
-                            cancellaPrenotazione(stanza, giorno, ora, function(response1) {
+                            cancellaPrenotazione(stanza, giorno, ora, username, risorsa, function(response1) {
                                 res.json(response1);
                             })
                         } else {
@@ -308,7 +312,7 @@ apiRoutes.delete('/cancellaPrenotazione', function(req, res) {
                         }
                     });
                 } else {
-                    cancellaPrenotazione(stanza, giorno, ora, function(response3) {
+                    cancellaPrenotazione(stanza, giorno, ora, username, risorsa, function(response3) {
                         res.json(response3);
                     })
                 }
@@ -342,14 +346,14 @@ apiRoutes.post('/creaEvento', function(req, res) {
             oraFine = res1;
 
             //inserisco l'evento
-            var sql_stmt = "INSERT INTO eventi(giorno, descrizione, oraInizio, oraFine, classi, stanze) VALUES('" + giorno + "', '" + 
+            var sql_stmt = "INSERT INTO eventi(giorno, descrizione, oraInizio, oraFine, classi, stanze) VALUES('" + giorno + "', '" +
                 descrizione + "', '" + start + "', '" + end + "', '" + classi + "', '" + stanze + "')";
-            
+
             connection.query(sql_stmt, function(err) {
                 if(!err) {
                     res.json(true);
                     //seleziono l'id dell'evento inserito
-                    sql_stmt = "SELECT id FROM eventi WHERE giorno = '" + giorno + "' AND descrizione = '" + descrizione 
+                    sql_stmt = "SELECT id FROM eventi WHERE giorno = '" + giorno + "' AND descrizione = '" + descrizione
                         + "' AND oraInizio = '" + start + "' AND oraFine = '" + end + "'";
 
                     connection.query(sql_stmt, function(err, rows, fields) {
@@ -412,13 +416,13 @@ apiRoutes.post('/liberaRisorse', function(req, res) {
     var stanza;
     var id;
 
-    sql_stmt = "INSERT INTO liberazione(giorno, descrizione, classe, ore) VALUES ('" + giorno + "', '" + 
+    sql_stmt = "INSERT INTO liberazione(giorno, descrizione, classe, ore) VALUES ('" + giorno + "', '" +
         descrizione + "', '" + classe + "', '" + ore + "')";
 
     connection.query(sql_stmt, function(err) {
         if (!err) {
             //seleziono l'id della liberazione
-            sql_stmt = "SELECT id FROM liberazione WHERE giorno = '" + giorno + "' AND ore = '" + ore 
+            sql_stmt = "SELECT id FROM liberazione WHERE giorno = '" + giorno + "' AND ore = '" + ore
                 + "' AND descrizione = '" + descrizione + "' AND classe = '" + classe + "'";
 
             connection.query(sql_stmt, function(err, rows, fields) {
@@ -438,7 +442,6 @@ apiRoutes.post('/liberaRisorse', function(req, res) {
         }
     });
 });
-
 
 // apply the routes to our application with the prefix /api
 app.use('/api', apiRoutes);
@@ -467,7 +470,7 @@ function addPrenotazione(giorno, stanza, ora, risorsa, who, èOraScuola, admin, 
             selectId(giorno, stanza, ora, function(id) {
                 sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", '" + who + "', " + èOraScuola + ", " + admin + ");";
                 connection.query(sql_stmt, function(err) {
-                     if (!err) {
+                    if (!err) {
                         res(true);
                     } else {
                         res(false);
@@ -486,7 +489,7 @@ function addPrenotazione(giorno, stanza, ora, risorsa, who, èOraScuola, admin, 
  */
 function  selectId(giorno, stanza, ora, res) {
     var sql_stmt = "SELECT id FROM timetable WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
-    
+
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
             res(rows[0].id);
@@ -502,20 +505,20 @@ function  selectId(giorno, stanza, ora, res) {
  * Se si, allora libera l'aula precedentemente occupata da tale classe.
  */
 function isSchoolOur(giorno, stanza, ora, risorsa, res) {
-    var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
+    var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '"
         + giorno + "' AND ora = " + ora + ";";
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
             var week_day = rows[0].giorno_settimana;
-            sql_stmt = "SELECT `Column 4` AS oldStanza FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '" 
+            sql_stmt = "SELECT `Column 4` AS oldStanza FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '"
                 + ora + "' AND `Column 1` = '" + risorsa + "';";
 
             connection.query(sql_stmt, function(err, rows, fields) {
                 if (!err) {
                     try {
                         var oldStanza = rows[0].oldStanza;
-                        sql_stmt = "SELECT stanza FROM timetable WHERE ora = " + ora  + " AND  giorno = '" 
+                        sql_stmt = "SELECT stanza FROM timetable WHERE ora = " + ora  + " AND  giorno = '"
                             + giorno + "' AND risorsa = '" + risorsa + "';";
 
                         connection.query(sql_stmt, function(err, rows, fields) {
@@ -570,7 +573,7 @@ function isSchoolOur(giorno, stanza, ora, risorsa, res) {
  * Funzione che libera l'aula occupata da una determinata classe e dai professori ad essa associati.
  */
 function liberaRisorse(stanza, ora, giorno, res) {
-    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null " + 
+    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null " +
         "WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
 
     connection.query(sql_stmt, function(err) {
@@ -589,7 +592,7 @@ function liberaRisorse(stanza, ora, giorno, res) {
  * Funzione che ritorna il professore1 dalla timetable in una determinata riga.
  */
 function getProf1(stanza, giorno, ora, res) {
-    var sql_stmt = "SELECT professore1 FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
+    var sql_stmt = "SELECT professore1 FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '"
         + giorno + "' AND ora = " + ora + ";";
 
     connection.query(sql_stmt, function(err, rows, fields) {
@@ -607,7 +610,7 @@ function getProf1(stanza, giorno, ora, res) {
  * Funzione che ritorna il professore2 dalla timetable in una determinata riga.
  */
 function getProf2(stanza, giorno, ora, res) {
-    var sql_stmt = "SELECT professore2 FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
+    var sql_stmt = "SELECT professore2 FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '"
         + giorno + "' AND ora = " + ora + ";";
 
     connection.query(sql_stmt, function(err, rows, fields) {
@@ -673,15 +676,15 @@ function moveProfessori(stanza, stanzaDaLib, giorno, ora, res) {
 function getProfFromOrario(stanza, giorno, ora, risorsa, res) {
     var prof1;
     var prof2;
-
-    var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
+    console.log("A che sono finito qui");
+    var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '"
         + giorno + "' AND ora = " + ora + ";";
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
             var week_day = rows[0].giorno_settimana;
 
-            sql_stmt = "SELECT `Column 2` AS prof FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '" 
+            sql_stmt = "SELECT `Column 2` AS prof FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '"
                 + ora + "' AND `Column 1` = '" + risorsa + "';";
 
             connection.query(sql_stmt, function(err, rows1, fields) {
@@ -754,7 +757,7 @@ function controllaPrenotazioni(stanza, giorno, ora, res) {
                     try {
                         var id2 = rows[0].id;
                         sql_stmt = "DELETE FROM prenotazioni WHERE id = " + id2;
-                        
+
                         connection.query(sql_stmt, function(err) {
                             if(!err) {
                                 res(true);
@@ -779,10 +782,10 @@ function controllaPrenotazioni(stanza, giorno, ora, res) {
 /*
  * Funzione che cancella una data prenotazione.
  */
-function cancellaPrenotazione(stanza, giorno, ora, res) {
-    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null " + 
+function cancellaPrenotazione(stanza, giorno, ora, username, classe, res) {
+    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null " +
         "WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
-    
+
     connection.query(sql_stmt, function(err) {
         if(!err) {
             selectId(giorno, stanza, ora, function(id) {
@@ -790,7 +793,7 @@ function cancellaPrenotazione(stanza, giorno, ora, res) {
                 console.log(sql_stmt);
                 connection.query(sql_stmt, function(err) {
                     if(!err) {
-                        prenotazioneNonApprovata(id);
+                        sendMailPrenotazioneRimossa(stanza, giorno, ora, username, classe);
                         res(true);
                     } else {
                         res(false);
@@ -808,15 +811,15 @@ function cancellaPrenotazione(stanza, giorno, ora, res) {
  * Funzione che fa tornare una classe nella sua stanza, secondo l'orario scolastico, se essa è libera
  * Altrimenti si invia la mail
  */
-function undoClasse(stanza, giorno, ora, risorsa, res) {
-    var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
+function undoClasse(stanza, giorno, ora, risorsa, username, res) {
+    var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '"
         + giorno + "' AND ora = " + ora + ";";
-
+    console.log("asasasasa", risorsa);
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
             var week_day = rows[0].giorno_settimana;
 
-            sql_stmt = "SELECT `Column 4` AS stanzaOrario FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '" 
+            sql_stmt = "SELECT `Column 4` AS stanzaOrario FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '"
                 + ora + "' AND `Column 1` = '" + risorsa + "';";
 
             connection.query(sql_stmt, function(err, rows, fields) {
@@ -824,14 +827,15 @@ function undoClasse(stanza, giorno, ora, risorsa, res) {
                     var stanzaOrario = rows[0].stanzaOrario;
                     sql_stmt = "SELECT risorsa FROM timetable WHERE stanza = '" +
                         stanzaOrario + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
-                    
+
                     connection.query(sql_stmt, function(err, rows, fields) {
                         if (!err) {
                             var classe = rows[0].risorsa;
-                            var ora = rows[0].ora;
-                            var giorno = rows[0].giorno;
+                            //var ora = rows[0].ora;
+                            //var giorno = rows[0].giorno;
+                            console.log("bbbbbb", risorsa);
                             if(classe != null) {
-                                senzaAula(classe,ora,giorno);
+                                sendMailSenzaAula(risorsa, giorno, ora, username);
                                 res(true);
                             } else {
                                 var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" +
@@ -1008,7 +1012,7 @@ function liberazione(id, classe, ora, giorno) {
                 connection.query(sql_stmt);
                 return;
             }
-            sql_stmt = "SELECT professore1, professore2 FROM timetable WHERE ora = " + ora + 
+            sql_stmt = "SELECT professore1, professore2 FROM timetable WHERE ora = " + ora +
                 " AND risorsa = '" + classe + "' AND giorno = '" + giorno + "'";
 
             connection.query(sql_stmt, function(err, rows, fields) {
@@ -1031,7 +1035,7 @@ function liberazione(id, classe, ora, giorno) {
                         prof2 = "";
                         professori = prof1 + ", " + prof2;
                         professori = professori.replace(", null", "");
-                        
+
                         sql_stmt = "INSERT INTO prof_liberazione VALUES(" + id + ", " + ora + ", '" + professori + "')";
                         connection.query(sql_stmt);
 
@@ -1048,78 +1052,18 @@ function liberazione(id, classe, ora, giorno) {
 }
 
 // quando la classe rimane senza aula
-function senzaAula(classe, giorno, ora) {
-    var sql_stmt = "SELECT professore1, professore2 FROM timetable WHERE risorsa = '" + classe +
-        "' AND giorno = '" + giorno + "' AND ora = " + ora;
-
-    var giornosplit = giorno.split("-");
-    var giornoitaliano = giornosplit[2] + "-" + giornosplit[1] + "-" +  giornosplit[0];
-
+function sendMailSenzaAula(classe, giorno, ora, username) {
+    var day = new Date(giorno);
+    sql_stmt = "SELECT mail FROM users WHERE username = '" + username +"'";
+    console.log("Senza aula: ", classe, giorno, ora, username);
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
-            var prof1 = rows[0].professore1;
-            var prof2 = rows[0].professore2;
+            var pretesto = "Il giorno " + day.getDate() + "-" + (day.getMonth()+1) + "-" + day.getFullYear() + " alla " + ora + "° ora la classe " + classe +" è rimasta senza aula. La preghiamo di prenotarne un'altra.";
+            var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr><tr><td bgcolor="#409ea8" style="padding:5px 0;background-color:#409ea8; border-top:1px solid #77d5ea; background-repeat:repeat-x" align="center"><a href="https://www.google.com/url?hl=it&q=http://88.149.220.222/marconitt-master/web&source=gmail&ust=1495874982149000&usg=AFQjCNF_VQkM1I8NIa3LyFBIQhWJBoJ9tg"style="color:#ffffff;font-size:13px;font-weight:bold;text-align:center;text-decoration:none;font-family:Arial, sans-serif;-webkit-text-size-adjust:none;">Clicchi qui per andare all`applicazione</a></td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><br></tr><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
+            var oggettomail = 'MARCONI TT: classe rimasta senza aula';
+            var mail = rows[0].mail;
 
-            sql_stmt = "SELECT `Column 0` AS username FROM GPU004 WHERE `Column 1` = '" + prof1 + "'";
-
-            connection.query(sql_stmt, function(err, rows, fields) {
-                if (!err) {
-                    var user1 = rows[0].username;
-                    sql_stmt = "SELECT mail FROM users WHERE username = '" + user1 +"'";
-
-                    connection.query(sql_stmt, function(err, rows, fields) {
-                        if (!err) {
-                            var pretesto = "Il giorno " + giornoitaliano + " alla " + ora + "° ora la sua classe " + classe +" è rimasta senza aula. La preghiamo di prenotarne un'altra.";
-                            var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr><tr><td bgcolor="#409ea8" style="padding:5px 0;background-color:#409ea8; border-top:1px solid #77d5ea; background-repeat:repeat-x" align="center"><a href="https://www.google.com/url?hl=it&q=http://88.149.220.222/marconitt-master/web&source=gmail&ust=1495874982149000&usg=AFQjCNF_VQkM1I8NIa3LyFBIQhWJBoJ9tg"style="color:#ffffff;font-size:13px;font-weight:bold;text-align:center;text-decoration:none;font-family:Arial, sans-serif;-webkit-text-size-adjust:none;">Clicchi qui per andare all`applicazione</a></td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><br></tr><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
-                            var oggettomail = 'MARCONI TT: problemi relativi alla sua classe';
-
-                            var mailprof1 = rows[0].mail;
-
-                            sendMail(mailprof1,testo,oggettomail);
-
-                        } else {
-
-                        }
-
-                    });
-                    
-                } else {
-
-                }
-            });
-
-            if (prof2 != null ){
-                sql_stmt = "SELECT `Column 0` AS username FROM GPU004 WHERE `Column 1` = '" + prof2 + "'";
-
-                connection.query(sql_stmt, function(err, rows, fields) {
-
-                    if (!err) {
-                        var user2 = rows[0].username;
-                        sql_stmt = "SELECT mail FROM users WHERE username = '" + user2 +"'";
-
-                        connection.query(sql_stmt, function(err, rows, fields) {
-                            if (!err) {
-                                var pretesto = "Il giorno " + giornoitaliano + " alla " + ora + "° ora la sua classe " + classe +" è rimasta senza aula. La preghiamo di prenotarne un'altra.";
-                                var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr><tr><td bgcolor="#409ea8" style="padding:5px 0;background-color:#409ea8; border-top:1px solid #77d5ea; background-repeat:repeat-x" align="center"><a href="https://www.google.com/url?hl=it&q=http://88.149.220.222/marconitt-master/web&source=gmail&ust=1495874982149000&usg=AFQjCNF_VQkM1I8NIa3LyFBIQhWJBoJ9tg"style="color:#ffffff;font-size:13px;font-weight:bold;text-align:center;text-decoration:none;font-family:Arial, sans-serif;-webkit-text-size-adjust:none;">Clicchi qui per andare all`applicazione</a></td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><br></tr><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
-                                var oggettomail = 'MARCONI TT: problemi relativi alla sua classe';
-
-                                var mailprof2 = rows[0].mail;
-
-                               sendMail(mailprof2,testo,oggettomail);
-
-                            } else {
-
-                            }
-
-                        });
-                    } else {
-
-                    }
-                });
-            }
-
-        } else {
-
+            sendMail(mail, testo, oggettomail);
         }
     });
 }
@@ -1128,85 +1072,20 @@ function senzaAula(classe, giorno, ora) {
 
 // quando una prenotazione viene approvata
 
-function prenotazioneApprovata(id) {
-    var sql_stmt = "SELECT professore1, professore2, giorno , ora, stanza, risorsa FROM timetable WHERE id = " + id;
+function sendMailPrenotazioneApprovata(stanza, giorno, ora, username, classe) {
+    var day = new Date(giorno);
+    console.log("dddddd", giorno, day);
+    sql_stmt = "SELECT mail FROM users WHERE username = '" + username + "'";
+    console.log("Prenotazione approvata: ", stanza, giorno, ora, username, classe);
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
-            var prof1 = rows[0].professore1;
-            var prof2 = rows[0].professore2;
-            var classe = rows[0].risorsa;
-            var giorno = rows[0].giorno;
-            var stanza = rows[0].stanza;
-            var ora = rows[0].ora;
-            var day = giorno.getDate();
-            var mese = giorno.getMonth() + 1;
-            var anno = giorno.getFullYear()
+            var pretesto = "La prenotazione da lei richiesta: <br> Aula: " + stanza + " <br> Ora: " + ora + "° <br> Classe: " + classe + " <br> Giorno: " + day.getDate() + "-" + (day.getMonth()+1) + "-" + day.getFullYear() + " <br> è stata confermata.";
+            var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
+            var oggettomail = 'MARCONI TT: prenotazione confermata';
 
-            if(day<10){
-                day='0'+day;
-            } 
-            if(mese<10){
-                mese='0'+mese;
-            } 
+            var mailprof = rows[0].mail;
 
-            sql_stmt = "SELECT `Column 0` AS username FROM GPU004 WHERE `Column 1` = '" + prof1 + "'";
-
-            connection.query(sql_stmt, function(err, rows, fields) {
-                if (!err) {
-                    var user1 = rows[0].username;
-                    sql_stmt = "SELECT mail FROM users WHERE username = '" + user1 + "'";
-                    connection.query(sql_stmt, function(err, rows, fields) {
-                        if (!err) {
-                            var pretesto = "La prenotazione da lei richiesta: <br> Aula: " + stanza + " <br> Ora: " + ora + "° <br> Classe: " + classe + " <br> Giorno: " + day + "-" + mese + "-" + anno + " <br> E' stata confermata";
-                            var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
-                            var oggettomail = 'MARCONI TT: conferma prenotazione';
-
-                            var mailprof1 = rows[0].mail;
-
-                            sendMail(mailprof1,testo,oggettomail);
-
-                        } else {
-
-                        }
-
-                    });
-                    
-                } else {
-
-                }
-            });
-
-            if (prof2 != null ){
-                sql_stmt = "SELECT `Column 0` AS username FROM GPU004 WHERE `Column 1` = '" + prof2 + "'";
-
-                connection.query(sql_stmt, function(err, rows, fields) {
-
-                    if (!err) {
-                        var user2 = rows[0].username;
-                        sql_stmt = "SELECT mail FROM users WHERE username = '" + user2 +"'";
-
-                        connection.query(sql_stmt, function(err, rows, fields) {
-                            if (!err) {
-                                var pretesto = "La prenotazione da lei richiesta: <br> Aula: " + stanza + " <br> Ora " + ora + "° <br> Classe " + classe + " <br> Giorno " + day + "-" + mese + "-" + anno + " <br> E' stata confermata";
-                                var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
-                                var oggettomail = 'MARCONI TT: conferma prenotazione';
-
-                                var mailprof2 = rows[0].mail;
-
-                                sendMail(mailprof2,testo,oggettomail);
-
-                            } else {
-
-                            }
-
-                        });
-                    } else {
-
-                    }
-                });
-            }
-
-        } else {
+            sendMail(mailprof, testo, oggettomail);
 
         }
     });
@@ -1214,87 +1093,18 @@ function prenotazioneApprovata(id) {
 
 // quando una prenotazione non viene approvata
 
-function prenotazioneNonApprovata(id) {
-    var sql_stmt = "SELECT professore1, professore2, giorno , ora, stanza, risorsa FROM timetable WHERE id = " + id;
-
+function sendMailPrenotazioneRimossa(stanza, giorno, ora, username, classe) {
+    var day = new Date(giorno);
+    sql_stmt = "SELECT mail FROM users WHERE username = '" + username + "'";
+    console.log("Prenotazione non approvata: ", stanza, giorno, ora, username, classe);
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
-            var prof1 = rows[0].professore1;
-            var prof2 = rows[0].professore2;
-            var classe = rows[0].risorsa;
-            var giorno = rows[0].giorno;
-            var stanza = rows[0].stanza;
-            var ora = rows[0].ora;
-            var day = giorno.getDate();
-            var mese = giorno.getMonth() + 1;
-            var anno = giorno.getFullYear()
+            var pretesto = "La prenotazione da lei richiesta:  <br> Aula: " + stanza + " <br> Ora: " + ora + "°<br> Classe:  " + classe + " <br> Giorno: " + day.getDate() + "-" + (day.getMonth()+1) + "-" + day.getFullYear() + " <br> è stata rimossa o non confermata.";
+            var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr><tr><td bgcolor="#409ea8" style="padding:5px 0;background-color:#409ea8; border-top:1px solid #77d5ea; background-repeat:repeat-x" align="center"><a href="https://www.google.com/url?hl=it&q=http://88.149.220.222/marconitt-master/web&source=gmail&ust=1495874982149000&usg=AFQjCNF_VQkM1I8NIa3LyFBIQhWJBoJ9tg"style="color:#ffffff;font-size:13px;font-weight:bold;text-align:center;text-decoration:none;font-family:Arial, sans-serif;-webkit-text-size-adjust:none;">Clicchi qui per andare all`applicazione</a></td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><br></tr><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
+            var oggettomail = 'MARCONI TT: prenotazione rimossa';
+            var mail = rows[0].mail;
 
-            if(day<10){
-                day='0'+day;
-            } 
-            if(mese<10){
-                mese='0'+mese;
-            } 
-
-            sql_stmt = "SELECT `Column 0` AS username FROM GPU004 WHERE `Column 1` = '" + prof1 + "'";
-
-            connection.query(sql_stmt, function(err, rows, fields) {
-                if (!err) {
-                    var user1 = rows[0].username;
-                    sql_stmt = "SELECT mail FROM users WHERE username = '" + user1 + "'";
-                    connection.query(sql_stmt, function(err, rows, fields) {
-                        if (!err) {
-                            var pretesto = "La prenotazione da lei richiesta:  <br> Aula: " + stanza + " <br> Ora: " + ora + "° ora <br> Classe:  " + classe + " <br> Giorno: " + day + "-" + mese + "-" + anno + " <br> <b>NON</b> è stata confermata";
-                            var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr><tr><td bgcolor="#409ea8" style="padding:5px 0;background-color:#409ea8; border-top:1px solid #77d5ea; background-repeat:repeat-x" align="center"><a href="https://www.google.com/url?hl=it&q=http://88.149.220.222/marconitt-master/web&source=gmail&ust=1495874982149000&usg=AFQjCNF_VQkM1I8NIa3LyFBIQhWJBoJ9tg"style="color:#ffffff;font-size:13px;font-weight:bold;text-align:center;text-decoration:none;font-family:Arial, sans-serif;-webkit-text-size-adjust:none;">Clicchi qui per andare all`applicazione</a></td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><br></tr><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
-                            var oggettomail = 'MARCONI TT: prenotazione non confermata';
-
-                            var mailprof1 = rows[0].mail;
-
-                            sendMail(mailprof1,testo,oggettomail);
-
-                        } else {
-
-                        }
-
-                    });
-                    
-                } else {
-
-                }
-            });
-
-            if (prof2 != null ){
-                sql_stmt = "SELECT `Column 0` AS username FROM GPU004 WHERE `Column 1` = '" + prof2 + "'";
-
-                connection.query(sql_stmt, function(err, rows, fields) {
-
-                    if (!err) {
-                        var user2 = rows[0].username;
-                        sql_stmt = "SELECT mail FROM users WHERE username = '" + user2 +"'";
-
-                        connection.query(sql_stmt, function(err, rows, fields) {
-                            if (!err) {
-                                var pretesto = "La prenotazione da lei richiesta:  <br> Aula: " + stanza + " <br> Ora: " + ora + "° ora <br> Classe:  " + classe + " <br> Giorno: " + day + "-" + mese + "-" + anno + " <br> <b>NON</b> è stata confermata";
-                                var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr><tr><td bgcolor="#409ea8" style="padding:5px 0;background-color:#409ea8; border-top:1px solid #77d5ea; background-repeat:repeat-x" align="center"><a href="https://www.google.com/url?hl=it&q=http://88.149.220.222/marconitt-master/web&source=gmail&ust=1495874982149000&usg=AFQjCNF_VQkM1I8NIa3LyFBIQhWJBoJ9tg"style="color:#ffffff;font-size:13px;font-weight:bold;text-align:center;text-decoration:none;font-family:Arial, sans-serif;-webkit-text-size-adjust:none;">Clicchi qui per andare all`applicazione</a></td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><br></tr><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
-                                var oggettomail = 'MARCONI TT: prenotazione non confermata';
-
-                                var mailprof2 = rows[0].mail;
-
-                                sendMail(mailprof2,testo);
-
-                            } else {
-
-                            }
-
-                        });
-                    } else {
-
-                    }
-                });
-            }
-
-        } else {
-
+            sendMail(mail,testo,oggettomail);
         }
     });
 }
@@ -1303,13 +1113,13 @@ function prenotazioneNonApprovata(id) {
 //invia le email
 function sendMail(email,testo,oggetto) {
     sendmail({
-	  from: 'marconiTT@marconivr.it',
-	  to: email,
-	  subject: oggetto,
-	  html: testo
-	}, function (err, reply) {
-	  console.log(err && err.stack)
-	  console.dir(reply)
-	});
-	//res.send("ok");
+        from: 'marconiTT@marconivr.it',
+        to: email,
+        subject: oggetto,
+        html: testo
+    }, function (err, reply) {
+        console.log(err && err.stack)
+        console.dir(reply)
+    });
+    //res.send("ok");
 }

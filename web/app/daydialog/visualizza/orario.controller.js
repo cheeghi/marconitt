@@ -66,17 +66,6 @@ app.
          */
         $scope.$on("reInitVisualizza", function (event, args) {
             $scope.init(args.day);
-
-            if (!$scope.isHoliday){
-
-                if ($scope.sClass != undefined){
-                    $scope.getOrarioClass($scope.sClass);
-                } else if ($scope.sTeacher != undefined){
-                    $scope.getOrarioTeacher($scope.sTeacher);
-                } else if ($scope.sRoom != undefined){
-                    $scope.getOrarioRoom($scope.sRoom);
-                }
-            }
         });
 
 

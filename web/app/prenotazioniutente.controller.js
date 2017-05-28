@@ -12,6 +12,7 @@ app.
         $scope.passedAltrePrenotazioni = false; // toggle for showing / not showing passed reservations
         $scope.passedEventi = false; // toggle for showing / not showing passed reservations
         $scope.isLoading; // used for loading circle
+        $scope.label = $rootScope.admin ? 'PRENOTAZIONI AMMINISTRATORE' : 'LE MIE PRENOTAZIONI';
 
     
         /**
@@ -31,6 +32,7 @@ app.
             $scope.isLoading = true;
 
             if ($scope.admin) {
+
                 $http.get('http://'+CONFIG.TIMETABLE, {
                     cache: false,
                     params: {
@@ -67,31 +69,56 @@ app.
 
                 }).error(function() {
                     $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
-                });  
-            } 
-
-            $http.get('http://'+CONFIG.TIMETABLE, {  
-                cache: false,
-                params: {
-                    prenotazioni: $rootScope.username
-                }
-            }).success(function(response) {
-
-                $scope.miePrenotazioni = response;
-                $scope.miePrenotazioni.forEach(function(prenotazione) {
-                    var giorno = new Date(prenotazione.giorno);
-                    var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
-                    prenotazione.fgiorno = fgiorno;
                 });
-                $scope.fillsMiePrenotazioni();
 
-                $timeout(function() {
-                    $scope.isLoading = false;
-                }, $rootScope.loadingTime);
+                $http.get('http://'+CONFIG.TIMETABLE, {
+                    cache: false,
+                    params: {
+                        prenotazioniadmin: ""
+                    }
+                }).success(function(response) {
 
-            }).error(function() {
-                $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
-            });
+                    $scope.miePrenotazioni = response;
+                    $scope.miePrenotazioni.forEach(function(prenotazione) {
+                        var giorno = new Date(prenotazione.giorno);
+                        var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
+                        prenotazione.fgiorno = fgiorno;
+                    });
+                    $scope.fillsMiePrenotazioni();
+
+                    $timeout(function() {
+                        $scope.isLoading = false;
+                    }, $rootScope.loadingTime);
+
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
+                });
+
+            } else {
+
+                $http.get('http://'+CONFIG.TIMETABLE, {
+                    cache: false,
+                    params: {
+                        prenotazioni: $rootScope.username
+                    }
+                }).success(function(response) {
+
+                    $scope.miePrenotazioni = response;
+                    $scope.miePrenotazioni.forEach(function(prenotazione) {
+                        var giorno = new Date(prenotazione.giorno);
+                        var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
+                        prenotazione.fgiorno = fgiorno;
+                    });
+                    $scope.fillsMiePrenotazioni();
+
+                    $timeout(function() {
+                        $scope.isLoading = false;
+                    }, $rootScope.loadingTime);
+
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
+                });
+            }
         };
 
 
@@ -168,8 +195,8 @@ app.
          * @param risorsa
          * @param ora
          */
-        $scope.removePrenotazione = function(giorno, stanza, risorsa, ora) {
-
+        $scope.removePrenotazione = function(giorno, stanza, risorsa, ora, username) {
+            console.log(giorno, stanza, risorsa, ora, username);
             var confirm = $mdDialog.confirm()
               .textContent('La prenotazione verrà rimossa per sempre. Continuare?')
               .ok('CONFERMA')
@@ -180,7 +207,7 @@ app.
                 $scope.isLoading = true;
 
                 var data = "token="+sessionStorage.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
-                        + "&risorsa="+ risorsa;
+                        + "&risorsa="+ risorsa+"&username="+username;
                 
                 var req = {
                     method: 'DELETE',
@@ -215,10 +242,10 @@ app.
          * @param stanza
          * @param ora
          */
-        $scope.approva = function(giorno, stanza, ora) {
+        $scope.approva = function(giorno, stanza, ora, username, classe) {
             $scope.isLoading = true;
             
-            var data = "token="+sessionStorage.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno;
+            var data = "token="+sessionStorage.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno+"&username="+username+"&classe="+classe;
             
             var req = {
                 method: 'POST',
@@ -234,7 +261,8 @@ app.
                 .success(function(data) {
                     if (data) {
                         $scope.initializeHttpCalls();
-                        $mdToast.show($mdToast.simple().textContent('Prenotazione approvata con successo'));      
+                        $mdToast.show($mdToast.simple().textContent('Prenotazione approvata con successo'));
+
                     } else {
                         $mdToast.show($mdToast.simple().textContent('Errore durante la approvazione'));
                         $scope.isLoading = false;
@@ -252,10 +280,10 @@ app.
          * @param risorsa
          * @param ora
          */
-        $scope.nonApprova = function(giorno, stanza, risorsa, ora) {
+        $scope.nonApprova = function(giorno, stanza, risorsa, ora, username) {
             //send email to...
-            
-            $scope.removePrenotazione(giorno, stanza, risorsa, ora);
+
+            $scope.removePrenotazione(giorno, stanza, risorsa, ora, username);
         };
 
 
