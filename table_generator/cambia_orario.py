@@ -2,8 +2,8 @@
 ##IMPORT
 import mysql.connector
 import os
-import smtplib
-from email.MIMEText import MIMEText
+import requests
+import json
 
 
 ##DOC
@@ -73,7 +73,6 @@ def fn_cambiaOrario():
         row = cursore.fetchone()
         row = str(row).replace("(", "")
         row = str(row).replace(",)", "")
-        print("RISORSA = " + str(row))
 
         if(row == "None"):
             query = "SELECT id FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + str(giorno) + "' AND ora = " + str(ora)
@@ -81,7 +80,6 @@ def fn_cambiaOrario():
             _id = str(cursore.fetchone())
             _id = _id.replace("(", "")
             _id = _id.replace(",)", "")
-            print("ID: " + str(_id))
 
             if(str(isSchoolHour) == "1"):
                 if(boolD):
@@ -93,7 +91,6 @@ def fn_cambiaOrario():
 
                 query = "INSERT INTO prenotazioni VALUES(" + _id + ", '" + who + "', " + str(isSchoolHour) + ", " + str(approvata) + ")"
                 cursore.execute(query)
-                print(query)
         else:
             if(boolD):
                 print("occupata")
@@ -129,8 +126,12 @@ def fn_liberaRisorse():
 
 
 def fn_sendMail(giorno, ora, stanza, who):
-    print("Invio la mail")
-    text = "La sua prenotazione del giorno..."
+    url = "http://localhost:8080/api/mailsender"
+    data = {'username': who, 'stanza': stanza, 'ora': ora, 'giorno': giorno}
+    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+    r = requests.post(url, data=json.dumps(data), headers=headers)
+    print(r)
+
 
 ##ELABORAZIONE
 

@@ -139,6 +139,34 @@ apiRoutes.post('/authenticate', function(req, res) {
 });
 
 
+apiRoutes.post('/mailsender', function(req, res) {
+    var user = req.body.username;
+    var stanza = req.body.stanza;
+    var ora = req.body.ora;
+
+    //sistemo la data
+    var giorno = req.body.giorno;
+    var parts = giorno.split("-");
+    var mydate = new Date(parts[0],parts[1]-1,parts[2]);
+    var day = mydate.getDate();
+    var mese = mydate.getMonth() + 1;
+    var anno = mydate.getFullYear()
+
+    sql_stmt = "SELECT mail FROM users WHERE username = '" + user + "'";
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            var pretesto = "La prenotazione da lei richiesta:  <br> Aula: " + stanza + " <br> Ora: " + ora + "° ora <br> Giorno: " + day + "-" + mese + "-" + anno + " <br> è stata annullata causa cambio dell'orario";
+            var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr><tr><td bgcolor="#409ea8" style="padding:5px 0;background-color:#409ea8; border-top:1px solid #77d5ea; background-repeat:repeat-x" align="center"><a href="https://www.google.com/url?hl=it&q=http://88.149.220.222/marconitt-master/web&source=gmail&ust=1495874982149000&usg=AFQjCNF_VQkM1I8NIa3LyFBIQhWJBoJ9tg"style="color:#ffffff;font-size:13px;font-weight:bold;text-align:center;text-decoration:none;font-family:Arial, sans-serif;-webkit-text-size-adjust:none;">Clicchi qui per andare all`applicazione</a></td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><br></tr><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
+            var oggettomail = 'MARCONI TT: prenotazione cancellata';
+            mail = rows[0].mail;
+            sendMail("eliasemprebon98@gmail.com", testo, oggettomail);
+            res.json(true);
+        }
+    });
+});
+
+
 apiRoutes.post('/verifyToken', function(req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
     // decode token
@@ -412,23 +440,6 @@ apiRoutes.post('/liberaRisorse', function(req, res) {
 });
 
 
-apiRoutes.post('/mailsender', function(req, res) {
-    var user = req.body.username;
-    var text = req.body.text;
-    sql_stmt = "SELECT mail FROM users WHERE username = '" + user + "'";
-
-    connection.query(sql_stmt, function(err) {
-        if (!err) {
-            mail = rows[0].mail;
-            console.log(mail);
-            sendmail(mail, text, "MARCONI TT: prenotazione cancellata");
-        } else {
-            res(false);
-        }
-    });
-});
-
-
 // apply the routes to our application with the prefix /api
 app.use('/api', apiRoutes);
 
@@ -662,7 +673,7 @@ function moveProfessori(stanza, stanzaDaLib, giorno, ora, res) {
 function getProfFromOrario(stanza, giorno, ora, risorsa, res) {
     var prof1;
     var prof2;
-    console.log("A che sono finito qui");
+
     var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" 
         + giorno + "' AND ora = " + ora + ";";
 
@@ -1224,7 +1235,6 @@ function prenotazioneNonApprovata(id) {
             if(mese<10){
                 mese='0'+mese;
             } 
-
 
             sql_stmt = "SELECT `Column 0` AS username FROM GPU004 WHERE `Column 1` = '" + prof1 + "'";
 
