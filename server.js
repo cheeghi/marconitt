@@ -570,7 +570,7 @@ function isSchoolOur(giorno, stanza, ora, risorsa, res) {
  * Funzione che libera l'aula occupata da una determinata classe e dai professori ad essa associati.
  */
 function liberaRisorse(stanza, ora, giorno, res) {
-    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null, professoreS = Null " + 
+    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null " + 
         "WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
 
     connection.query(sql_stmt, function(err) {
@@ -780,7 +780,7 @@ function controllaPrenotazioni(stanza, giorno, ora, res) {
  * Funzione che cancella una data prenotazione.
  */
 function cancellaPrenotazione(stanza, giorno, ora, res) {
-    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null, professoreS = Null " + 
+    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null " + 
         "WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
     
     connection.query(sql_stmt, function(err) {
