@@ -44,7 +44,7 @@ app
                         $scope.logged = true;
                         $rootScope.admin = response.admin;
                         $scope.admin = response.admin;
-                        $rootScope.username = response.admin ? 'admin' : response.username;
+                        $rootScope.username = response.username;
 
                         $scope.highlight(1);
                     }
@@ -124,7 +124,7 @@ app
                             $scope.admin = data.data.admin;
                             $rootScope.logged = true;
                             $scope.logged = true;
-                            $rootScope.username = data.data.admin ? 'admin' : data.data.username;
+                            $rootScope.username = data.data.username;
 
                             $mdToast.show($mdToast.simple().textContent('Login avvenuto con successo!'));
                             $scope.highlight(1);

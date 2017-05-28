@@ -10,6 +10,8 @@
 		echo json_encode(getPrenotazioni($mysqli, $_GET["prenotazioni"]));
     } else if (isset($_GET["prenotazionidaapprovare"])) {
 		echo json_encode(getPrenotazioniDaApprovare($mysqli, $_GET["prenotazionidaapprovare"]));
+    } else if (isset($_GET["prenotazioniadmin"])) {
+		echo json_encode(getPrenotazioniAdmin($mysqli, $_GET["prenotazioniadmin"]));
     } else if (isset($_GET["prenotazioniexceptadmin"])) {
 		echo json_encode(getPrenotazioniExceptAdmin($mysqli, $_GET["prenotazioniexceptadmin"]));
     } else if (isset($_GET["classesbyteacher"])) {
@@ -81,7 +83,6 @@
 		}
 		
 		// Stanze
-		//if ($result = $mysqli->query("SELECT DISTINCT `Column 4` FROM `GPU001` WHERE `Column 4` NOT IN ('', 'D1', 'AGEN') ORDER BY `Column 4`")) {
         if ($result = $mysqli->query("SELECT * FROM aule ORDER BY aula")) {
 			$aule = array();
 			while($c = $result->fetch_array()){
@@ -100,7 +101,6 @@
 		}
         
         // solo aule
-        //if ($result = $mysqli->query("SELECT DISTINCT `Column 4` FROM `GPU001` WHERE `Column 4` NOT IN ('', 'D1', 'AGEN') AND `Column 4` like ('A%') ORDER BY `Column 4`")) {
         if ($result = $mysqli->query("SELECT * FROM aule where aula like 'A%' ORDER BY aula")) {
 			$aule = array();
 			while($c = $result->fetch_array()){			
@@ -110,7 +110,6 @@
 		}
         
         // solo laboratori
-        //if ($result = $mysqli->query("SELECT DISTINCT `Column 4` FROM `GPU001` WHERE `Column 4` NOT IN ('', 'D1', 'AGEN') AND `Column 4` like ('L%') ORDER BY `Column 4`")) {        
         if ($result = $mysqli->query("SELECT * FROM aule where aula like 'L%' ORDER BY aula")) {
 			$aule = array();
 			while($c = $result->fetch_array()){			
@@ -218,7 +217,7 @@
      */
     function getPrenotazioni($mysqli, $user) {
 		$celle = array();
-        $query = "SELECT giorno, stanza, risorsa, ora, approvata FROM timetable INNER JOIN prenotazioni ON timetable.id=prenotazioni.id WHERE who='$user' ORDER BY giorno DESC, ora";
+        $query = "SELECT giorno, stanza, risorsa, ora, approvata, who FROM timetable INNER JOIN prenotazioni ON timetable.id=prenotazioni.id WHERE who='$user' ORDER BY giorno DESC, ora";
         
 		if ($result = $mysqli->query($query)) {
         	while($c = $result->fetch_array()){
@@ -252,7 +251,7 @@
      */
     function getPrenotazioniExceptAdmin($mysqli) {
 		$celle = array();
-        $query = "SELECT giorno, stanza, risorsa, ora, approvata, who FROM timetable INNER JOIN prenotazioni ON timetable.id=prenotazioni.id WHERE who != 'admin' ORDER BY giorno DESC, ora";
+        $query = "SELECT giorno, stanza, risorsa, ora, approvata, GPU004.`column 1` as user, who FROM timetable INNER JOIN prenotazioni ON timetable.id=prenotazioni.id INNER JOIN users ON users.username=prenotazioni.who INNER JOIN GPU004 ON who=GPU004.`column 0` WHERE users.admin=false ORDER BY giorno DESC, ora";
         
 		if ($result = $mysqli->query($query)) {
         	while($c = $result->fetch_array()){
@@ -260,7 +259,24 @@
 			}
 		}
 		return $celle;
-    }      
+    }     
+
+    /**
+        Ritorna tutte le prenotazione eccetto quelle effettuate dall'admin
+        @param $mysqli
+        @return {array}
+     */
+    function getPrenotazioniAdmin($mysqli) {
+		$celle = array();
+        $query = "SELECT giorno, stanza, risorsa, ora, approvata, GPU004.`column 1` as user, who FROM timetable INNER JOIN prenotazioni ON timetable.id=prenotazioni.id INNER JOIN users ON users.username=prenotazioni.who INNER JOIN GPU004 ON who=GPU004.`column 0` WHERE users.admin=true ORDER BY giorno DESC, ora";
+        
+		if ($result = $mysqli->query($query)) {
+        	while($c = $result->fetch_array()){
+				array_push($celle,$c);
+			}
+		}
+		return $celle;
+    }  
 
     /**
         Ritorna tutte le classi di un professore

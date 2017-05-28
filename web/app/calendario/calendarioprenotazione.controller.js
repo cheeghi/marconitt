@@ -25,7 +25,7 @@ app
          */
         $scope.resetCalendar = function() {
 
-            // we need to do clear the current, the previous and the next month 
+            // we need to clear the current, the previous and the next month 
             for (i = 1; i <= 31; i++)
                 MaterialCalendarData.setDayContent(new Date($scope.currentYear + "-" + ($scope.currentMonth) + '-' + i), ' ');
             for (i = 1; i <= 31; i++)

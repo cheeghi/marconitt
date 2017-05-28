@@ -30,7 +30,9 @@ def fn_tablesToCsv():
     '''
     anno = datetime.now().year
     directory = "year_" + str(anno)
-    os.system("mkdir " + directory)
+    
+    if not (os.path.isdir(directory)):
+        os.system("mkdir " + directory)
     
     #creating files
     f1 = open(directory + "\\prenotazioni.csv", "w")
