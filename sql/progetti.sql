@@ -1,4 +1,4 @@
-create table progetti(progetto varchar(25));
+create table progetti(progetto varchar(255));
 
 insert into progetti values('RFI');
 insert into progetti values('INSIEME');

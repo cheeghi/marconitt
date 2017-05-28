@@ -84,7 +84,6 @@
     "require_optional": "^1.0.0",
     "resolve-from": "^2.0.0",
     "semver": "^5.1.0",
-    "send": "^0.13.1",
     "sendmail": "^1.1.1",
     "serve-static": "^1.10.2",
     "sliced": "^1.0.1",
