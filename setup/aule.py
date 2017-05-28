@@ -5,13 +5,13 @@ import mysql.connector
 
 
 ##DOC
-__author__ = 'Elia Semprebon'
-__description__ = "Generatore della tabella centrale per marconitt e dei file con i dati dell'anno passato"
+__author__ = 'MarconiTT Team'
+__description__ = "Programma che carica le aule scolastiche su DB"
 
 
 ##VARIABILI
 global boolD
-boolD = True
+boolD = False
 
 
 ##FUNZIONI

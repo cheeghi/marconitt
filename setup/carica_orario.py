@@ -4,20 +4,23 @@ import mysql.connector
 
 ##DOC
 __author__ = 'Elia Semprebon'
-__description__ = "Carica l'orario nella time table"
+__description__ = "Carica l'orario nella timetable"
 
 
 ##VARIABILI
 global boolD
-boolD = True
+boolD = False
 
 ##FUNZIONI
 def fn_creaconnesione():
-    connessione = mysql.connector.connect(user='root', password='',host='127.0.0.1',database='marconitt')
+    connessione = mysql.connector.connect(user='root', password='', host='127.0.0.1', database='marconitt')
     return connessione
 
 
 def fn_caricaorario():
+    '''
+    Funzione che carica l'orario nella timetable
+    '''
     connessione = fn_creaconnesione()
     connessione2 = fn_creaconnesione()
     connessione3 = fn_creaconnesione()
@@ -73,7 +76,7 @@ def fn_caricaorario():
             cont = cont + 1
 
             if(cont == appo):
-                print(appo)
+                #ogni 500, rigenero la connessione per non finire il buffer
                 appo += 500
                 connessione2.commit()
                 cursore2.close()
