@@ -7,13 +7,13 @@ import mysql.connector
 import os
 
 ##DOC
-__author__ = 'Elia Semprebon'
+__author__ = 'MarconiTT Team'
 __description__ = "Generatore della tabella centrale per marconitt e dei file con i dati dell'anno passato"
 
 
 ##VARIABILI
 global boolD
-boolD = True
+boolD = False
 
 
 ##FUNZIONI
@@ -177,17 +177,17 @@ def fn_generarighe():
                 cont += 1
 
                 if (cont == appo):
+                    #rigenero la connessione per non impienire il buffer
                     if(boolD):
                         print("Cont= " + str(cont) + "     appo= " + str(appo))
-                        
+
                     appo += 500
                     cursore.close()
                     connessione.commit()
                     connessione.close()
                     connessione = fn_generaconnessione()
                     cursore = connessione.cursor()
-                    
-    #query = "DELETE FROM timetable WHERE stanza IS NULL or stanza = ''"
+
     cursore.close()
     connessione.commit()
     connessione.close()

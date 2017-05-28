@@ -7,13 +7,13 @@ import json
 
 
 ##DOC
-__author__ = 'Elia Semprebon'
+__author__ = 'MarconiTT Team'
 __description__ = "Programma da eseguire quando cambia l'orario"
 
 
 ##VARIABILI
 global boolD
-boolD = True
+boolD = False
 
 
 ##FUNZIONI
@@ -28,11 +28,15 @@ def fn_generaconnessione():
 
 
 def fn_cambiaOrario():
+    '''
+    Metodo che carica il nuovo orario nella timetable, poi inserisce se possibile le prenotazioni.
+    Per le prenotazioni annullate si invia una mail a chi ha prenotato.
+    '''
     connessione = fn_generaconnessione()
     cursore = connessione.cursor()
 
+    #salva le prenotazioni
     fout = open("appoggio.csv", "w")
-
     query = "SELECT giorno, ora, stanza, risorsa, professore1, professore2, who, isSchoolHour, approvata FROM timetable INNER JOIN prenotazioni ON timetable.id = prenotazioni.id"
     cursore.execute(query)
 
@@ -42,6 +46,7 @@ def fn_cambiaOrario():
 
     fout.close()
 
+    #pulisce il DB
     query = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null"
     cursore.execute(query)
     query = "ALTER TABLE prenotazioni DROP FOREIGN KEY id_fk"
@@ -52,7 +57,7 @@ def fn_cambiaOrario():
     cursore.execute(query)
     connessione.commit()
 
-    print("carica_orario.py")
+    #carica il nuovo orario
     os.system("C:\Python27\python.exe carica_orario.py")
 
     fin = open("appoggio.csv", "r")
@@ -82,18 +87,19 @@ def fn_cambiaOrario():
             _id = _id.replace(",)", "")
 
             if(str(isSchoolHour) == "1"):
+                #prenotazione cancellata ----> era ora di scuola
                 if(boolD):
                     print("isSchoolHour")
                 fn_sendMail(giorno, ora, stanza, who)
             else:
+                #prenotazione reinserita
                 query = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE id = " + _id
                 cursore.execute(query)
 
                 query = "INSERT INTO prenotazioni VALUES(" + _id + ", '" + who + "', " + str(isSchoolHour) + ", " + str(approvata) + ")"
                 cursore.execute(query)
         else:
-            if(boolD):
-                print("occupata")
+            #prenotazione cancellata ----> la stanza è occupata
             fn_sendMail(giorno, ora, stanza, who)
 
         line = fin.readline()
@@ -105,6 +111,9 @@ def fn_cambiaOrario():
 
 
 def fn_liberaRisorse():
+    '''
+    Funzione che rigenera le liberazioni di risorse
+    '''
     connessione = fn_generaconnessione()
     cursore = connessione.cursor()
     connessione1 = fn_generaconnessione()
@@ -126,11 +135,13 @@ def fn_liberaRisorse():
 
 
 def fn_sendMail(giorno, ora, stanza, who):
+    '''
+    Richiesta POST al server, il quale invia la mail
+    '''
     url = "http://localhost:8080/api/mailsender"
     data = {'username': who, 'stanza': stanza, 'ora': ora, 'giorno': giorno}
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-    r = requests.post(url, data=json.dumps(data), headers=headers)
-    print(r)
+    requests.post(url, data=json.dumps(data), headers=headers)
 
 
 ##ELABORAZIONE

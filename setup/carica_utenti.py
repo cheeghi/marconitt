@@ -2,19 +2,22 @@
 import mysql.connector
 
 ##DOC
-__author__ = 'Elia Semprebon'
+__author__ = 'MarconiTT Team'
 __description__ = 'Generatore della tabella users per marconitt'
 
 
 ##VARIABILI
 global boolD
-boolD = True
+boolD = False
 
 
 ##FUNZIONI
 
 
 def fn_eliminaUtenti():
+    '''
+    Tabella che pulisce la tabella users
+    '''
     connessione = fn_generaconnessione()
     cursore = connessione.cursor()
 
@@ -23,6 +26,9 @@ def fn_eliminaUtenti():
 
 
 def fn_caricaProf():
+    '''
+    Funzione che prende i professori da gpu004 e li carica in users col loro username e la mail
+    '''
     connessione = fn_generaconnessione()
     cursore = connessione.cursor()
     connessione2 = fn_generaconnessione()

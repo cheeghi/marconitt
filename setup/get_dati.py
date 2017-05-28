@@ -4,13 +4,13 @@ import mysql.connector
 import os
 
 ##DOC
-__author__ = 'Elia Semprebon'
+__author__ = 'MarconiTT Team'
 __description__ = "Generatore dei file .csv con i dati(prenotazioni, eventi, ...) dell'anno passato"
 
 
 ##VARIABILI
 global boolD
-boolD = True
+boolD = False
 
 
 ##FUNZIONI
