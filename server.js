@@ -781,27 +781,31 @@ function controllaPrenotazioni(stanza, giorno, ora, res) {
  * Funzione che cancella una data prenotazione.
  */
 function cancellaPrenotazione(stanza, giorno, ora, username, classe, res) {
-    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null " +
-        "WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+    try {
+        var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null " +
+            "WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
 
-    connection.query(sql_stmt, function(err) {
-        if(!err) {
-            selectId(giorno, stanza, ora, function(id) {
-                sql_stmt = "DELETE FROM prenotazioni WHERE id = " + id;
+        connection.query(sql_stmt, function(err) {
+            if(!err) {
+                selectId(giorno, stanza, ora, function(id) {
+                    sql_stmt = "DELETE FROM prenotazioni WHERE id = " + id;
 
-                connection.query(sql_stmt, function(err) {
-                    if(!err) {
-                        sendMailPrenotazioneRimossa(stanza, giorno, ora, username, classe);
-                        res(true);
-                    } else {
-                        res(false);
-                    }
+                    connection.query(sql_stmt, function(err) {
+                        if(!err) {
+                            sendMailPrenotazioneRimossa(stanza, giorno, ora, username, classe);
+                            res(true);
+                        } else {
+                            res(false);
+                        }
+                    });
                 });
-            });
-        } else {
-            res(false);
-        }
-    });
+            } else {
+                res(false);
+            }
+        });
+    } catch(e) {
+        res(false);
+    }
 }
 
 
