@@ -41,6 +41,7 @@ connection.connect();
 // use morgan to log requests to the console
 app.use(morgan('dev'));
 
+
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -98,36 +99,33 @@ apiRoutes.post('/authenticate', function(req, res) {
                 };
 
                 const request = http.request(options, (result) => {
-                        console.log(`STATUS: ${res.statusCode}`);
-                console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-                result.setEncoding('utf8');
-                result.on('data', (chunk) => {
-                    console.log(`BODY: ${chunk}`);
-                if (chunk == 'true') {
-                    var token = jwt.sign(user, app.get('secret'), {
-                        expiresInMinutes: 1440 // expires in 24 hours
+                    result.setEncoding('utf8');
+                    result.on('data', (chunk) => {
+                        if (chunk == 'true') {
+                            var token = jwt.sign(user, app.get('secret'), {
+                                expiresInMinutes: 1440 // expires in 24 hours
+                            });
+
+                            // return the information including token as JSON
+                            res.json({
+                                success: true,
+                                message: 'Enjoy your token!',
+                                token: token,
+                                username: user.username,
+                                admin: user.admin
+                            });
+                        } else {
+                            res.json({ success: false, message: 'Credenziali errate.' });
+                        }
                     });
 
-                    // return the information including token as JSON
-                    res.json({
-                        success: true,
-                        message: 'Enjoy your token!',
-                        token: token,
-                        username: user.username,
-                        admin: user.admin
-                    });
-                } else {
-                    res.json({ success: false, message: 'Credenziali errate.' });
-                }
-            });
-                result.on('end', () => {
-                    console.log('No more data in response.');
-            });
+                    result.on('end', () => {
+                        console.log('No more data in response.');
+                });
             });
                 request.on('error', (e) => {
                     console.error(`problem with request: ${e.message}`);
             });
-
                 // write data to request body
                 request.write(postData);
                 request.end();
@@ -267,7 +265,6 @@ apiRoutes.post('/approva', function(req, res) {
     var ora = req.body.ora;
     var username = req.body.username;
     var classe = req.body.classe;
-    console.log(stanza, giorno, ora, username, classe);
     var id;
 
     selectId(giorno, stanza, ora, function(response) {
@@ -292,7 +289,7 @@ apiRoutes.delete('/cancellaPrenotazione', function(req, res) {
     var ora = req.body.ora;
     var risorsa = req.body.risorsa;
     var username = req.body.username;
-    console.log("##################", username, stanza, giorno, ora, risorsa);
+
     selectId(giorno, stanza, ora, function(response) {
         var id = response;
         sql_stmt = "SELECT isSchoolHour FROM prenotazioni WHERE id = " + id;
@@ -442,6 +439,7 @@ apiRoutes.post('/liberaRisorse', function(req, res) {
         }
     });
 });
+
 
 // apply the routes to our application with the prefix /api
 app.use('/api', apiRoutes);
@@ -676,7 +674,7 @@ function moveProfessori(stanza, stanzaDaLib, giorno, ora, res) {
 function getProfFromOrario(stanza, giorno, ora, risorsa, res) {
     var prof1;
     var prof2;
-    console.log("A che sono finito qui");
+
     var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '"
         + giorno + "' AND ora = " + ora + ";";
 
@@ -783,27 +781,31 @@ function controllaPrenotazioni(stanza, giorno, ora, res) {
  * Funzione che cancella una data prenotazione.
  */
 function cancellaPrenotazione(stanza, giorno, ora, username, classe, res) {
-    var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null " +
-        "WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
+    try {
+        var sql_stmt = "UPDATE timetable SET risorsa = Null, professore1 = Null, professore2 = Null " +
+            "WHERE stanza = '" + stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
 
-    connection.query(sql_stmt, function(err) {
-        if(!err) {
-            selectId(giorno, stanza, ora, function(id) {
-                sql_stmt = "DELETE FROM prenotazioni WHERE id = " + id;
-                console.log(sql_stmt);
-                connection.query(sql_stmt, function(err) {
-                    if(!err) {
-                        sendMailPrenotazioneRimossa(stanza, giorno, ora, username, classe);
-                        res(true);
-                    } else {
-                        res(false);
-                    }
+        connection.query(sql_stmt, function(err) {
+            if(!err) {
+                selectId(giorno, stanza, ora, function(id) {
+                    sql_stmt = "DELETE FROM prenotazioni WHERE id = " + id;
+
+                    connection.query(sql_stmt, function(err) {
+                        if(!err) {
+                            sendMailPrenotazioneRimossa(stanza, giorno, ora, username, classe);
+                            res(true);
+                        } else {
+                            res(false);
+                        }
+                    });
                 });
-            });
-        } else {
-            res(false);
-        }
-    });
+            } else {
+                res(false);
+            }
+        });
+    } catch(e) {
+        res(false);
+    }
 }
 
 
@@ -814,7 +816,7 @@ function cancellaPrenotazione(stanza, giorno, ora, username, classe, res) {
 function undoClasse(stanza, giorno, ora, risorsa, username, res) {
     var sql_stmt = "SELECT giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '"
         + giorno + "' AND ora = " + ora + ";";
-    console.log("asasasasa", risorsa);
+
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
             var week_day = rows[0].giorno_settimana;
@@ -831,9 +833,7 @@ function undoClasse(stanza, giorno, ora, risorsa, username, res) {
                     connection.query(sql_stmt, function(err, rows, fields) {
                         if (!err) {
                             var classe = rows[0].risorsa;
-                            //var ora = rows[0].ora;
-                            //var giorno = rows[0].giorno;
-                            console.log("bbbbbb", risorsa);
+
                             if(classe != null) {
                                 sendMailSenzaAula(risorsa, giorno, ora, username);
                                 res(true);
@@ -1051,11 +1051,12 @@ function liberazione(id, classe, ora, giorno) {
     });
 }
 
+
 // quando la classe rimane senza aula
 function sendMailSenzaAula(classe, giorno, ora, username) {
     var day = new Date(giorno);
     sql_stmt = "SELECT mail FROM users WHERE username = '" + username +"'";
-    console.log("Senza aula: ", classe, giorno, ora, username);
+
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
             var pretesto = "Il giorno " + day.getDate() + "-" + (day.getMonth()+1) + "-" + day.getFullYear() + " alla " + ora + "° ora la classe " + classe +" è rimasta senza aula. La preghiamo di prenotarne un'altra.";
@@ -1069,34 +1070,28 @@ function sendMailSenzaAula(classe, giorno, ora, username) {
 }
 
 
-
 // quando una prenotazione viene approvata
-
 function sendMailPrenotazioneApprovata(stanza, giorno, ora, username, classe) {
     var day = new Date(giorno);
-    console.log("dddddd", giorno, day);
     sql_stmt = "SELECT mail FROM users WHERE username = '" + username + "'";
-    console.log("Prenotazione approvata: ", stanza, giorno, ora, username, classe);
+
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
             var pretesto = "La prenotazione da lei richiesta: <br> Aula: " + stanza + " <br> Ora: " + ora + "° <br> Classe: " + classe + " <br> Giorno: " + day.getDate() + "-" + (day.getMonth()+1) + "-" + day.getFullYear() + " <br> è stata confermata.";
             var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
             var oggettomail = 'MARCONI TT: prenotazione confermata';
-
             var mailprof = rows[0].mail;
-
             sendMail(mailprof, testo, oggettomail);
-
         }
     });
 }
 
-// quando una prenotazione non viene approvata
 
+// quando una prenotazione non viene approvata
 function sendMailPrenotazioneRimossa(stanza, giorno, ora, username, classe) {
     var day = new Date(giorno);
     sql_stmt = "SELECT mail FROM users WHERE username = '" + username + "'";
-    console.log("Prenotazione non approvata: ", stanza, giorno, ora, username, classe);
+
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
             var pretesto = "La prenotazione da lei richiesta:  <br> Aula: " + stanza + " <br> Ora: " + ora + "°<br> Classe:  " + classe + " <br> Giorno: " + day.getDate() + "-" + (day.getMonth()+1) + "-" + day.getFullYear() + " <br> è stata rimossa o non confermata.";
@@ -1118,7 +1113,6 @@ function sendMail(email,testo,oggetto) {
         subject: oggetto,
         html: testo
     }, function (err, reply) {
-        console.log(err && err.stack)
         console.dir(reply)
     });
     //res.send("ok");
