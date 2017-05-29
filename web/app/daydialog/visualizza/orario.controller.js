@@ -226,7 +226,7 @@ app.
                         x += "<td>" + data[i].descrizione  + "<br>" + data[i].stanze + "</td>";
 
                     } else if(data[i].descrizione != undefined && data[i].stanze == undefined){
-                        x += "<td>" + data[i].descrizione.toLowerCase()  + "</td>";
+                        x += "<td>" + data[i].descrizione  + "</td>";
 
                     } else {
 
