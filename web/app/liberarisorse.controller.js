@@ -32,43 +32,62 @@ app
          * sends event information to server
          */
         $scope.insert = function () {
+            //control if selected date is not holiday
+            var data = new Date($scope.event.day);
+            var giorno = data.getDate();
+            var mese = data.getMonth() + 1;
+            var anno = data.getFullYear();
+            var n_date = anno + "-" + mese + "-" + giorno;
+            
+            $http.get('http://'+ CONFIG.TIMETABLE + "?isholiday=" + n_date)
+                .success(function(response) {
+                    response = response.replace(/\s/g, ''); // remove spaces from the response
 
-            var confirm = $mdDialog.confirm()
-              .textContent('La risorsa verrà liberata per sempre. Continuare?')
-              .ok('CONFERMA')
-              .cancel('ANNULLA');
+                    if (response == "true") {
+                        //date is holiday
+                        $mdToast.show($mdToast.simple().textContent("Non si può liberare in un giorno di vacanza"));
+                    } else {
+                        //date is not holiday
+                        var confirm = $mdDialog.confirm()
+                        .textContent('La risorsa verrà liberata per sempre. Continuare?')
+                        .ok('CONFERMA')
+                        .cancel('ANNULLA');
 
-            $mdDialog.show(confirm).then(function() {
-                var desc = $scope.event.description;
-                var day = $scope.event.day.getFullYear() + "-" + ($scope.event.day.getMonth()+1) + "-" + $scope.event.day.getDate();
-                var sClass = $scope.event.class;
-                var sOre = $scope.event.ore;
-                var data = "descrizione="+desc+"&day="+day+"&classe="+sClass+"&ore="+sOre+"&token="+sessionStorage.token+"&username="+$rootScope.username;
+                        $mdDialog.show(confirm).then(function() {
+                            var desc = $scope.event.description;
+                            var day = $scope.event.day.getFullYear() + "-" + ($scope.event.day.getMonth()+1) + "-" + $scope.event.day.getDate();
+                            var sClass = $scope.event.class;
+                            var sOre = $scope.event.ore;
+                            var data = "descrizione="+desc+"&day="+day+"&classe="+sClass+"&ore="+sOre+"&token="+sessionStorage.token+"&username="+$rootScope.username;
 
-                var req = {
-                    method: 'POST',
-                    url: 'http://'+CONFIG.HOST+':8080/api/liberaRisorse',
-                    data: data,
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
+                            var req = {
+                                method: 'POST',
+                                url: 'http://'+CONFIG.HOST+':8080/api/liberaRisorse',
+                                data: data,
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                }
+                            };
+
+                            $http(req)
+                                .then(
+                                    function(data) {
+                                        if (data) {
+                                            $mdToast.show($mdToast.simple().textContent("Risorsa liberata con successo"));
+                                            $scope.event = {};
+                                            $scope.event.day = new Date();   
+                                        } else
+                                            $mdToast.show($mdToast.simple().textContent("Errore durante la liberazione"));
+                                    },
+                                    function(err) {
+                                        $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
+                                    }
+                                );
+                        });    
                     }
-                };
-
-                $http(req)
-                    .then(
-                        function(data) {
-                            if (data) {
-                                $mdToast.show($mdToast.simple().textContent("Risorsa liberata con successo"));
-                                $scope.event = {};
-                                $scope.event.day = new Date();   
-                            } else
-                                $mdToast.show($mdToast.simple().textContent("Errore durante la liberazione"));
-                        },
-                        function(err) {
-                            $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
-                        }
-                    );
-            });    
+                }).error(function() {
+                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
+                });
         };
 
 
