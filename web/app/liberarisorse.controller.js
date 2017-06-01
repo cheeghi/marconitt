@@ -43,7 +43,7 @@ app
                 var day = $scope.event.day.getFullYear() + "-" + ($scope.event.day.getMonth()+1) + "-" + $scope.event.day.getDate();
                 var sClass = $scope.event.class;
                 var sOre = $scope.event.ore;
-                var data = "descrizione="+desc+"&day="+day+"&classe="+sClass+"&ore="+sOre+"&token="+sessionStorage.token;
+                var data = "descrizione="+desc+"&day="+day+"&classe="+sClass+"&ore="+sOre+"&token="+sessionStorage.token+"&username="+$rootScope.username;
 
                 var req = {
                     method: 'POST',

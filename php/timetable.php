@@ -65,7 +65,7 @@
 		$options = new stdClass();
 		
 		// Classi
-		if ($result = $mysqli->query("SELECT DISTINCT `Column 1` FROM `GPU001` where `Column 1` NOT IN ('', 'RIC', 'D1', 'ALT') ORDER BY `Column 1`")) {
+		if ($result = $mysqli->query("SELECT DISTINCT `Column 1` FROM `GPU001` where `Column 1` NOT IN ('', 'RIC', 'D1', 'ALT', 'PRO') ORDER BY `Column 1`")) {
 			$classi = array();
 			while($c = $result->fetch_array()){			
 				array_push($classi,$c[0]);
@@ -268,7 +268,7 @@
      */
     function getPrenotazioniAdmin($mysqli) {
 		$celle = array();
-        $query = "SELECT giorno, stanza, risorsa, ora, approvata, GPU004.`column 1` as user, who FROM timetable INNER JOIN prenotazioni ON timetable.id=prenotazioni.id INNER JOIN users ON users.username=prenotazioni.who INNER JOIN GPU004 ON who=GPU004.`column 0` WHERE users.admin=true ORDER BY giorno DESC, ora";
+        $query = "SELECT giorno, stanza, risorsa, ora, approvata, who FROM timetable INNER JOIN prenotazioni ON timetable.id=prenotazioni.id INNER JOIN users ON users.username=prenotazioni.who WHERE users.admin=true ORDER BY giorno DESC, ora";
         
 		if ($result = $mysqli->query($query)) {
         	while($c = $result->fetch_array()){

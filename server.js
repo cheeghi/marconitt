@@ -124,7 +124,7 @@ apiRoutes.post('/authenticate', function(req, res) {
                 });
             });
                 request.on('error', (e) => {
-                    console.error(`problem with request: ${e.message}`);
+                    //console.error(`problem with request: ${e.message}`);
             });
                 // write data to request body
                 request.write(postData);
@@ -407,6 +407,7 @@ apiRoutes.post('/liberaRisorse', function(req, res) {
     var s_ore = req.body.ore;
     var giorno = req.body.day;
     var descrizione = req.body.descrizione;
+    var username = req.body.username;
 
     var ore = s_ore.split(",");
     var sql_stmt;
@@ -427,7 +428,7 @@ apiRoutes.post('/liberaRisorse', function(req, res) {
                     id = rows[0].id;
 
                     for(var i in ore) {
-                        liberazione(id, classe, ore[i], giorno);
+                        liberazione(id, classe, ore[i], giorno, username);
                     }
                     res.json(true);
                 } else {
@@ -459,14 +460,14 @@ console.log('Magic happens at http://localhost:' + port);
 /*
  * Funzione che setta la risorsa nella timetable ed aggiunge la prenotazione nella timetable
  */
-function addPrenotazione(giorno, stanza, ora, risorsa, who, èOraScuola, admin, res) {
+function addPrenotazione(giorno, stanza, ora, risorsa, who, isOraScuola, admin, res) {
     var sql_stmt = "UPDATE timetable SET risorsa = '" + risorsa + "' WHERE stanza = '" +
         stanza + "' AND ora = " + ora + " AND giorno = '" + giorno + "';";
 
     connection.query(sql_stmt, function(err) {
         if (!err) {
             selectId(giorno, stanza, ora, function(id) {
-                sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", '" + who + "', " + èOraScuola + ", " + admin + ");";
+                sql_stmt = "INSERT INTO prenotazioni VALUES(" + id + ", '" + who + "', " + isOraScuola + ", " + admin + ");";
                 connection.query(sql_stmt, function(err) {
                     if (!err) {
                         res(true);
@@ -995,7 +996,7 @@ function hourToStartHour(giorno, data, res) {
 }
 
 
-function liberazione(id, classe, ora, giorno) {
+function liberazione(id, classe, ora, giorno, username) {
     var sql_stmt = "SELECT stanza FROM timetable WHERE risorsa = '" + classe + "' AND ora = " + ora + " AND giorno = '" + giorno + "'";
     var prof1;
     var prof2;
@@ -1027,7 +1028,7 @@ function liberazione(id, classe, ora, giorno) {
                         connection.query(sql_stmt);
 
                         for(i in vett) {
-                            cancellaPrenotazione(vett[i], giorno, ora, function() {
+                            cancellaPrenotazione(vett[i], giorno, ora, username, classe, function(res) {
                                 //Prenotazione cancellata
                             });
                         }
@@ -1040,7 +1041,7 @@ function liberazione(id, classe, ora, giorno) {
                         connection.query(sql_stmt);
 
                         for(i in vett) {
-                            cancellaPrenotazione(vett[i], giorno, ora, function() {
+                            cancellaPrenotazione(vett[i], giorno, ora, username, classe, function(res) {
                                 //Prenotazione cancellata
                             });
                         }
