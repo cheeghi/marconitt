@@ -154,7 +154,7 @@ app.
             $http.get ("http://" + CONFIG.TIMETABLE, {
                 cache: false,
                 params: {
-                    liberazioniclassbyday: '',
+                    ttclassbyday: '',
                     classe: $scope.sClass,
                     day: $scope.giornoSelezionato
                 }
@@ -167,7 +167,7 @@ app.
                 $http.get ("http://" + CONFIG.TIMETABLE, {
                     cache: false,
                     params: {
-                        ttclassbyday: '',
+                        classeventsbyday: '',
                         classe: $scope.sClass,
                         day: $scope.giornoSelezionato
                     }
@@ -180,7 +180,7 @@ app.
                 $http.get ("http://" + CONFIG.TIMETABLE, {
                         cache: false,
                         params: {
-                            classeventsbyday: '',
+                            liberazioniclassbyday: '',
                             classe: $scope.sClass,
                             day: $scope.giornoSelezionato
                         }
