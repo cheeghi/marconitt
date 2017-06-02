@@ -1600,10 +1600,3 @@ INSERT INTO `timetable` (`id`, `giorno`, `ora`, `stanza`, `risorsa`, `giorno_set
 (1598, '2017-06-10', 10, 'L342', NULL, 6, NULL, NULL),
 (1599, '2017-06-10', 10, 'L345', NULL, 6, NULL, NULL),
 (1600, '2017-06-10', 10, 'L346', NULL, 6, NULL, NULL);
-
-
-UPDATE timetable SET risorsa = "Coso" WHERE id = 701;
-UPDATE timetable SET risorsa = "Coso" WHERE id = 61;
-
-INSERT INTO prenotazioni VALUES(701, "gbellini", 1, 1);
-INSERT INTO prenotazioni VALUES(61, "admin", 0, 0)

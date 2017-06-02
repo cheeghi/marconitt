@@ -338,9 +338,11 @@ apiRoutes.post('/creaEvento', function(req, res) {
     //sistemo le ore
     hourToStartHour(giorno, start, function(res1) {
         oraInizio = res1;
+        console.log("OI: " + oraInizio);
 
         hourToEndHour(giorno, end, function(res1) {
             oraFine = res1;
+            console.log("OF: " + oraFine);
 
             //inserisco l'evento
             var sql_stmt = "INSERT INTO eventi(giorno, descrizione, oraInizio, oraFine, classi, stanze) VALUES('" + giorno + "', '" +
@@ -361,6 +363,7 @@ apiRoutes.post('/creaEvento', function(req, res) {
 
                             while(cont <= oraFine) {
                                 vett.push(cont);
+                                console.log("Cont: " + cont);
                                 cont++;
                             }
                             cont = 0;
@@ -867,51 +870,11 @@ function undoClasse(stanza, giorno, ora, risorsa, username, res) {
 }
 
 
-function profInEventi(classi, id, giorno, ora, res) {
+function profInEventi(classi, id, giorno, ora) {
     var vett = classi.split(",");
-    var sql_stmt = "";
-    var professori = "";
-    var prof1, prof2 = "";
-    var tot = vett.length * 2;
-    var cont = 0;
-    var ret = 0;
 
     for(i in vett) {
-        sql_stmt = "SELECT professore1, professore2 FROM timetable WHERE risorsa = '" + vett[i] +
-            "' AND ora = " + ora + " AND giorno = '" + giorno + "'";
-
-        connection.query(sql_stmt, function(err, rows, fields) {
-            if (!err) {
-                try {
-                    professori += rows[0].professore1 + ", ";
-                    cont = cont + 1;
-                    professori += rows[0].professore2 + ", ";
-                    cont = cont + 1;
-
-                    if(cont == tot) {
-                        professori = professori.replace("null, ", "");
-                        var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
-                        connection.query(sql_stmt);;
-                    }
-                } catch(e) {
-                    cont = cont + 1;
-
-                    if(cont == tot) {
-                        professori = professori.replace("null, ", "");
-                        var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
-                        connection.query(sql_stmt);
-                    }
-                }
-            } else {
-                cont = cont + 2;
-
-                if(cont == tot) {
-                    professori = professori.replace("null, ", "");
-                    var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
-                    connection.query(sql_stmt);
-                }
-            }
-        });
+        profToEventi(id, vett[i], ora, giorno);
     }
 }
 
@@ -1117,4 +1080,36 @@ function sendMail(email,testo,oggetto) {
         console.dir(reply)
     });
     //res.send("ok");
+}
+
+
+function profToEventi(id, classe, ora, giorno) {
+    var sql_stmt = "";
+    var professori = "";
+    var prof1, prof2 = "";
+    sql_stmt = "SELECT professore1, professore2 FROM timetable WHERE risorsa = '" + classe +
+        "' AND ora = " + ora + " AND giorno = '" + giorno + "'";
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            try {
+                professori += rows[0].professore1 + ", ";
+                professori += rows[0].professore2 + ", ";
+                professori = professori.replace("null,", "");
+                var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
+                console.log(sql_stmt);
+                connection.query(sql_stmt);;
+            } catch(e) {
+                professori = professori.replace("null, ", "");
+                var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
+                console.log(sql_stmt);
+                connection.query(sql_stmt);
+            }
+        } else {
+            professori = professori.replace("null, ", "");
+            var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
+            console.log(sql_stmt);
+            connection.query(sql_stmt);
+        }
+    });
 }
