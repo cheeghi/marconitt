@@ -34,7 +34,6 @@
                             <h3>{{prenotazione.fgiorno}}</h3>
                             <h4>{{prenotazione.stanza}} - {{prenotazione.ora}}°ORA</h4>
                             <p>{{prenotazione.risorsa}}</p>
-                            <p ng-show="admin">Effettuata da: {{prenotazione.user}}</p>
                         </div>
                         <i style="color: grey; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==0&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">pan_tool<md-tooltip md-direction='bottom'>In attesa di approvazione</md-tooltip></i>
                         <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">done<md-tooltip md-direction='bottom'>Approvato</md-tooltip></i>

@@ -99,33 +99,33 @@ apiRoutes.post('/authenticate', function(req, res) {
                 };
 
                 const request = http.request(options, (result) => {
-                    result.setEncoding('utf8');
-                    result.on('data', (chunk) => {
-                        if (chunk == 'true') {
-                            var token = jwt.sign(user, app.get('secret'), {
-                                expiresInMinutes: 1440 // expires in 24 hours
-                            });
-
-                            // return the information including token as JSON
-                            res.json({
-                                success: true,
-                                message: 'Enjoy your token!',
-                                token: token,
-                                username: user.username,
-                                admin: user.admin
-                            });
-                        } else {
-                            res.json({ success: false, message: 'Credenziali errate.' });
-                        }
+                        result.setEncoding('utf8');
+                result.on('data', (chunk) => {
+                    if (chunk == 'true') {
+                    var token = jwt.sign(user, app.get('secret'), {
+                        expiresInMinutes: 1440 // expires in 24 hours
                     });
 
-                    result.on('end', () => {
-                        console.log('No more data in response.');
-                });
+                    // return the information including token as JSON
+                    res.json({
+                        success: true,
+                        message: 'Enjoy your token!',
+                        token: token,
+                        username: user.username,
+                        admin: user.admin
+                    });
+                } else {
+                    res.json({ success: false, message: 'Credenziali errate.' });
+                }
+            });
+
+                result.on('end', () => {
+                    console.log('No more data in response.');
+            });
             });
                 request.on('error', (e) => {
                     //console.error(`problem with request: ${e.message}`);
-            });
+                });
                 // write data to request body
                 request.write(postData);
                 request.end();
@@ -231,54 +231,65 @@ apiRoutes.use(function(req, res, next) {
 
 
 apiRoutes.post('/prenota', function(req, res) {
-    var stanza = req.body.stanza;
-    var giorno = req.body.giorno;
-    var ora = req.body.ora;
-    var risorsa = req.body.risorsa;
-    var isClasse = (req.body.isclasse == "true");
-    var user = req.body.user;
-    var admin = req.body.admin;
+    getUserInfo(req.body.token, function (userVerified) {
+        if (userVerified) {
+            var stanza = req.body.stanza;
+            var giorno = req.body.giorno;
+            var ora = req.body.ora;
+            var risorsa = req.body.risorsa;
+            var isClasse = (req.body.isclasse == "true");
+            var user = userVerified.username; //req.body.user;
+            var admin = userVerified.admin; //req.body.admin;
 
-    if(isClasse) {
-        isSchoolOur(giorno, stanza, ora, risorsa, function(response) {
-            if(response) {
-                addPrenotazione(giorno, stanza, ora, risorsa, user, true, admin,  function(response1) {
-                    res.json(response1);
+            if(isClasse) {
+                isSchoolOur(giorno, stanza, ora, risorsa, function(response) {
+                    if(response) {
+                        addPrenotazione(giorno, stanza, ora, risorsa, user, true, admin,  function(response1) {
+                            res.json(response1);
+                        });
+                    } else {
+                        addPrenotazione(giorno, stanza, ora, risorsa, user, false, admin, function(response1) {
+                            res.json(response1);
+                        });
+                    }
                 });
             } else {
-                addPrenotazione(giorno, stanza, ora, risorsa, user, false, admin, function(response1) {
-                    res.json(response1);
+                addPrenotazione(giorno, stanza, ora, risorsa, user, false, admin, function(response) {
+                    res.json(response);
                 });
             }
-        });
-    } else {
-        addPrenotazione(giorno, stanza, ora, risorsa, user, false, admin, function(response) {
-            res.json(response);
-        });
-    }
+        } else {
+            res.json(false);
+        }
+    });
 });
 
-
 apiRoutes.post('/approva', function(req, res) {
-    var stanza = req.body.stanza;
-    var giorno = req.body.giorno;
-    var ora = req.body.ora;
-    var username = req.body.username;
-    var classe = req.body.classe;
-    var id;
+    getUserInfo(req.body.token, function (userVerified) {
+        if (userVerified.admin) {
+            var stanza = req.body.stanza;
+            var giorno = req.body.giorno;
+            var ora = req.body.ora;
+            var username = req.body.username;
+            var classe = req.body.classe;
+            var id;
 
-    selectId(giorno, stanza, ora, function(response) {
-        id = response;
-        var sql_stmt = "UPDATE prenotazioni SET approvata = True WHERE id = " + id;
+            selectId(giorno, stanza, ora, function(response) {
+                id = response;
+                var sql_stmt = "UPDATE prenotazioni SET approvata = True WHERE id = " + id;
 
-        connection.query(sql_stmt, function(err) {
-            if (!err) {
-                sendMailPrenotazioneApprovata(stanza, giorno, ora, username, classe);
-                res.json(true);
-            } else {
-                res.json(false);
-            }
-        });
+                connection.query(sql_stmt, function(err) {
+                    if (!err) {
+                        sendMailPrenotazioneApprovata(stanza, giorno, ora, username, classe);
+                        res.json(true);
+                    } else {
+                        res.json(false);
+                    }
+                });
+            });
+        } else {
+            res.json(false);
+        }
     });
 });
 
@@ -288,88 +299,135 @@ apiRoutes.delete('/cancellaPrenotazione', function(req, res) {
     var giorno = req.body.giorno;
     var ora = req.body.ora;
     var risorsa = req.body.risorsa;
-    var username = req.body.username;
+    //var username = req.body.username;
+    var today = new Date().getFullYear() + "-" + (new Date().getMonth()+1) + "-" + new Date().getDate();
 
     selectId(giorno, stanza, ora, function(response) {
         var id = response;
-        sql_stmt = "SELECT isSchoolHour FROM prenotazioni WHERE id = " + id;
 
-        connection.query(sql_stmt, function(err, rows, fields) {
-            if (!err) {
-                var isSOur = rows[0].isSchoolHour;
+        verify_user_query = "SELECT who FROM prenotazioni WHERE id="+id;
 
-                if(isSOur) {
-                    undoClasse(stanza, giorno, ora, risorsa, username, function(response2) {
-                        if(response2) {
-                            cancellaPrenotazione(stanza, giorno, ora, username, risorsa, function(response1) {
-                                res.json(response1);
-                            })
+        connection.query(verify_user_query, function (err, rows, fields) {
+
+            if (rows[0])
+                username = rows[0].who;
+            else
+                return res.json(false);
+
+            getUserInfo(req.body.token, function (userVerified) {
+                if (userVerified.admin || userVerified.username == username || giorno < today) {
+                    sql_stmt = "SELECT isSchoolHour FROM prenotazioni WHERE id = " + id;
+
+                    connection.query(sql_stmt, function(err, rows, fields) {
+                        if (!err) {
+                            var isSOur = rows[0].isSchoolHour;
+
+                            if(isSOur) {
+                                undoClasse(stanza, giorno, ora, risorsa, username, function(response2) {
+                                    if(response2) {
+                                        cancellaPrenotazione(stanza, giorno, ora, username, risorsa, function(response1) {
+                                            res.json(response1);
+                                        })
+                                    } else {
+                                        res.json(false);
+                                    }
+                                });
+                            } else {
+                                cancellaPrenotazione(stanza, giorno, ora, username, risorsa, function(response3) {
+                                    res.json(response3);
+                                })
+                            }
                         } else {
                             res.json(false);
                         }
                     });
                 } else {
-                    cancellaPrenotazione(stanza, giorno, ora, username, risorsa, function(response3) {
-                        res.json(response3);
-                    })
+                    res.json(false);
                 }
-            } else {
-                res.json(false);
-            }
+            });
         });
     });
 });
 
 
 apiRoutes.post('/creaEvento', function(req, res) {
-    var oraInizio = 1;
-    var oraFine = 0;
-    var professori = "";
-    var id;
+    getUserInfo(req.body.token, function (userVerified) {
+        if (userVerified.admin) {
+            var oraInizio = 1;
+            var oraFine = 0;
+            var professori = "";
+            var id;
 
-    //Prendo le variabili dal form
-    var descrizione = req.body.descrizione;
-    var giorno = req.body.day;
-    var start = req.body.oraInizio;
-    var end = req.body.oraFine;
-    var classi = req.body.classi;
-    var stanze = req.body.stanze;
+            //Prendo le variabili dal form
+            var descrizione = req.body.descrizione;
+            var giorno = req.body.day;
+            var start = req.body.oraInizio;
+            var end = req.body.oraFine;
+            var classi = req.body.classi;
+            var stanze = req.body.stanze;
 
-    //sistemo le ore
-    hourToStartHour(giorno, start, function(res1) {
-        oraInizio = res1;
-        console.log("OI: " + oraInizio);
+            //sistemo le ore
+            hourToStartHour(giorno, start, function(res1) {
+                oraInizio = res1;
 
-        hourToEndHour(giorno, end, function(res1) {
-            oraFine = res1;
-            console.log("OF: " + oraFine);
+                hourToEndHour(giorno, end, function(res1) {
+                    oraFine = res1;
 
-            //inserisco l'evento
-            var sql_stmt = "INSERT INTO eventi(giorno, descrizione, oraInizio, oraFine, classi, stanze) VALUES('" + giorno + "', '" +
-                descrizione + "', '" + start + "', '" + end + "', '" + classi + "', '" + stanze + "')";
+                    //inserisco l'evento
+                    var sql_stmt = "INSERT INTO eventi(giorno, descrizione, oraInizio, oraFine, classi, stanze) VALUES('" + giorno + "', '" +
+                        descrizione + "', '" + start + "', '" + end + "', '" + classi + "', '" + stanze + "')";
+
+                    connection.query(sql_stmt, function(err) {
+                        if(!err) {
+                            res.json(true);
+                            //seleziono l'id dell'evento inserito
+                            sql_stmt = "SELECT id FROM eventi WHERE giorno = '" + giorno + "' AND descrizione = '" + descrizione
+                                + "' AND oraInizio = '" + start + "' AND oraFine = '" + end + "'";
+
+                            connection.query(sql_stmt, function(err, rows, fields) {
+                                if (!err) {
+                                    id = rows[0].id;
+                                    cont = oraInizio;
+                                    var vett = [];
+
+                                    while(cont <= oraFine) {
+                                        vett.push(cont);
+                                        cont++;
+                                    }
+                                    cont = 0;
+                                    for(ora in vett) {
+                                        profInEventi(classi, id, giorno, vett[ora]);
+                                    }
+                                } else {
+                                    res.json(false);
+                                }
+                            });
+                        } else {
+                            res.json(false);
+                        }
+                    });
+                })
+            })
+        } else {
+            res.json(false);
+        }
+    });
+});
+
+
+apiRoutes.delete('/cancellaEvento', function(req, res) {
+    getUserInfo(req.body.token, function (userVerified) {
+        if (userVerified.admin) {
+            var id = req.body.id;
+            var sql_stmt = "DELETE FROM prof_eventi WHERE id = " + id;
 
             connection.query(sql_stmt, function(err) {
-                if(!err) {
-                    res.json(true);
-                    //seleziono l'id dell'evento inserito
-                    sql_stmt = "SELECT id FROM eventi WHERE giorno = '" + giorno + "' AND descrizione = '" + descrizione
-                        + "' AND oraInizio = '" + start + "' AND oraFine = '" + end + "'";
+                if (!err) {
+                    sql_stmt = "DELETE FROM eventi WHERE id = " + id;
 
-                    connection.query(sql_stmt, function(err, rows, fields) {
+                    connection.query(sql_stmt, function(err) {
                         if (!err) {
-                            id = rows[0].id;
-                            cont = oraInizio;
-                            var vett = [];
-
-                            while(cont <= oraFine) {
-                                vett.push(cont);
-                                console.log("Cont: " + cont);
-                                cont++;
-                            }
-                            cont = 0;
-                            for(ora in vett) {
-                                profInEventi(classi, id, giorno, vett[ora]);
-                            }
+                            res.json(true);
                         } else {
                             res.json(false);
                         }
@@ -378,22 +436,46 @@ apiRoutes.post('/creaEvento', function(req, res) {
                     res.json(false);
                 }
             });
-        })
-    })
+        }
+    });
 });
 
 
-apiRoutes.delete('/cancellaEvento', function(req, res) {
-    var id = req.body.id;
-    var sql_stmt = "DELETE FROM prof_eventi WHERE id = " + id;
+apiRoutes.post('/liberaRisorse', function(req, res) {
+    getUserInfo(req.body.token, function (userVerified) {
+        if (userVerified.admin) {
+            var classe = req.body.classe;
+            var s_ore = req.body.ore;
+            var giorno = req.body.day;
+            var descrizione = req.body.descrizione;
+            var username = req.body.username;
 
-    connection.query(sql_stmt, function(err) {
-        if (!err) {
-            sql_stmt = "DELETE FROM eventi WHERE id = " + id;
+            var ore = s_ore.split(",");
+            var sql_stmt;
+            var stanza;
+            var id;
+
+            sql_stmt = "INSERT INTO liberazione(giorno, descrizione, classe, ore) VALUES ('" + giorno + "', '" +
+                descrizione + "', '" + classe + "', '" + ore + "')";
 
             connection.query(sql_stmt, function(err) {
                 if (!err) {
-                    res.json(true);
+                    //seleziono l'id della liberazione
+                    sql_stmt = "SELECT id FROM liberazione WHERE giorno = '" + giorno + "' AND ore = '" + ore
+                        + "' AND descrizione = '" + descrizione + "' AND classe = '" + classe + "'";
+
+                    connection.query(sql_stmt, function(err, rows, fields) {
+                        if (!err) {
+                            id = rows[0].id;
+
+                            for(var i in ore) {
+                                liberazione(id, classe, ore[i], giorno, username);
+                            }
+                            res.json(true);
+                        } else {
+                            res.json(false);
+                        }
+                    });
                 } else {
                     res.json(false);
                 }
@@ -405,42 +487,54 @@ apiRoutes.delete('/cancellaEvento', function(req, res) {
 });
 
 
-apiRoutes.post('/liberaRisorse', function(req, res) {
-    var classe = req.body.classe;
-    var s_ore = req.body.ore;
-    var giorno = req.body.day;
-    var descrizione = req.body.descrizione;
-    var username = req.body.username;
-
-    var ore = s_ore.split(",");
-    var sql_stmt;
-    var stanza;
-    var id;
-
-    sql_stmt = "INSERT INTO liberazione(giorno, descrizione, classe, ore) VALUES ('" + giorno + "', '" +
-        descrizione + "', '" + classe + "', '" + ore + "')";
-
-    connection.query(sql_stmt, function(err) {
-        if (!err) {
-            //seleziono l'id della liberazione
-            sql_stmt = "SELECT id FROM liberazione WHERE giorno = '" + giorno + "' AND ore = '" + ore
-                + "' AND descrizione = '" + descrizione + "' AND classe = '" + classe + "'";
-
-            connection.query(sql_stmt, function(err, rows, fields) {
-                if (!err) {
-                    id = rows[0].id;
-
-                    for(var i in ore) {
-                        liberazione(id, classe, ore[i], giorno, username);
-                    }
-                    res.json(true);
-                } else {
-                    res.json(false);
-                }
+apiRoutes.post('/getPrenotazioniExceptAdmin', function (req, res) {
+    getUserInfo(req.body.token, function (userVerified) {
+        if (userVerified.admin) {
+            var sql = "SELECT giorno, stanza, risorsa, ora, approvata, GPU004.`column 1` as user, who FROM timetable INNER JOIN prenotazioni ON timetable.id=prenotazioni.id INNER JOIN users ON users.username=prenotazioni.who INNER JOIN GPU004 ON who=GPU004.`column 0` WHERE users.admin=false ORDER BY giorno DESC, ora";
+            connection.query(sql, function(err, rows, fields) {
+                res.json(rows);
             });
         } else {
             res.json(false);
         }
+    });
+});
+
+
+apiRoutes.post('/getPrenotazioniAdmin', function (req, res) {
+    getUserInfo(req.body.token, function (userVerified) {
+        if (userVerified.admin) {
+            var sql = "SELECT giorno, stanza, risorsa, ora, approvata, who FROM timetable INNER JOIN prenotazioni ON timetable.id=prenotazioni.id INNER JOIN users ON users.username=prenotazioni.who WHERE users.admin=true ORDER BY giorno DESC, ora";
+            connection.query(sql, function(err, rows, fields) {
+                res.json(rows);
+            });
+        } else {
+            res.json(false);
+        }
+    });
+});
+
+
+apiRoutes.post('/getEvents', function (req, res) {
+    getUserInfo(req.body.token, function (userVerified) {
+        if (userVerified.admin) {
+            var sql = "SELECT * FROM eventi ORDER BY giorno DESC";
+            connection.query(sql, function(err, rows, fields) {
+                res.json(rows);
+            });
+        } else {
+            res.json(false);
+        }
+    });
+});
+
+
+apiRoutes.post('/getPrenotazioniUser', function (req, res) {
+    getUserInfo(req.body.token, function (userVerified) {
+        var sql = "SELECT giorno, stanza, risorsa, ora, approvata, who FROM timetable INNER JOIN prenotazioni ON timetable.id=prenotazioni.id WHERE who='" + userVerified.username + "' ORDER BY giorno DESC, ora";
+        connection.query(sql, function(err, rows, fields) {
+            res.json(rows);
+        });
     });
 });
 
@@ -1112,4 +1206,30 @@ function profToEventi(id, classe, ora, giorno) {
             connection.query(sql_stmt);
         }
     });
+}
+
+
+function getUserInfo(token, res) {
+    // decode token
+    if (token) {
+        // verifies secret and checks exp
+        jwt.verify(token, app.get('secret'), function(err, decoded) {
+            if (err) {
+                res(false);
+            } else {
+                // if everything is good, save to request for use in other routes
+
+                var user = {
+                    username: decoded.username,
+                    admin: decoded.admin
+                };
+
+                res(user);
+            }
+        });
+    } else {
+        // if there is no token
+        // return an error
+        res(false);
+    }
 }

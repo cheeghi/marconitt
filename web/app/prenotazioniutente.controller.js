@@ -207,7 +207,7 @@ app.
                 $scope.isLoading = true;
 
                 var data = "token="+sessionStorage.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
-                        + "&risorsa="+ risorsa+"&username="+username;
+                        + "&risorsa="+ risorsa;
                 
                 var req = {
                     method: 'DELETE',
