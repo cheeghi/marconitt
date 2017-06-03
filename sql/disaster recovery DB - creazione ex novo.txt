@@ -1,0 +1,2 @@
+1) utilizzare recovery_database.sql per la creazione di tutte le tabelle
+2) aggiungere la tabella GPU001 contenente orario settimanale statico
