@@ -32,92 +32,131 @@ app.
             $scope.isLoading = true;
 
             if ($scope.admin) {
-
-                $http.get('http://'+CONFIG.TIMETABLE, {
+                var reqPrenotazioniProfessori = {
                     cache: false,
-                    params: {
-                        prenotazioniexceptadmin: ""
-                    }
-                }).success(function(response) {
+                    method: 'POST',
+                    url: 'http://'+CONFIG.HOST+':8080/api/getPrenotazioniExceptAdmin',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    data: "token="+sessionStorage.token
+                };
 
-                    $scope.altrePrenotazioni = response;
-                    $scope.altrePrenotazioni.forEach(function(prenotazione) {
-                        var giorno = new Date(prenotazione.giorno);
-                        var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
-                        prenotazione.fgiorno = fgiorno;
-                    });
-                    $scope.fillsAltrePrenotazioni();
-
-                }).error(function() {
-                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
-                });    
-
-                $http.get('http://'+CONFIG.TIMETABLE, {
-                    cache: false,
-                    params: {
-                        events: "" 
-                    }
-                }).success(function(response) {
-
-                    $scope.events = response;
-                    $scope.events.forEach(function(prenotazione) {
-                        var giorno = new Date(prenotazione.giorno);
-                        var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
-                        prenotazione.fgiorno = fgiorno;
-                    });
-                    $scope.fillsEventi();
-
-                }).error(function() {
-                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
+                $http(reqPrenotazioniProfessori)
+                    .success(function (response) {
+                        if (response) {
+                            $scope.altrePrenotazioni = response;
+                            $scope.altrePrenotazioni.forEach(function(prenotazione) {
+                                var giorno = new Date(prenotazione.giorno);
+                                var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
+                                prenotazione.fgiorno = fgiorno;
+                                prenotazione.giorno = giorno.getFullYear() + "-" + (giorno.getMonth()+1) + "-" + giorno.getDate();
+                            });
+                            $scope.fillsAltrePrenotazioni();
+                        } else {
+                            $mdToast.show($mdToast.simple().textContent("Errore!"));
+                        }
+                    }).error(function () {
+                        $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                 });
 
-                $http.get('http://'+CONFIG.TIMETABLE, {
+                var reqEventi = {
                     cache: false,
-                    params: {
-                        prenotazioniadmin: ""
-                    }
-                }).success(function(response) {
+                    method: 'POST',
+                    url: 'http://'+CONFIG.HOST+':8080/api/getEvents',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    data: "token="+sessionStorage.token
+                };
 
-                    $scope.miePrenotazioni = response;
-                    $scope.miePrenotazioni.forEach(function(prenotazione) {
-                        var giorno = new Date(prenotazione.giorno);
-                        var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
-                        prenotazione.fgiorno = fgiorno;
+                $http(reqEventi)
+                    .success(function(response) {
+                        if (response) {
+
+                            $scope.events = response;
+                            $scope.events.forEach(function(prenotazione) {
+                                var giorno = new Date(prenotazione.giorno);
+                                var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
+                                prenotazione.fgiorno = fgiorno;
+                                prenotazione.giorno = giorno.getFullYear() + "-" + (giorno.getMonth()+1) + "-" + giorno.getDate();
+                            });
+                            $scope.fillsEventi();
+
+                        } else {
+                            $mdToast.show($mdToast.simple().textContent("Errore!"));
+                        }
+                    }).error(function() {
+                        $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                     });
-                    $scope.fillsMiePrenotazioni();
 
-                    $timeout(function() {
-                        $scope.isLoading = false;
-                    }, $rootScope.loadingTime);
+                var reqPrenotazioniAdmin = {
+                    cache: false,
+                    method: 'POST',
+                    url: 'http://'+CONFIG.HOST+':8080/api/getPrenotazioniAdmin',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    data: "token="+sessionStorage.token
+                };
 
-                }).error(function() {
-                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
+                $http(reqPrenotazioniAdmin)
+                    .success(function (response) {
+                        if (response) {
+                            $scope.miePrenotazioni = response;
+                            $scope.miePrenotazioni.forEach(function(prenotazione) {
+                                var giorno = new Date(prenotazione.giorno);
+                                var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
+                                prenotazione.fgiorno = fgiorno;
+                                prenotazione.giorno = giorno.getFullYear() + "-" + (giorno.getMonth()+1) + "-" + giorno.getDate();
+                            });
+                            $scope.fillsMiePrenotazioni();
+
+                            $timeout(function() {
+                                $scope.isLoading = false;
+                            }, $rootScope.loadingTime);
+
+                        } else {
+                            $mdToast.show($mdToast.simple().textContent("Errore!"));
+                        }
+                    }).error(function () {
+                        $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                 });
-
             } else {
 
-                $http.get('http://'+CONFIG.TIMETABLE, {
+                var reqMiePrenotazioni = {
                     cache: false,
-                    params: {
-                        prenotazioni: $rootScope.username
-                    }
-                }).success(function(response) {
+                    method: 'POST',
+                    url: 'http://'+CONFIG.HOST+':8080/api/getPrenotazioniUser',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    data: "token="+sessionStorage.token
+                };
 
-                    $scope.miePrenotazioni = response;
-                    $scope.miePrenotazioni.forEach(function(prenotazione) {
-                        var giorno = new Date(prenotazione.giorno);
-                        var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
-                        prenotazione.fgiorno = fgiorno;
+                $http(reqMiePrenotazioni)
+                    .success(function (response) {
+                        if (response) {
+
+                            $scope.miePrenotazioni = response;
+                            $scope.miePrenotazioni.forEach(function(prenotazione) {
+                                var giorno = new Date(prenotazione.giorno);
+                                var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
+                                prenotazione.fgiorno = fgiorno;
+                                prenotazione.giorno = giorno.getFullYear() + "-" + (giorno.getMonth()+1) + "-" + giorno.getDate();
+                            });
+                            $scope.fillsMiePrenotazioni();
+
+                            $timeout(function() {
+                                $scope.isLoading = false;
+                            }, $rootScope.loadingTime);
+
+                        } else {
+                            $mdToast.show($mdToast.simple().textContent("Errore!"));
+                        }
+                    }).error(function () {
+                        $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
                     });
-                    $scope.fillsMiePrenotazioni();
-
-                    $timeout(function() {
-                        $scope.isLoading = false;
-                    }, $rootScope.loadingTime);
-
-                }).error(function() {
-                    $mdToast.show($mdToast.simple().textContent("Errore di rete!"));
-                });
             }
         };
 
@@ -195,8 +234,8 @@ app.
          * @param risorsa
          * @param ora
          */
-        $scope.removePrenotazione = function(giorno, stanza, risorsa, ora, username) {
-            console.log(giorno, stanza, risorsa, ora, username);
+        $scope.removePrenotazione = function(id) {
+            console.log(id);
             var confirm = $mdDialog.confirm()
               .textContent('La prenotazione verrà rimossa per sempre. Continuare?')
               .ok('CONFERMA')
@@ -206,9 +245,8 @@ app.
                   
                 $scope.isLoading = true;
 
-                var data = "token="+sessionStorage.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno
-                        + "&risorsa="+ risorsa;
-                
+                //var data = "token="+sessionStorage.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno+ "&risorsa="+ risorsa+"&username="+username;
+                var data = "token="+sessionStorage.token+"&id="+id;
                 var req = {
                     method: 'DELETE',
                     url: 'http://'+CONFIG.HOST+':8080/api/cancellaPrenotazione',
@@ -242,10 +280,10 @@ app.
          * @param stanza
          * @param ora
          */
-        $scope.approva = function(giorno, stanza, ora, username, classe) {
+        $scope.approva = function(id) {
             $scope.isLoading = true;
             
-            var data = "token="+sessionStorage.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno+"&username="+username+"&classe="+classe;
+            var data = "token="+sessionStorage.token+"&id="+id;
             
             var req = {
                 method: 'POST',
@@ -280,10 +318,8 @@ app.
          * @param risorsa
          * @param ora
          */
-        $scope.nonApprova = function(giorno, stanza, risorsa, ora, username) {
-            //send email to...
-
-            $scope.removePrenotazione(giorno, stanza, risorsa, ora, username);
+        $scope.nonApprova = function(id) {
+            $scope.removePrenotazione(id);
         };
 
 

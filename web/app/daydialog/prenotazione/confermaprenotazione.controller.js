@@ -64,14 +64,12 @@ app.
 
             $scope.disabled = true;
             var risorsa = '';
-            var isClasse = false;
             var classe = !$scope.sClass ? $scope.sTeacherClass : $scope.sClass;
             
             if ($scope.admin) {
                 switch ($scope.tipoPrenotazione) {
                     case "Classe":
                         risorsa = classe;
-                        isClasse = true;
                         break;
                     case "Progetto":
                         risorsa = 'Progetto: ' + $scope.sProgetto;    
@@ -89,13 +87,10 @@ app.
                         risorsa = $scope.tipoPrenotazione + ": " + classe;
                 }
 
-            } else {
+            } else
                 risorsa = classe;
-                isClasse = true;
-            }
 
-            //var data = "token="+sessionStorage.token+"&stanza="+$rootScope.stanzaPrenotata+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoSelezionato + "&risorsa="+ risorsa+ "&isclasse="+ isClasse+ "&user="+ $rootScope.username+ "&admin="+ $rootScope.admin;
-            var data = "token="+sessionStorage.token+"&stanza="+$rootScope.stanzaPrenotata+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoSelezionato + "&risorsa="+ risorsa+ "&isclasse="+ isClasse;
+            var data = "token="+sessionStorage.token+"&stanza="+$rootScope.stanzaPrenotata+"&ora="+$rootScope.oraPrenotata+"&giorno="+$rootScope.giornoSelezionato+"&risorsa="+risorsa;
 
             var req = {
                 method: 'POST',

@@ -37,7 +37,7 @@
                         </div>
                         <i style="color: grey; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==0&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">pan_tool<md-tooltip md-direction='bottom'>In attesa di approvazione</md-tooltip></i>
                         <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!admin&&!isPassed(prenotazione.giorno)" class="material-icons">done<md-tooltip md-direction='bottom'>Approvato</md-tooltip></i>
-                        <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora, prenotazione.who)" ng-hide="isPassed(prenotazione.giorno)" class="md-block">
+                        <md-button style="color:#2196F3; margin-right: 2%; margin-top: 2.5%;" class="md-raised" ng-click="removePrenotazione(prenotazione.id)" ng-hide="isPassed(prenotazione.giorno)" class="md-block">
                             RIMUOVI
                         </md-button>
                         <!--<a ng-disabled="disabled" style="color:red; margin-right: 2%; margin-top: 3%;cursor: pointer;" ng-click="removePrenotazione(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora)">
@@ -63,11 +63,11 @@
                             <p>{{prenotazione.risorsa}}</p>
                             <p>Richiedente: {{prenotazione.user}}</p>
                         </div>
-                        <md-button ng-disabled="isPassed(prenotazione.giorno)"  ng-hide='prenotazione.approvata==1||isPassed(prenotazione.giorno)' style="color:#2196F3; margin-right: 1%; margin-top: 2.5%" class="md-raised" ng-click="approva(prenotazione.giorno, prenotazione.stanza, prenotazione.ora, prenotazione.who, prenotazione.risorsa)" class="md-block" >
+                        <md-button ng-disabled="isPassed(prenotazione.giorno)"  ng-hide='prenotazione.approvata==1||isPassed(prenotazione.giorno)' style="color:#2196F3; margin-right: 1%; margin-top: 2.5%" class="md-raised" ng-click="approva(prenotazione.id)" class="md-block" >
                             APPROVA
                         </md-button>
                         <i style="color:green; margin-right: 3%; margin-top: 3%" ng-show="prenotazione.approvata==1&&!isPassed(prenotazione.giorno)" class="material-icons">done<md-tooltip md-direction='bottom'>Approvato</md-tooltip></i>
-                        <md-button ng-hide="isPassed(prenotazione.giorno)" style=" color:#2196F3; margin-right: 2%; margin-top: 2.5%" class="md-raised" ng-click="nonApprova(prenotazione.giorno, prenotazione.stanza, prenotazione.risorsa, prenotazione.ora, prenotazione.who)" class="md-block" >
+                        <md-button ng-hide="isPassed(prenotazione.giorno)" style=" color:#2196F3; margin-right: 2%; margin-top: 2.5%" class="md-raised" ng-click="nonApprova(prenotazione.id)" class="md-block" >
                             NON APPROVA
                         </md-button>
                         <md-divider></md-divider>

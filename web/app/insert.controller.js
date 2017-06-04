@@ -76,14 +76,14 @@ app
             $http(req)
                 .then(
                     function(data) {
-                        if (data) {
-                            $mdToast.show($mdToast.simple().textContent("Evento inserito correttamente"));
+                        if (data.data) {
                             $scope.event = {};
                             $scope.event.day = new Date();
                             $scope.event.hourStart = new Date();
                             $scope.event.hourEnd = new Date();
                             $scope.event.classes = [];
-                            $scope.event.rooms = [];   
+                            $scope.event.rooms = [];
+                            $mdToast.show($mdToast.simple().textContent("Evento inserito correttamente"));
                         } else {
                             $mdToast.show($mdToast.simple().textContent("Errore durante l'inserimento"));
                         }

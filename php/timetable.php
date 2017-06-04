@@ -6,7 +6,7 @@
 	header('Access-Control-Allow-Origin: *');  
 	$mysqli = new mysqli("localhost", "root", "", "marconitt");
 	
-    if (isset($_GET["prenotazioni"])) {
+    /*if (isset($_GET["prenotazioni"])) {
 		echo json_encode(getPrenotazioni($mysqli, $_GET["prenotazioni"]));
     } else if (isset($_GET["prenotazionidaapprovare"])) {
 		echo json_encode(getPrenotazioniDaApprovare($mysqli, $_GET["prenotazionidaapprovare"]));
@@ -14,7 +14,7 @@
 		echo json_encode(getPrenotazioniAdmin($mysqli, $_GET["prenotazioniadmin"]));
     } else if (isset($_GET["prenotazioniexceptadmin"])) {
 		echo json_encode(getPrenotazioniExceptAdmin($mysqli, $_GET["prenotazioniexceptadmin"]));
-    } else if (isset($_GET["classesbyteacher"])) {
+    } else*/if (isset($_GET["classesbyteacher"])) {
 		echo json_encode(getClassesByTeacher($mysqli, $_GET["classesbyteacher"]));        
     } else if (isset($_GET["eventsbymonth"])) {
 		echo json_encode(getEventsByMonth($mysqli, $_GET["eventsbymonth"])); 
