@@ -62,3 +62,9 @@ Inserire\Rimuovere nella tabella *progetti* i vari progetti scolastici che posso
 Ogni qual volta cambia l'orario, caricare nel Database la nuova tabella *gpu001*.<br>
 Successivamente eseguire il programma Python *cambia_orario.py*.<br>
 **Attenzione**:  l'esecuzione di tale programma richiede diversi minuti.
+<br><br>
+
+
+## Step 10
+Tenere un Backup dei dati del database ogni giorno.<br>
+**NB**: export da mysql di tutto il DataBase.

@@ -58,6 +58,355 @@ app.get('/', function(req, res) {
 });
 
 
+app.get('/classesbyteacher', function(req, res) {
+    var teacher = req.query.teacher;
+    var sql_stmt = "SELECT distinct `column 1` AS c1 FROM `GPU001` WHERE `column 2`='" + teacher + "' AND `column 1` NOT IN ('', 'RIC', 'D1', 'ALT') ORDER BY `column 1`";
+    var vett = [];
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for(i in rows) {
+                vett.push(rows[i].c1);
+
+                if(vett.length == rows.length) {
+                    res.json(vett);
+                }
+            }
+        }
+    });
+});
+
+
+app.get('/eventsbymonth', function(req, res) {
+    var month = req.query.month;
+    var sql_stmt = "SELECT * FROM eventi WHERE month(giorno) = " + month + " ORDER BY giorno";
+    var vett = [];
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for(i in rows) {
+                var object = {
+                    'id': rows[i].id, 
+                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
+                    'descrizione': rows[i].descrizione,
+                    'oraInizio': rows[i].oraInizio,
+                    'oraFine': rows[i].oraFine,
+                    'classi': rows[i].classi,
+                    'stanze': rows[i].stanze
+                }
+                vett.push(object);
+
+                if(vett.length == rows.length) {
+                    res.json(vett);
+                }
+            }
+        }
+    });
+});
+
+
+app.get('/eventscountbymonth', function(req, res) {
+    var month = req.query.month;
+    var sql_stmt = "SELECT giorno, COUNT(giorno) as quantity FROM `eventi` WHERE month(giorno) = " + month + " GROUP BY giorno";
+    var vett = [];
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for(i in rows) {
+                var object = {
+                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
+                    'quantity': rows[i].quantity
+                }
+                vett.push(object);
+
+                if(vett.length == rows.length) {
+                    res.json(vett);
+                }
+            }
+        }
+    });
+});
+
+
+app.get('/eventsbyday', function(req, res) {
+    var day = req.query.day;
+    var sql_stmt = "SELECT * FROM eventi WHERE giorno='" + day + "' ORDER BY giorno";
+    var vett = [];
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for(i in rows) {
+                var object = {
+                    'id': rows[i].id, 
+                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
+                    'descrizione': rows[i].descrizione,
+                    'oraInizio': rows[i].oraInizio,
+                    'oraFine': rows[i].oraFine,
+                    'classi': rows[i].classi,
+                    'stanze': rows[i].stanze
+                }
+                vett.push(object);
+
+                if(vett.length == rows.length) {
+                    res.json(vett);
+                }
+            }
+        }
+    });
+});
+
+
+app.get('/events', function(req, res) {
+    var sql_stmt = "SELECT * FROM eventi ORDER BY giorno DESC";
+    var vett = [];
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for(i in rows) {
+                var object = {
+                    'id': rows[i].id, 
+                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
+                    'descrizione': rows[i].descrizione,
+                    'oraInizio': rows[i].oraInizio,
+                    'oraFine': rows[i].oraFine,
+                    'classi': rows[i].classi,
+                    'stanze': rows[i].stanze
+                }
+                vett.push(object);
+
+                if(vett.length == rows.length) {
+                    res.json(vett);
+                }
+            }
+        }
+    });
+});
+
+
+app.get('/ttroombyday', function(req, res) {
+    var day = req.query.day;
+    var room = req.query.room;
+    var sql_stmt = "select * from timetable where stanza = '" + room + "' and giorno = '" + day + "' order by ora";
+    var vett = [];
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for(i in rows) {
+                var object = {
+                    'id': rows[i].id, 
+                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
+                    'ora': rows[i].ora,
+                    'stanza': rows[i].stanza,
+                    'professore1': rows[i].professore1,
+                    'professore2': rows[i].professore2,
+                    'giorno_settimana': rows[i].giorno_settimana,
+                    'risorsa': rows[i].risorsa
+                }
+                vett.push(object);
+
+                if(vett.length == rows.length) {
+                    res.json(vett);
+                }
+            }
+        }
+    });
+});
+
+
+app.get('/liberazioniclassbyday', function(req, res) {
+    var day = req.query.day;
+    var classe = req.query.class;
+    var sql_stmt = "select liberazione.descrizione, prof_liberazione.professori, prof_liberazione.ora from liberazione inner join prof_liberazione on liberazione.id = prof_liberazione.liberazione where liberazione.classe = '" + classe + "' and giorno = '" + day + "' order by ora";
+    var vett = [];
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for(i in rows) {
+                var object = {
+                    'descrizione': rows[i].descrizione, 
+                    'professori': rows[i].professori, 
+                    'ora': rows[i].ora
+                }
+                vett.push(object);
+
+                if(vett.length == rows.length) {
+                    res.json(vett);
+                }
+            }
+        }
+    });
+});
+
+
+app.get('/teachereventsbyday', function(req, res) {
+    var day = req.query.day;
+    var teacher = req.query.prof;
+    var sql_stmt = "select distinct eventi.descrizione, eventi.stanze, prof_eventi.ora from eventi inner join prof_eventi on eventi.id = prof_eventi.id where eventi.giorno = '" + day + "' and prof_eventi.professori like '%" + teacher + "%' order by oraInizio";
+    var vett = [];
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for(i in rows) {
+                var object = {
+                    'descrizione': rows[i].descrizione, 
+                    'stanze': rows[i].stanze,
+                    'ora': rows[i].ora
+                }
+                vett.push(object);
+
+                if(vett.length == rows.length) {
+                    res.json(vett);
+                }
+            }
+        }
+    });
+});
+
+
+app.get('/ttteacherbyday', function(req, res) {
+    var day = req.query.day;
+    var teacher = req.query.prof;
+    var sql_stmt = "select * from timetable where (professore1 = '" + teacher + "' or professore2 = '" + teacher + "') and giorno = '" + day + "' order by ora";
+    var vett = [];
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for(i in rows) {
+                var object = {
+                    'id': rows[i].id, 
+                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
+                    'ora': rows[i].ora,
+                    'stanza': rows[i].stanza,
+                    'professore1': rows[i].professore1,
+                    'professore2': rows[i].professore2,
+                    'giorno_settimana': rows[i].giorno_settimana,
+                    'risorsa': rows[i].risorsa
+                }
+                vett.push(object);
+
+                if(vett.length == rows.length) {
+                    res.json(vett);
+                }
+            }
+        }
+    });
+});
+
+
+app.get('/ttclassbyday', function(req, res) {
+    var day = req.query.day;
+    var classe = req.query.classe;
+    var sql_stmt = "select * from timetable where risorsa = '" + classe + "' and giorno = '" + day + "' order by ora";
+    var vett = [];
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for(i in rows) {
+                var object = {
+                    'id': rows[i].id, 
+                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
+                    'ora': rows[i].ora,
+                    'stanza': rows[i].stanza,
+                    'professore1': rows[i].professore1,
+                    'professore2': rows[i].professore2,
+                    'giorno_settimana': rows[i].giorno_settimana,
+                    'risorsa': rows[i].risorsa
+                }
+                vett.push(object);
+
+                if(vett.length == rows.length) {
+                    res.json(vett);
+                }
+            }
+        }
+    });
+});
+
+
+app.get('/classeventsbyday', function(req, res) {
+    var day = req.query.day;
+    var classe = req.query.classe;
+    var sql_stmt = "select eventi.descrizione, eventi.stanze, prof_eventi.ora, prof_eventi.professori from eventi inner join prof_eventi on eventi.id = prof_eventi.id where eventi.giorno = '" + day + "' and eventi.classi like '%" + classe + "%' order by oraInizio;";
+    var vett = [];
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for(i in rows) {
+                var object = {
+                    'descrizione': rows[i].descrizione, 
+                    'stanze': rows[i].stanze,
+                    'ora': rows[i].ora,
+                    'professori': rows[i].professori
+                }
+                vett.push(object);
+
+                if(vett.length == rows.length) {
+                    res.json(vett);
+                }
+            }
+        }
+    });
+});
+
+
+app.get('/roomsbydate', function(req, res) {
+    //un oggetto con dentro un oggetto stanze(L + A)
+    //per ogni stanza un vettore
+    //dentro al vettore 10 oggetti con le robe della timetable per quella stanza quel giorno
+});
+
+
+app.get('/classroomsbydate', function(req, res) {
+    giorno = req.query.day;
+    sql_stmt = "SELECT * FROM aule WHERE aule.aula like 'A%' ORDER BY aula"
+    obj = {};
+    cont = 0;
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for(i in rows) {
+                stanza = rows[i].aula;
+
+                getTTFromStanza(stanza, giorno, function(response) {
+                    obj[stanza] = response;
+                    cont++;
+                    console.log(cont);
+                    
+                    if(cont == rows.length) {
+                        res.json(obj);
+                    }
+                });
+            }
+        }
+    });
+});
+
+
+app.get('/labroomsbydate', function(req, res) {
+    //un oggetto con dentro un oggetto laboratori(L)
+    //per ogni laboratorio un vettore
+    //dentro al vettore 10 oggetti con le robe della timetable per quel laboratorio quel giorno
+});
+
+
+app.get('/isholiday', function(req, res) {
+    var day = req.query.day;
+    var sql_stmt = "SELECT * FROM timetable WHERE giorno='" + day + "'";
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            if(rows.length === 0 | rows.length == undefined) {
+                res.json(true);
+            } else {
+                res.json(false);
+            }
+        } else {
+            res.json(false);
+        }
+    });
+});
+
+
 // =======================
 // API ROUTES -------------------
 // =======================
@@ -232,6 +581,7 @@ apiRoutes.use(function(req, res, next) {
 
 apiRoutes.post('/prenota', function(req, res) {
     decodeUser(req.body.token, function (userVerified) {
+		console.log(req.body);
         if (userVerified) {
             var stanza = req.body.stanza;
             var giorno = req.body.giorno;
@@ -1341,6 +1691,31 @@ function verifyRoomIsEmpty(giorno, ora, stanza, callback) {
             }
         } else {
             callback(false);
+        }
+    });
+}
+
+
+function getTTFromStanza(stanza, giorno, res) {
+    sql_stmt = "SELECT giorno, ora, stanza, risorsa, giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + giorno + "' ORDER BY ora * 1"
+    vett = [];
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for (i in rows) {
+                var object = {
+                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
+                    'ora': rows[i].ora,
+                    'stanza': rows[i].stanza,
+                    'giorno_settimana': rows[i].giorno_settimana,
+                    'risorsa': rows[i].risorsa
+                }
+                vett.push(object);
+
+                if(vett.length == rows.length) {
+                    res(vett);
+                }
+            }
         }
     });
 }
