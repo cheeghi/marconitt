@@ -18,7 +18,7 @@ app
          * Initialization method
          */
         var init = function() {
-            $http.get('http://'+CONFIG.TIMETABLE)
+            $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/default')
                 .success(function(response) {
 
                     $scope.classes = response.classes;
@@ -66,7 +66,7 @@ app
 
             var req = {
                 method: 'POST',
-                url: 'http://'+CONFIG.HOST+':8080/api/creaEvento',
+                url: 'http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/api/creaEvento',
                 data: data,
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'

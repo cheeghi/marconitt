@@ -28,20 +28,19 @@ app.
             $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1) + "-" + $scope.day.getDate();
 
             // do the check if the selected day is holiday or not
-            $http.get('http://'+CONFIG.TIMETABLE, {
-                    cache: false,
-                    params: {
-                        isholiday: $rootScope.giornoSelezionato
-                    }
-                }).success(function(response) {
+            $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/isholiday', {
+                cache: false,
+                params: {
+                    day: $rootScope.giornoSelezionato
+                }
+            }).success(function(response) {
 
-                    response = response.replace(/\s/g, ''); // remove spaces from the response
-                    $scope.isHoliday = response == 'true';
-                    $scope.htmlTable = ($scope.isHoliday) ? "<p>Non c'è scuola oggi, prenditi una pausa!</p>" : "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
+                $scope.isHoliday = response;
+                $scope.htmlTable = ($scope.isHoliday) ? "<p>Non c'è scuola oggi, prenditi una pausa!</p>" : "<p>Seleziona se vuoi prenotare un laboratorio o un'aula</p>";
 
-                }).error(function() {
-                    $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
-                });
+            }).error(function() {
+                $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
+            });
         };
 
 
@@ -49,7 +48,7 @@ app.
          * makes http requests to populate classes, rooms, teachers, labs and classrooms arrays
          */
         $scope.initializeHttpCalls = function() {
-            $http.get('http://'+CONFIG.TIMETABLE)
+            $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/default')
                 .success(function(response) {
                 
                     $scope.classrooms = response.classrooms;
@@ -62,7 +61,7 @@ app.
 
 
         /**
-         * re-initialize method
+         * re-initialization method
          * method called when the user change the day with the right/left arrows
          * @param date
          */
@@ -73,15 +72,14 @@ app.
             $rootScope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1) + "-" + $scope.day.getDate();
 
             // do the check if the selected day is holiday or not
-            $http.get('http://'+CONFIG.TIMETABLE, {
+            $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/isholiday', {
                 cache: false,
                 params: {
-                    isholiday: $rootScope.giornoSelezionato
+                    day: $rootScope.giornoSelezionato
                 }
             }).success(function(response) {
 
-                response = response.replace(/\s/g, ''); // remove spaces from the response
-                $scope.isHoliday = response == 'true';
+                $scope.isHoliday = response;
                 if ($scope.isHoliday)
                      $scope.htmlTable = "<p>Non c'è scuola oggi, prenditi una pausa!</p>";
                 else if(!$scope.sRoomType || $scope.isLoading)
@@ -104,14 +102,14 @@ app.
             $scope.isLoading = true;
 
             if ($scope.sRoomType == "LABORATORIO") {
-                $http.get('http://'+CONFIG.TIMETABLE, {
+                $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/labroomsbydate', {
                     cache: false,
                     params: {
-                        labroomsbydate: $rootScope.giornoSelezionato
+                        day: $rootScope.giornoSelezionato
                     }
                 }).success(function(response) {
                     
-                    $scope.genTable(response.rooms);
+                    $scope.genTable(response);
                     $scope.isLoading = false;
                     
                 }).error(function() {
@@ -119,14 +117,14 @@ app.
                 });
 
             } else if ($scope.sRoomType == "AULA") {
-                $http.get('http://'+CONFIG.TIMETABLE, {
+                $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/classroomsbydate', {
                     cache: false,
                     params: {
-                        classroomsbydate: $rootScope.giornoSelezionato
+                        day: $rootScope.giornoSelezionato
                     }
                 }).success(function(response) {
                     
-                    $scope.genTable(response.rooms);
+                    $scope.genTable(response);
                     $scope.isLoading = false;
                     
                 }).error(function() {
@@ -147,6 +145,7 @@ app.
 
         /**
          * generates "prenotazioni" table
+         * @param responses
          */
         $scope.genTable = function(responses) {
 
@@ -288,26 +287,5 @@ app.
             else if ($scope.sRoomType == "AULA")
                 $mdToast.show($mdToast.simple().textContent('Aula non prenotabile!').hideDelay(1500));
         };
-        
-        
-        /**
-         * Returns true if the day is holiday
-         * @param giorno
-         */
-        $scope.isHolidayDay = function(giorno) {
-           $http.get('http://'+CONFIG.TIMETABLE, {
-                cache: false,
-                params: {
-                    isholiday: giorno
-                }
-            }).success(function(response) {
-               
-                response = response.replace(/\s/g, ''); // remove spaces from the response
-                return response == 'true';
-               
-            }).error(function() {
-                $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
-            });
-        };
-        
+
     });

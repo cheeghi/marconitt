@@ -30,7 +30,7 @@ app
 
             var req = {
                 method: 'POST',
-                url: 'http://'+CONFIG.HOST+':8080/api/verifyToken',
+                url: 'http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/api/verifyToken',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
@@ -107,7 +107,7 @@ app
             //chiamata http che ritorna il token da utilizzare nelle prossime chiamate
             var req = {
                 method: 'POST',
-                url: 'http://'+CONFIG.HOST+':8080/api/authenticate',
+                url: 'http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/api/authenticate',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
@@ -247,7 +247,6 @@ app
                 }    
             }
         };
-
 
         // on start
         $scope.setView('calendario/calendariovisualizza');

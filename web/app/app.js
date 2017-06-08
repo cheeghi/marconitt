@@ -38,5 +38,5 @@ app.config(function($mdThemingProvider, $mdDateLocaleProvider, $httpProvider) {
 
 app.constant("CONFIG", {
     'HOST' : 'localhost',
-    'TIMETABLE' : 'localhost/timetable.php'
+    'PORT': '8080'
 });

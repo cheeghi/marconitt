@@ -1,5 +1,5 @@
 app.
-    controller("PrenotazioniUtenteCtrl", function($scope, $http, CONFIG, $mdDialog, $mdToast, $rootScope, $mdDateLocale, $timeout) {
+    controller("PrenotazioniUtenteCtrl", function($scope, $http, CONFIG, $mdDialog, $mdToast, $rootScope, $mdDateLocale) {
 
         $scope.admin = $rootScope.admin; // is admin or not
         $scope.miePrenotazioni; // array that contains logged user's reservations
@@ -35,7 +35,7 @@ app.
                 var reqPrenotazioniProfessori = {
                     cache: false,
                     method: 'POST',
-                    url: 'http://'+CONFIG.HOST+':8080/api/getPrenotazioniExceptAdmin',
+                    url: 'http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/api/getPrenotazioniExceptAdmin',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
@@ -50,7 +50,6 @@ app.
                                 var giorno = new Date(prenotazione.giorno);
                                 var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
                                 prenotazione.fgiorno = fgiorno;
-                                prenotazione.giorno = giorno.getFullYear() + "-" + (giorno.getMonth()+1) + "-" + giorno.getDate();
                             });
                             $scope.fillsAltrePrenotazioni();
                         } else {
@@ -63,7 +62,7 @@ app.
                 var reqEventi = {
                     cache: false,
                     method: 'POST',
-                    url: 'http://'+CONFIG.HOST+':8080/api/getEvents',
+                    url: 'http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/api/getEvents',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
@@ -79,7 +78,6 @@ app.
                                 var giorno = new Date(prenotazione.giorno);
                                 var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
                                 prenotazione.fgiorno = fgiorno;
-                                prenotazione.giorno = giorno.getFullYear() + "-" + (giorno.getMonth()+1) + "-" + giorno.getDate();
                             });
                             $scope.fillsEventi();
 
@@ -93,7 +91,7 @@ app.
                 var reqPrenotazioniAdmin = {
                     cache: false,
                     method: 'POST',
-                    url: 'http://'+CONFIG.HOST+':8080/api/getPrenotazioniAdmin',
+                    url: 'http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/api/getPrenotazioniAdmin',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
@@ -108,13 +106,10 @@ app.
                                 var giorno = new Date(prenotazione.giorno);
                                 var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
                                 prenotazione.fgiorno = fgiorno;
-                                prenotazione.giorno = giorno.getFullYear() + "-" + (giorno.getMonth()+1) + "-" + giorno.getDate();
                             });
                             $scope.fillsMiePrenotazioni();
 
-                            $timeout(function() {
-                                $scope.isLoading = false;
-                            }, $rootScope.loadingTime);
+                            $scope.isLoading = false;
 
                         } else {
                             $mdToast.show($mdToast.simple().textContent("Errore!"));
@@ -127,7 +122,7 @@ app.
                 var reqMiePrenotazioni = {
                     cache: false,
                     method: 'POST',
-                    url: 'http://'+CONFIG.HOST+':8080/api/getPrenotazioniUser',
+                    url: 'http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/api/getPrenotazioniUser',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
@@ -143,13 +138,10 @@ app.
                                 var giorno = new Date(prenotazione.giorno);
                                 var fgiorno = $mdDateLocale.days[giorno.getDay()] + " " + giorno.getDate() + " " + $mdDateLocale.months[giorno.getMonth()] + " " + giorno.getFullYear();
                                 prenotazione.fgiorno = fgiorno;
-                                prenotazione.giorno = giorno.getFullYear() + "-" + (giorno.getMonth()+1) + "-" + giorno.getDate();
                             });
                             $scope.fillsMiePrenotazioni();
 
-                            $timeout(function() {
-                                $scope.isLoading = false;
-                            }, $rootScope.loadingTime);
+                            $scope.isLoading = false;
 
                         } else {
                             $mdToast.show($mdToast.simple().textContent("Errore!"));
@@ -229,13 +221,10 @@ app.
 
         /**
          * calls the server method for removing a 'prenotazione'
-         * @param giorno
-         * @param stanza
-         * @param risorsa
-         * @param ora
+         * @param id
          */
         $scope.removePrenotazione = function(id) {
-            console.log(id);
+
             var confirm = $mdDialog.confirm()
               .textContent('La prenotazione verrà rimossa per sempre. Continuare?')
               .ok('CONFERMA')
@@ -245,11 +234,10 @@ app.
                   
                 $scope.isLoading = true;
 
-                //var data = "token="+sessionStorage.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno+ "&risorsa="+ risorsa+"&username="+username;
                 var data = "token="+sessionStorage.token+"&id="+id;
                 var req = {
                     method: 'POST',
-                    url: 'http://'+CONFIG.HOST+':8080/api/cancellaPrenotazione',
+                    url: 'http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/api/cancellaPrenotazione',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
@@ -276,9 +264,7 @@ app.
 
         /**
          * approves a request of 'prenotazione'
-         * @param giorno
-         * @param stanza
-         * @param ora
+         * @param id
          */
         $scope.approva = function(id) {
             $scope.isLoading = true;
@@ -287,7 +273,7 @@ app.
             
             var req = {
                 method: 'POST',
-                url: 'http://'+CONFIG.HOST+':8080/api/approva',
+                url: 'http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/api/approva',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
@@ -313,10 +299,7 @@ app.
 
         /**
          * denies a request of 'prenotazione'
-         * @param giorno
-         * @param stanza
-         * @param risorsa
-         * @param ora
+         * @param id
          */
         $scope.nonApprova = function(id) {
             $scope.removePrenotazione(id);
@@ -341,7 +324,7 @@ app.
                 var data = "token="+sessionStorage.token+"&id="+id;
                 var req = {
                     method: 'POST',
-                    url: 'http://'+CONFIG.HOST+':8080/api/cancellaEvento',
+                    url: 'http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/api/cancellaEvento',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },

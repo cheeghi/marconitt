@@ -1,5 +1,5 @@
 app.
-    controller("EventCtrl", function($scope, $rootScope, $filter, $http, $q, $window, $sce, $mdDateLocale, $timeout, CONFIG) {
+    controller("EventCtrl", function($scope, $rootScope, $http, CONFIG) {
 
         $scope.day;
         $rootScope.selectedDate;
@@ -12,8 +12,8 @@ app.
         
 
         /**
-        * chiamata per iniziallizare il controller e iniziare il retrieve degli eventi
-        */
+         * chiamata per iniziallizare il controller e iniziare il retrieve degli eventi
+         */
         $scope.init = function() {
 
             $scope.eventsArray = [];
@@ -25,8 +25,8 @@ app.
 
 
         /**
-        * chiamata per re-iniziallizare il controller
-        */
+         * chiamata per re-iniziallizare il controller
+         */
         $scope.$on("reInitEvents", function () {
 
             $scope.init();
@@ -35,26 +35,28 @@ app.
 
 
         /**
-        * chiamata per recuperare gli eventi dal DB
-        */
+         * chiamata per recuperare gli eventi dal DB
+         * @param response
+         */
         $scope.fillEvents = function(giorno) {
-            $http.get ('http://' + CONFIG.TIMETABLE, {
+            $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/eventsbyday', {
                 cache: false,
                 params: {
-                    eventsbyday: giorno
+                    day: giorno
                 }
 
             }).success (function(response) {
                 $scope.genArrayEvents(response);
                 
             });
-        }
+        };
 
 
         /**
-        *  chiamata per riempire l'array di eventi per il giorno selezionato
-        */
-        $scope.genArrayEvents = function(response){
+         * chiamata per riempire l'array di eventi per il giorno selezionato
+         * @param response
+         */
+        $scope.genArrayEvents = function(response) {
 
             if (response.length == 0) {
                 $scope.isEmpty = true;
@@ -66,6 +68,6 @@ app.
                     $scope.eventsArray.push(a);
                 });
             }
-        }
+        };
 
     });

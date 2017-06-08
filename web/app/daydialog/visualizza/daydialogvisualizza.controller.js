@@ -13,7 +13,7 @@ app
             $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
             $rootScope.$broadcast('reInitVisualizza',{day:day});
             $rootScope.$broadcast('reInitEvents');
-        }
+        };
 
 
         /**
@@ -24,7 +24,7 @@ app
             $scope.dayString = $mdDateLocale.days[day.getDay()] + " " + day.getDate() + " " + $mdDateLocale.months[day.getMonth()] + " " + day.getFullYear();   
             $rootScope.$broadcast('reInitVisualizza',{day:day});
             $rootScope.$broadcast('reInitEvents');
-        }
+        };
 
 
         /**

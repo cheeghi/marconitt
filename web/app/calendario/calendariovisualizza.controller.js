@@ -1,5 +1,5 @@
 app
-    .controller('CalendarioVisualizzaCtrl', function($scope, $timeout, $http, MaterialCalendarData, $mdToast, $mdDialog, CONFIG, $rootScope) {
+    .controller('CalendarioVisualizzaCtrl', function($scope, $timeout, $http, MaterialCalendarData, $mdToast, $mdDialog, CONFIG) {
 
         $scope.direction = "horizontal"; // calendar direction
         $scope.selectedDate; // selected day in the calendar
@@ -14,29 +14,45 @@ app
          */
         $scope.getData = function() {
             $scope.resetCalendar();
-            
-            var req = {
-                method: 'GET',
-                url: 'http://'+CONFIG.TIMETABLE+'?eventscountbymonth='+ ($scope.currentMonth),
-                cache: false
-            };
 
-            $http(req)
-                .then(function(data) {
+            $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/eventscountbymonth', {
+                cache: false,
+                params: {
+                    month: $scope.currentMonth
+                }
+            }).success(function (data) {
 
-                    data.data.forEach(function(entry) {
-                        var d = new Date(entry.giorno);
-                        var evento_or_eventi = parseInt(entry.quantity) > 1 ? 'eventi' : 'evento';
-                        MaterialCalendarData.setDayContent(d, '<md-button class="md-fab md-mini md-tiny type">' + entry.quantity + '<md-tooltip md-direction="top">' + entry.quantity + ' ' + evento_or_eventi + '</md-tooltip></md-button>');
-                    }, this);
+                var isEntered = false;
+                data.forEach(function(entry) {
+                    var d = new Date(entry.giorno);
+                    var evento_or_eventi = parseInt(entry.quantity) > 1 ? 'eventi' : 'evento';
+                    var dayContent = '<md-button class="md-fab md-mini md-tiny type">' + entry.quantity + '<md-tooltip md-direction="top">' + entry.quantity + ' ' + evento_or_eventi + '</md-tooltip></md-button>';
+                    if ($scope.isToday(d)) {
+                        dayContent += '<md-button style="background-color: red;" class="md-fab md-mini md-tiny type">T<md-tooltip md-direction="top">Today!</md-tooltip></md-button>';
+                        isEntered = true;
+                    }
+                    MaterialCalendarData.setDayContent(d, dayContent);
+                }, this);
 
-                    $timeout(function() {
-                        $scope.isLoading = false
-                    }, $rootScope.loadingTime);
+                if (!isEntered)
+                    MaterialCalendarData.setDayContent(new Date(), '<md-button style="background-color: red;" class="md-fab md-mini md-tiny type">T<md-tooltip md-direction="top">Today!</md-tooltip></md-button>');
 
-                }, function(err) {
-                    $mdToast.show($mdToast.simple().textContent("Errore nel recuperare gli eventi"));
-                });
+                $scope.isLoading = false;
+
+            }).error(function (err) {
+                $mdToast.show($mdToast.simple().textContent("Errore nel recuperare gli eventi"));
+            });
+        };
+
+
+        /**
+         * says if the tay is doday
+         * @param day
+         * @return {boolean}
+         */
+        $scope.isToday = function (day) {
+            var today = new Date();
+            return today.getFullYear() == day.getFullYear() && today.getMonth() == day.getMonth() && today.getDate() == day.getDate();
         };
 
 

@@ -1,5 +1,5 @@
 app.
-    controller("OrarioCtrl", function($scope, $filter, $http, $q, $window, $sce, $mdDateLocale, CONFIG) {
+    controller("OrarioCtrl", function($scope, $http, $mdDateLocale, CONFIG) {
 
         $scope.day;
         $scope.currentItem = '';
@@ -13,56 +13,55 @@ app.
         
 
         /**
-        * chiamata per riempire gli md-select in HTML
-        */
-        $http.get ("http://" + CONFIG.TIMETABLE, {
-            params: {
-                search: ""
-            }
-        }).success (function(response) {
-            $scope.classes = response.classes;        
-            $scope.rooms = response.rooms;
-            $scope.teachers = response.teachers;
-            $scope.projects = response.projects;
-        })
+         * chiamata per riempire gli md-select in HTML
+         */
+        $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/default')
+            .success (function(response) {
+                $scope.classes = response.classes;
+                $scope.rooms = response.rooms;
+                $scope.teachers = response.teachers;
+                $scope.projects = response.projects;
+            });
 
 
         /**
-        * chiamata per iniziallizare il controller, il giorno e stabilire se c'è scuola
-        */
+         * chiamata per iniziallizare il controller, il giorno e stabilire se c'è scuola
+         * @param date
+         */
         $scope.init = function(date) {
             $scope.day = new Date(date);
             $scope.giornoSelezionato = $scope.day.getFullYear() + "-" + ($scope.day.getMonth() + 1) + "-" + $scope.day.getDate();
-            
-            $http.get ('http://'+CONFIG.TIMETABLE, {
+
+            $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/isholiday', {
                     cache: false,
                     params: {
-                        isholiday: $scope.giornoSelezionato
+                        day: $scope.giornoSelezionato
                     }
+            }).success(function(response) {
 
-                }).success (function(response) {
-                    response = response.replace(/\s/g, '');
-                    $scope.isHoliday = response == 'true';
-                    $scope.htmlTable = ($scope.isHoliday) ? "<p>Non c'è scuola oggi, prenditi una pausa!</p>" : "";
+                $scope.isHoliday = response;
+                $scope.htmlTable = ($scope.isHoliday) ? "<p>Non c'è scuola oggi, prenditi una pausa!</p>" : "";
 
-                    if (!$scope.isHoliday){
-                        if ($scope.sClass != undefined){
-                            $scope.getOrarioClass($scope.sClass);
-                        } else if ($scope.sTeacher != undefined){
-                            $scope.getOrarioTeacher($scope.sTeacher);
-                        } else if ($scope.sRoom != undefined){
-                             $scope.getOrarioRoom($scope.sRoom);
-                        }
-                    }                
-                
-                }).error(function() {
-                    $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
-                });            
-        }
+                if (!$scope.isHoliday){
+                    if ($scope.sClass != undefined){
+                        $scope.getOrarioClass($scope.sClass);
+                    } else if ($scope.sTeacher != undefined){
+                        $scope.getOrarioTeacher($scope.sTeacher);
+                    } else if ($scope.sRoom != undefined){
+                         $scope.getOrarioRoom($scope.sRoom);
+                    }
+                }
+
+            }).error(function() {
+                $mdToast.show($mdToast.simple().textContent('Errore di rete!'));
+            });
+        };
 
 
         /**
          * funzione per ri-inizializzare il controller
+         * @param event
+         * @param args
          */
         $scope.$on("reInitVisualizza", function (event, args) {
             $scope.init(args.day);
@@ -70,8 +69,8 @@ app.
 
 
         /**
-        * chiamata per ottenere l'orario di una stanza una volta premuta dall' md-select
-        */
+         * chiamata per ottenere l'orario di una stanza una volta premuta dall' md-select
+         */
         $scope.getOrarioRoom = function() {
             $scope.selected = true;
             $scope.sTeacher = undefined;
@@ -79,24 +78,23 @@ app.
             $scope.htmlTable = '<p><div layout="row" layout-sm="column" layout-align="center center" layout-fill>\
                                 <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>\
                                 </div></p>';
-            $http.get ("http://" + CONFIG.TIMETABLE, {
+            $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/ttroombyday', {
                 cache: false,
                 params: {
-                    ttroombyday: '',
-                    stanza: $scope.sRoom,
+                    room: $scope.sRoom,
                     day: $scope.giornoSelezionato
                 }
             }).success (function(response) {
 
-            $scope.genTable(response, 'aula');
+                $scope.genTable(response, 'aula');
                 
             });
-        }
+        };
 
 
         /**
-        * chiamata per ottenere l'orario di un professore una volta premuto dall' md-select
-        */
+         * chiamata per ottenere l'orario di un professore una volta premuto dall' md-select
+         */
         $scope.getOrarioTeacher = function() {
             $scope.selected = true; 
             $scope.sRoom = undefined; 
@@ -106,10 +104,9 @@ app.
                                 </div></p>';
 
             var orarioTeacher = {};
-            $http.get ("http://" + CONFIG.TIMETABLE, {
+            $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/ttteacherbyday', {
                 cache: false,
                 params: {
-                    ttteacherbyday: '',
                     prof: $scope.sTeacher,
                     day: $scope.giornoSelezionato
                 }
@@ -119,28 +116,26 @@ app.
                     orarioTeacher[response.ora] = response;
                 });
 
-                $http.get ("http://" + CONFIG.TIMETABLE, {
-                        cache: false,
-                        params: {
-                            teachereventsbyday: '',
-                            prof: $scope.sTeacher,
-                            day: $scope.giornoSelezionato
-                        }
-                    }).success (function(response2) {
-
+                $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/teachereventsbyday', {
+                    cache: false,
+                    params: {
+                        prof: $scope.sTeacher,
+                        day: $scope.giornoSelezionato
+                    }
+                }).success (function(response2) {
                         response2.forEach (function (response2){
                             orarioTeacher[response2.ora] = response2;                
                         });
 
                         $scope.genTable(orarioTeacher, 'prof');
-                    }) 
-            })
-        }
+                });
+            });
+        };
 
 
         /**
-        * chiamata per ottenere l'orario di una classe una volta premuta dall' md-select
-        */
+         * chiamata per ottenere l'orario di una classe una volta premuta dall' md-select
+         */
         $scope.getOrarioClass = function() {
 
             $scope.selected = true;
@@ -151,10 +146,9 @@ app.
                                 </div></p>';
             var orarioClass = {};
 
-            $http.get ("http://" + CONFIG.TIMETABLE, {
+            $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/ttclassbyday', {
                 cache: false,
                 params: {
-                    ttclassbyday: '',
                     classe: $scope.sClass,
                     day: $scope.giornoSelezionato
                 }
@@ -162,44 +156,44 @@ app.
 
                 response.forEach (function (response){
                     orarioClass[response.ora] = response;
-                });      
+                });
 
-                $http.get ("http://" + CONFIG.TIMETABLE, {
+                $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/classeventsbyday', {
                     cache: false,
                     params: {
-                        classeventsbyday: '',
                         classe: $scope.sClass,
                         day: $scope.giornoSelezionato
                     }
                 }).success (function(response2) {
 
-                    response2.forEach (function (response2){
+                    response2.forEach (function (response2) {
                         orarioClass[response2.ora] = response2;
                     });
 
-                $http.get ("http://" + CONFIG.TIMETABLE, {
-                        cache: false,
-                        params: {
-                            liberazioniclassbyday: '',
-                            classe: $scope.sClass,
-                            day: $scope.giornoSelezionato
-                        }
+                    $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/liberazioniclassbyday', {
+                            cache: false,
+                            params: {
+                                classe: $scope.sClass,
+                                day: $scope.giornoSelezionato
+                            }
                     }).success (function(response3) {
 
-                        response3.forEach (function (response3){
+                        response3.forEach (function (response3) {
                             orarioClass[response3.ora] = response3;
                         });
-                        
+
                     $scope.genTable(orarioClass, 'classe');
-                    })    
-                })
-            })
-        }
+                    });
+                });
+            });
+        };
 
 
         /**
-        * chiamata per generare la tabella html dell'orario prendendo in input gli orari dei diversi tipi di elementi
-        */
+         * chiamata per generare la tabella html dell'orario prendendo in input gli orari dei diversi tipi di elementi
+         * @param data
+         * @param tipo
+         */
         $scope.genTable = function(data, tipo) {
             var days = $mdDateLocale.days;
             if (tipo == 'classe'){
@@ -339,7 +333,7 @@ app.
             x += "</table>";
             $scope.htmlTable = x;
         }
-    }
+    };
 
 });
 

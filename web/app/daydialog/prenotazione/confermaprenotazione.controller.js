@@ -29,8 +29,7 @@ app.
          * makes http requests to populate classes, rooms, teachers, progetti arrays
          */
         $scope.initializeHttpCalls = function() {
-
-            $http.get('http://'+CONFIG.TIMETABLE)
+            $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/default')
                 .success(function(response) {
                 
                     $scope.classes = response.classes;
@@ -42,9 +41,9 @@ app.
                 });
             
             if (!$rootScope.admin) {
-                $http.get('http://'+CONFIG.TIMETABLE, {
+                $http.get('http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/classesbyteacher', {
                     params: {
-                        classesbyteacher: $rootScope.username
+                        teacher: $rootScope.username
                     }
                 }).success(function(response) {
                     
@@ -94,7 +93,7 @@ app.
 
             var req = {
                 method: 'POST',
-                url: 'http://'+CONFIG.HOST+':8080/api/prenota',
+                url: 'http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/api/prenota',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },

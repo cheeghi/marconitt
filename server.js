@@ -58,13 +58,16 @@ app.get('/', function(req, res) {
 });
 
 
-app.get('/all', function(req, res) {
+app.get('/default', function(req, res) {
     var object = {};
     var sql_stmt = "SELECT DISTINCT `Column 1` AS c1 FROM `GPU001` where `Column 1` NOT IN ('', 'RIC', 'D1', 'ALT', 'PRO') ORDER BY `Column 1`"
     var vett = [];
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
+            if (!rows.length)
+                return res.json('Errore: La tabella \'GPU001\' è vuota');
+
             for (i in rows) {
                 vett.push(rows[i].c1);
 
@@ -74,6 +77,9 @@ app.get('/all', function(req, res) {
                     
                     connection.query(sql_stmt, function(err, rows, fields) {
                         if (!err) {
+                            if (!rows.length)
+                                return res.json('Errore: La tabella \'GPU001\' è vuota');
+
                             vett = [];
 
                             for (i in rows) {
@@ -85,6 +91,9 @@ app.get('/all', function(req, res) {
                                     
                                     connection.query(sql_stmt, function(err, rows, fields) {
                                         if (!err) {
+                                            if (!rows.length)
+                                                return res.json('Errore: La tabella \'aule\' è vuota');
+
                                             vett = [];
 
                                             for (i in rows) {
@@ -96,6 +105,9 @@ app.get('/all', function(req, res) {
 
                                                     connection.query(sql_stmt, function(err, rows, fields) {
                                                         if (!err) {
+                                                            if (!rows.length)
+                                                                return res.json('Errore: La tabella \'progetti\' è vuota');
+
                                                             vett = [];
 
                                                             for (i in rows) {
@@ -107,6 +119,9 @@ app.get('/all', function(req, res) {
 
                                                                     connection.query(sql_stmt, function(err, rows, fields) {
                                                                         if (!err) {
+                                                                            if (!rows.length)
+                                                                                return res.json('Errore: La tabella \'aule_eventi\' è vuota');
+
                                                                             vett = [];
 
                                                                             for (i in rows) {
@@ -118,6 +133,9 @@ app.get('/all', function(req, res) {
 
                                                                                     connection.query(sql_stmt, function(err, rows, fields) {
                                                                                         if (!err) {
+                                                                                            if (!rows.length)
+                                                                                                return res.json('Errore: La tabella \'aule\' è vuota');
+
                                                                                             vett = [];
 
                                                                                             for (i in rows) {
@@ -129,6 +147,9 @@ app.get('/all', function(req, res) {
 
                                                                                                     connection.query(sql_stmt, function(err, rows, fields) {
                                                                                                         if (!err) {
+                                                                                                            if (!rows.length)
+                                                                                                                return res.json('Errore: La tabella \'aule\' è vuota');
+
                                                                                                             vett = [];
 
                                                                                                             for (i in rows) {
@@ -176,36 +197,11 @@ app.get('/classesbyteacher', function(req, res) {
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
+            if (!rows.length)
+                return res.json(vett);
+
             for(i in rows) {
                 vett.push(rows[i].c1);
-
-                if(vett.length == rows.length) {
-                    res.json(vett);
-                }
-            }
-        }
-    });
-});
-
-
-app.get('/eventsbymonth', function(req, res) {
-    var month = req.query.month;
-    var sql_stmt = "SELECT * FROM eventi WHERE month(giorno) = " + month + " ORDER BY giorno";
-    var vett = [];
-
-    connection.query(sql_stmt, function(err, rows, fields) {
-        if (!err) {
-            for(i in rows) {
-                var object = {
-                    'id': rows[i].id, 
-                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
-                    'descrizione': rows[i].descrizione,
-                    'oraInizio': rows[i].oraInizio,
-                    'oraFine': rows[i].oraFine,
-                    'classi': rows[i].classi,
-                    'stanze': rows[i].stanze
-                }
-                vett.push(object);
 
                 if(vett.length == rows.length) {
                     res.json(vett);
@@ -223,12 +219,12 @@ app.get('/eventscountbymonth', function(req, res) {
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
+            if (!rows.length)
+                return res.json(vett);
+
             for(i in rows) {
-                var object = {
-                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
-                    'quantity': rows[i].quantity
-                }
-                vett.push(object);
+                rows[i].giorno = dateFormat(rows[i].giorno, "yyyy-mm-dd");
+                vett.push(rows[i]);
 
                 if(vett.length == rows.length) {
                     res.json(vett);
@@ -246,44 +242,12 @@ app.get('/eventsbyday', function(req, res) {
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
+            if (!rows.length)
+                return res.json(vett);
+
             for(i in rows) {
-                var object = {
-                    'id': rows[i].id, 
-                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
-                    'descrizione': rows[i].descrizione,
-                    'oraInizio': rows[i].oraInizio,
-                    'oraFine': rows[i].oraFine,
-                    'classi': rows[i].classi,
-                    'stanze': rows[i].stanze
-                }
-                vett.push(object);
-
-                if(vett.length == rows.length) {
-                    res.json(vett);
-                }
-            }
-        }
-    });
-});
-
-
-app.get('/events', function(req, res) {
-    var sql_stmt = "SELECT * FROM eventi ORDER BY giorno DESC";
-    var vett = [];
-
-    connection.query(sql_stmt, function(err, rows, fields) {
-        if (!err) {
-            for(i in rows) {
-                var object = {
-                    'id': rows[i].id, 
-                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
-                    'descrizione': rows[i].descrizione,
-                    'oraInizio': rows[i].oraInizio,
-                    'oraFine': rows[i].oraFine,
-                    'classi': rows[i].classi,
-                    'stanze': rows[i].stanze
-                }
-                vett.push(object);
+                rows[i].giorno = dateFormat(rows[i].giorno, "yyyy-mm-dd");
+                vett.push(rows[i]);
 
                 if(vett.length == rows.length) {
                     res.json(vett);
@@ -302,18 +266,12 @@ app.get('/ttroombyday', function(req, res) {
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
+            if (!rows.length)
+                return res.json(vett);
+
             for(i in rows) {
-                var object = {
-                    'id': rows[i].id, 
-                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
-                    'ora': rows[i].ora,
-                    'stanza': rows[i].stanza,
-                    'professore1': rows[i].professore1,
-                    'professore2': rows[i].professore2,
-                    'giorno_settimana': rows[i].giorno_settimana,
-                    'risorsa': rows[i].risorsa
-                }
-                vett.push(object);
+                rows[i].giorno = dateFormat(rows[i].giorno, "yyyy-mm-dd");
+                vett.push(rows[i]);
 
                 if(vett.length == rows.length) {
                     res.json(vett);
@@ -326,19 +284,17 @@ app.get('/ttroombyday', function(req, res) {
 
 app.get('/liberazioniclassbyday', function(req, res) {
     var day = req.query.day;
-    var classe = req.query.class;
+    var classe = req.query.classe;
     var sql_stmt = "select liberazione.descrizione, prof_liberazione.professori, prof_liberazione.ora from liberazione inner join prof_liberazione on liberazione.id = prof_liberazione.liberazione where liberazione.classe = '" + classe + "' and giorno = '" + day + "' order by ora";
     var vett = [];
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
+            if (!rows.length)
+                return res.json(vett);
+
             for(i in rows) {
-                var object = {
-                    'descrizione': rows[i].descrizione, 
-                    'professori': rows[i].professori, 
-                    'ora': rows[i].ora
-                }
-                vett.push(object);
+                vett.push(rows[i]);
 
                 if(vett.length == rows.length) {
                     res.json(vett);
@@ -357,13 +313,11 @@ app.get('/teachereventsbyday', function(req, res) {
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
+            if (!rows.length)
+                return res.json(vett);
+
             for(i in rows) {
-                var object = {
-                    'descrizione': rows[i].descrizione, 
-                    'stanze': rows[i].stanze,
-                    'ora': rows[i].ora
-                }
-                vett.push(object);
+                vett.push(rows[i]);
 
                 if(vett.length == rows.length) {
                     res.json(vett);
@@ -382,18 +336,12 @@ app.get('/ttteacherbyday', function(req, res) {
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
+            if (!rows.length)
+                return res.json(vett);
+
             for(i in rows) {
-                var object = {
-                    'id': rows[i].id, 
-                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
-                    'ora': rows[i].ora,
-                    'stanza': rows[i].stanza,
-                    'professore1': rows[i].professore1,
-                    'professore2': rows[i].professore2,
-                    'giorno_settimana': rows[i].giorno_settimana,
-                    'risorsa': rows[i].risorsa
-                }
-                vett.push(object);
+                rows[i].giorno = dateFormat(rows[i].giorno, "yyyy-mm-dd");
+                vett.push(rows[i]);
 
                 if(vett.length == rows.length) {
                     res.json(vett);
@@ -412,18 +360,12 @@ app.get('/ttclassbyday', function(req, res) {
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
+            if (!rows.length)
+                return res.json(vett);
+
             for(i in rows) {
-                var object = {
-                    'id': rows[i].id, 
-                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
-                    'ora': rows[i].ora,
-                    'stanza': rows[i].stanza,
-                    'professore1': rows[i].professore1,
-                    'professore2': rows[i].professore2,
-                    'giorno_settimana': rows[i].giorno_settimana,
-                    'risorsa': rows[i].risorsa
-                }
-                vett.push(object);
+                rows[i].giorno = dateFormat(rows[i].giorno, "yyyy-mm-dd");
+                vett.push(rows[i]);
 
                 if(vett.length == rows.length) {
                     res.json(vett);
@@ -442,14 +384,11 @@ app.get('/classeventsbyday', function(req, res) {
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
+            if (!rows.length)
+                return res.json(vett);
+
             for(i in rows) {
-                var object = {
-                    'descrizione': rows[i].descrizione, 
-                    'stanze': rows[i].stanze,
-                    'ora': rows[i].ora,
-                    'professori': rows[i].professori
-                }
-                vett.push(object);
+                vett.push(rows[i]);
 
                 if(vett.length == rows.length) {
                     res.json(vett);
@@ -468,6 +407,9 @@ app.get('/classroomsbydate', function(req, res) {
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
+            if (!rows.length)
+                return res.json(obj);
+
             for(i in rows) {
                 var stanza = rows[i].aula;
 
@@ -492,6 +434,9 @@ app.get('/labroomsbydate', function(req, res) {
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
+            if (!rows.length)
+                return res.json(obj);
+
             for(i in rows) {
                 var stanza = rows[i].aula;
 
@@ -623,7 +568,7 @@ apiRoutes.post('/mailsender', function(req, res) {
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
             var pretesto = "La prenotazione da lei richiesta:  <br> Aula: " + stanza + " <br> Ora: " + ora + "° ora <br> Giorno: " + day + "-" + mese + "-" + anno + " <br> è stata annullata causa cambio dell'orario";
-            var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr><tr><td bgcolor="#409ea8" style="padding:5px 0;background-color:#409ea8; border-top:1px solid #77d5ea; background-repeat:repeat-x" align="center"><a href="https://www.google.com/url?hl=it&q=http://88.149.220.222/marconitt-master/web&source=gmail&ust=1495874982149000&usg=AFQjCNF_VQkM1I8NIa3LyFBIQhWJBoJ9tg"style="color:#ffffff;font-size:13px;font-weight:bold;text-align:center;text-decoration:none;font-family:Arial, sans-serif;-webkit-text-size-adjust:none;">Clicchi qui per andare all`applicazione</a></td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><br></tr><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
+            var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr><tr><td bgcolor="#409ea8" style="padding:5px 0;background-color:#409ea8; border-top:1px solid #77d5ea; background-repeat:repeat-x" align="center"></td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><br></tr><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
             var oggettomail = 'MARCONI TT: prenotazione cancellata';
             mail = rows[0].mail;
             sendMail("eliasemprebon98@gmail.com", testo, oggettomail);
@@ -700,7 +645,6 @@ apiRoutes.use(function(req, res, next) {
 
 apiRoutes.post('/prenota', function(req, res) {
     decodeUser(req.body.token, function (userVerified) {
-		console.log(req.body);
         if (userVerified) {
             var stanza = req.body.stanza;
             var giorno = req.body.giorno;
@@ -814,7 +758,7 @@ apiRoutes.post('/cancellaPrenotazione', function(req, res) {
                                 undoClasse(stanza, giorno, ora, risorsa, username, function(response2) {
                                     if(response2) {
                                         cancellaPrenotazione(stanza, giorno, ora, username, risorsa, function(response1) {
-                                            res.json(response1);
+                                            return res.json(response1);
                                         })
                                     } else {
                                         return res.json(false);
@@ -822,7 +766,7 @@ apiRoutes.post('/cancellaPrenotazione', function(req, res) {
                                 });
                             } else {
                                 cancellaPrenotazione(stanza, giorno, ora, username, risorsa, function(response3) {
-                                    res.json(response3);
+                                    return res.json(response3);
                                 })
                             }
                         } else {
@@ -893,11 +837,11 @@ apiRoutes.post('/creaEvento', function(req, res) {
                                         return res.json(false);
                                     }
                                 } else {
-                                    res.json(false);
+                                    return res.json(false);
                                 }
                             });
                         } else {
-                            res.json(false);
+                            return res.json(false);
                         }
                     });
                 })
@@ -967,11 +911,11 @@ apiRoutes.post('/liberaRisorse', function(req, res) {
                             }
                             res.json(true);
                         } else {
-                            res.json(false);
+                            return res.json(false);
                         }
                     });
                 } else {
-                    res.json(false);
+                    return res.json(false);
                 }
             });
         } else {
@@ -986,10 +930,13 @@ apiRoutes.post('/getPrenotazioniExceptAdmin', function (req, res) {
         if (userVerified.admin) {
             var sql = "SELECT timetable.id, giorno, stanza, risorsa, ora, approvata, GPU004.`column 1` as user, who FROM timetable INNER JOIN prenotazioni ON timetable.id=prenotazioni.id INNER JOIN users ON users.username=prenotazioni.who INNER JOIN GPU004 ON who=GPU004.`column 0` WHERE users.admin=false ORDER BY giorno DESC, ora";
             connection.query(sql, function(err, rows, fields) {
+                for (i in rows)
+                    rows[i].giorno = dateFormat(rows[i].giorno, "yyyy-mm-dd");
+
                 res.json(rows);
             });
         } else {
-            res.json(false);
+            return res.json(false);
         }
     });
 });
@@ -1000,9 +947,12 @@ apiRoutes.post('/getPrenotazioniAdmin', function (req, res) {
         if (userVerified.admin) {
             var sql = "SELECT timetable.id, giorno, stanza, risorsa, ora, approvata, who FROM timetable INNER JOIN prenotazioni ON timetable.id=prenotazioni.id INNER JOIN users ON users.username=prenotazioni.who WHERE users.admin=true ORDER BY giorno DESC, ora";
             connection.query(sql, function(err, rows, fields) {
-                if (!err)
+                if (!err) {
+                    for (i in rows)
+                        rows[i].giorno = dateFormat(rows[i].giorno, "yyyy-mm-dd");
+
                     res.json(rows);
-                else
+                } else
                     return res.json(false);
             });
         } else {
@@ -1017,10 +967,13 @@ apiRoutes.post('/getEvents', function (req, res) {
         if (userVerified.admin) {
             var sql = "SELECT * FROM eventi ORDER BY giorno DESC";
             connection.query(sql, function(err, rows, fields) {
+                for (i in rows)
+                    rows[i].giorno = dateFormat(rows[i].giorno, "yyyy-mm-dd");
+
                 res.json(rows);
             });
         } else {
-            res.json(false);
+            return res.json(false);
         }
     });
 });
@@ -1089,14 +1042,14 @@ function  selectId(giorno, stanza, ora, res) {
                 try {
                     res(rows[0].id);
                 } catch (err) {
-                    res(false);
+                    return res(false);
                 }
             } else {
-                res(false);
+                return res(false);
             }
         });
     } catch (err) {
-        return res.json(false);
+        return res(false);
     }
 }
 
@@ -1116,7 +1069,7 @@ function isSchoolOur(giorno, stanza, ora, risorsa, res) {
             try {
                 week_day = rows[0].giorno_settimana;
             } catch (err) {
-                res(false);
+                return res(false);
             }
 
             sql_stmt = "SELECT `Column 4` AS oldStanza FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '"
@@ -1140,38 +1093,38 @@ function isSchoolOur(giorno, stanza, ora, risorsa, res) {
                                                 res(response);
                                             });
                                         } else {
-                                            res(false);
+                                            return res(false);
                                         }
                                     })
                                 } catch(e) {
                                     getProfFromOrario(stanza, giorno, ora, risorsa, function(resp) {
                                         if(resp == false) {
-                                            res(false);
+                                            return res(false);
                                         } else {
                                             sql_stmt = resp;
                                             connection.query(sql_stmt, function(err) {
                                                 if (!err) {
                                                     res(true);
                                                 } else {
-                                                    res(false);
+                                                    return res(false);
                                                 }
                                             });
                                         }
                                     });
                                 }
                             } else {
-                                res(false);
+                                return res(false);
                             }
                         });
                     } catch(e) {
-                        res(false);
+                        return res(false);
                     }
                 } else {
-                    res(false);
+                    return res(false);
                 }
             });
         } else {
-            res(false);
+            return res(false);
         }
     });
 }
@@ -1209,10 +1162,10 @@ function getProf1(stanza, giorno, ora, res) {
                 var prof1 = rows[0].professore1;
                 res(prof1);
             } catch (err) {
-                res(false)
+                return res(false)
             }
         } else {
-            res(false);
+            return res(false);
         }
     });
 }
@@ -1231,10 +1184,10 @@ function getProf2(stanza, giorno, ora, res) {
                 var prof2 = rows[0].professore2;
                 res(prof2);
             } catch (err) {
-                res(false);
+                return res(false);
             }
         } else {
-            res(false);
+            return res(false);
         }
     });
 }
@@ -1262,7 +1215,7 @@ function moveProfessori(stanza, stanzaDaLib, giorno, ora, res) {
                             if (!err) {
                                 res(true);
                             } else {
-                                res(false);
+                                return res(false);
                             }
                         });
                     } catch(e) {
@@ -1273,12 +1226,12 @@ function moveProfessori(stanza, stanzaDaLib, giorno, ora, res) {
                             if (!err) {
                                 res(true);
                             } else {
-                                res(false);
+                                return res(false);
                             }
                         });
                     }
                 } else {
-                    res(false);
+                    return res(false);
                 }
             });
         });
@@ -1303,7 +1256,7 @@ function getProfFromOrario(stanza, giorno, ora, risorsa, res) {
             try {
                 week_day = rows[0].giorno_settimana;
             } catch (err) {
-                res(false);
+                return res(false);
             }
 
             sql_stmt = "SELECT `Column 2` AS prof FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '"
@@ -1329,11 +1282,11 @@ function getProfFromOrario(stanza, giorno, ora, risorsa, res) {
                                             "' WHERE stanza = '" + stanza  + "' AND ora = " + ora + " AND giorno = '" + giorno + "'";
                                         res(sql_stmt);
                                     } else {
-                                        res(false);
+                                        return res(false);
                                     }
                                 });
                             } else {
-                                res(false);
+                                return res(false);
                             }
                         });
                     } catch(e) {
@@ -1347,16 +1300,16 @@ function getProfFromOrario(stanza, giorno, ora, risorsa, res) {
                                     "' WHERE stanza = '" + stanza  + "' AND ora = " + ora + " AND giorno = '" + giorno + "'";
                                 res(sql_stmt);
                             } else {
-                                res(false);
+                                return res(false);
                             }
                         });
                     }
                 } else {
-                    res(false);
+                    return res(false);
                 }
             });
         } else {
-            res(false);
+            return res(false);
         }
     });
 }
@@ -1376,7 +1329,7 @@ function controllaPrenotazioni(stanza, giorno, ora, res) {
             try {
                 id1 = rows[0].id;
             } catch (err) {
-                res(false);
+                return res(false);
             }
 
             sql_stmt = "SELECT id FROM prenotazioni WHERE id = " + id1;
@@ -1391,18 +1344,18 @@ function controllaPrenotazioni(stanza, giorno, ora, res) {
                             if(!err) {
                                 res(true);
                             } else {
-                                res(false);
+                                return res(false);
                             }
                         });
                     } catch(e) {
-                        res(true);
+                        return res(true);
                     }
                 } else {
-                    res(false);
+                    return res(false);
                 }
             });
         } else {
-            res(false);
+            return res(false);
         }
     });
 }
@@ -1426,16 +1379,16 @@ function cancellaPrenotazione(stanza, giorno, ora, username, classe, res) {
                             sendMailPrenotazioneRimossa(stanza, giorno, ora, username, classe);
                             res(true);
                         } else {
-                            res(false);
+                            return res(false);
                         }
                     });
                 });
             } else {
-                res(false);
+                return res(false);
             }
         });
     } catch(e) {
-        res(false);
+        return res(false);
     }
 }
 
@@ -1455,7 +1408,7 @@ function undoClasse(stanza, giorno, ora, risorsa, username, res) {
             try {
                 week_day = rows[0].giorno_settimana;
             } catch (err) {
-                res(false);
+                return res(false);
             }
 
             sql_stmt = "SELECT `Column 4` AS stanzaOrario FROM GPU001 WHERE `Column 5` = " + week_day + " AND `Column 6` = '"
@@ -1468,7 +1421,7 @@ function undoClasse(stanza, giorno, ora, risorsa, username, res) {
                     try {
                         stanzaOrario= rows[0].stanzaOrario;
                     } catch (err) {
-                        res(false)
+                        return res(false);
                     }
 
                     sql_stmt = "SELECT risorsa FROM timetable WHERE stanza = '" +
@@ -1481,7 +1434,7 @@ function undoClasse(stanza, giorno, ora, risorsa, username, res) {
                             try {
                                 classe = rows[0].risorsa;
                             } catch (err) {
-                                res(false);
+                                return res(false);
                             }
 
                             if(classe != null) {
@@ -1497,20 +1450,20 @@ function undoClasse(stanza, giorno, ora, risorsa, username, res) {
                                             res(response);
                                         });
                                     } else {
-                                        res(false);
+                                        return res(false);
                                     }
                                 });
                             }
                         } else {
-                            res(false);
+                            return res(false);
                         }
                     });
                 } else {
-                    res(false);
+                    return res(false);
                 }
             });
         } else {
-            res(false);
+            return res(false);
         }
     });
 }
@@ -1671,7 +1624,7 @@ function sendMailSenzaAula(classe, giorno, ora, username) {
         if (!err) {
             try {
                 var pretesto = "Il giorno " + day.getDate() + "-" + (day.getMonth()+1) + "-" + day.getFullYear() + " alla " + ora + "° ora la classe " + classe +" è rimasta senza aula. La preghiamo di prenotarne un'altra.";
-                var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr><tr><td bgcolor="#409ea8" style="padding:5px 0;background-color:#409ea8; border-top:1px solid #77d5ea; background-repeat:repeat-x" align="center"><a href="https://www.google.com/url?hl=it&q=http://88.149.220.222/marconitt-master/web&source=gmail&ust=1495874982149000&usg=AFQjCNF_VQkM1I8NIa3LyFBIQhWJBoJ9tg"style="color:#ffffff;font-size:13px;font-weight:bold;text-align:center;text-decoration:none;font-family:Arial, sans-serif;-webkit-text-size-adjust:none;">Clicchi qui per andare all`applicazione</a></td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><br></tr><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
+                var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr><tr><td bgcolor="#409ea8" style="padding:5px 0;background-color:#409ea8; border-top:1px solid #77d5ea; background-repeat:repeat-x" align="center"></td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><br></tr><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
                 var oggettomail = 'MARCONI TT: classe rimasta senza aula';
                 var mail = rows[0].mail;
 
@@ -1693,7 +1646,7 @@ function sendMailPrenotazioneApprovata(stanza, giorno, ora, username, classe) {
         if (!err) {
             try {
                 var pretesto = "La prenotazione da lei richiesta: <br> Aula: " + stanza + " <br> Ora: " + ora + "° <br> Classe: " + classe + " <br> Giorno: " + day.getDate() + "-" + (day.getMonth()+1) + "-" + day.getFullYear() + " <br> è stata confermata.";
-                var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
+                var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
                 var oggettomail = 'MARCONI TT: prenotazione confermata';
                 var mail = rows[0].mail;
 
@@ -1715,7 +1668,7 @@ function sendMailPrenotazioneRimossa(stanza, giorno, ora, username, classe) {
         if (!err) {
             try {
                 var pretesto = "La prenotazione da lei richiesta:  <br> Aula: " + stanza + " <br> Ora: " + ora + "°<br> Classe:  " + classe + " <br> Giorno: " + day.getDate() + "-" + (day.getMonth()+1) + "-" + day.getFullYear() + " <br> è stata rimossa o non confermata.";
-                var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><a href="#"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></a></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr><tr><td bgcolor="#409ea8" style="padding:5px 0;background-color:#409ea8; border-top:1px solid #77d5ea; background-repeat:repeat-x" align="center"><a href="https://www.google.com/url?hl=it&q=http://88.149.220.222/marconitt-master/web&source=gmail&ust=1495874982149000&usg=AFQjCNF_VQkM1I8NIa3LyFBIQhWJBoJ9tg"style="color:#ffffff;font-size:13px;font-weight:bold;text-align:center;text-decoration:none;font-family:Arial, sans-serif;-webkit-text-size-adjust:none;">Clicchi qui per andare all`applicazione</a></td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><br></tr><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
+                var testo = '<!doctype html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Marconi TT</title><style type="text/css">.ReadMsgBody{width: 100%; background-color: #ffffff;}.ExternalClass{width: 100%; background-color: #ffffff;}body{width: 100%; background-color: #ffffff; margin:0; padding:0; -webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif}table{border-collapse: collapse;}@media only screen and (max-width: 640px){body[yahoo] .deviceWidth{width:440px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}@media only screen and (max-width: 479px){body[yahoo] .deviceWidth{width:280px!important; padding:0;}body[yahoo] .center{text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Georgia, Times, serif"><table width="600" style="margin-top:20px;" border="0" cellpadding="0" cellspacing="0" align="center"><tr bgcolor="#eeeeed"><td width="100%" valign="top" style="padding-top:20px"><table width="580" class="deviceWidth" border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#eeeeed" style="margin:0 auto;"><tr><div style="height:15px;margin:0 auto;">&nbsp;</div><br></tr><tr><td valign="top" style="padding:0" bgcolor="#eeeeed"><center><img class="deviceWidth" src="http://i.imgur.com/1cSHWao.png" height="115" width="220" alt="logo" alkformat="srcU" border="0" style="display: block; border-radius: 4px;"/></center></td></tr><tr height="20px"></tr><tr> <td style="font-size: 20px; color: #000000; font-weight: normal; text-align: center; font-family: Georgia, Times, serif; line-height: 30px; vertical-align: top; padding:10px 8px 10px 8px" bgcolor="#eeeeed"> '+ pretesto +' </td></tr><tr><td bgcolor="#409ea8" style="padding:5px 0;background-color:#409ea8; border-top:1px solid #77d5ea; background-repeat:repeat-x" align="center"></td></tr></table></td></tr><tr><td><table bgcolor="#ffffff" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><br></tr><tr bgcolor="#eeeeed"><td><table cellpadding="0" cellspacing="0" border="0" align="center" width="580" class="container"><tr><td width="80%" height="70" valign="middle" align="center" style="padding-bottom:10px;padding-top:10px; border-top-style:solid; border-top-color:#979FA3"><div class="contentEditableContainer contentTextEditable"><div align="center" style="margin-top:0px; font-size:13px;color:#181818;font-family:Helvetica, Arial, sans-serif;line-height:200%;text-align:center;"> Copyright © 2017. All right reserved to Marconi TT team.<br></div></div></td></tr></table></td></tr><tr ><td height="50" valign="middle" style="padding-bottom:10px;"></td></tr></table></td></tr></table> <div style="display:none; white-space:nowrap; font:15px courier; color:#ffffff;">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</div></body></html>';
                 var oggettomail = 'MARCONI TT: prenotazione rimossa';
                 var mail = rows[0].mail;
 
@@ -1756,18 +1709,18 @@ function profToEventi(id, classe, ora, giorno) {
                 professori += rows[0].professore2 + ", ";
                 professori = professori.replace("null,", "");
                 var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
-                console.log(sql_stmt);
+
                 connection.query(sql_stmt);;
             } catch(e) {
                 professori = professori.replace("null, ", "");
                 var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
-                console.log(sql_stmt);
+
                 connection.query(sql_stmt);
             }
         } else {
             professori = professori.replace("null, ", "");
             var sql_stmt = "INSERT INTO prof_eventi VALUES(" + id + ", " + ora + ", '" + professori + "')";
-            console.log(sql_stmt);
+
             connection.query(sql_stmt);
         }
     });
@@ -1795,7 +1748,7 @@ function decodeUser(token, res) {
     } else {
         // if there is no token
         // return an error
-        res(false);
+        return res(false);
     }
 }
 
@@ -1807,10 +1760,10 @@ function verifyRoomIsEmpty(giorno, ora, stanza, callback) {
             try {
                 return (rows[0].risorsa || rows[0].risorsa != null) ? callback(false) : callback(true);
             } catch (err) {
-                callback(false);
+                return callback(false);
             }
         } else {
-            callback(false);
+            return callback(false);
         }
     });
 }
@@ -1822,15 +1775,14 @@ function getTTFromStanza(stanza, giorno, obj, res) {
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
+            if (!rows.length) {
+                obj[stanza] = vett;
+                res(true);
+            }
+
             for (i in rows) {
-                var object = {
-                    'giorno': dateFormat(rows[i].giorno, "yyyy-mm-dd"),
-                    'ora': rows[i].ora,
-                    'stanza': rows[i].stanza,
-                    'giorno_settimana': rows[i].giorno_settimana,
-                    'risorsa': rows[i].risorsa
-                };
-                vett.push(object);
+                rows[i].giorno = dateFormat(rows[i].giorno, "yyyy-mm-dd");
+                vett.push(rows[i]);
 
                 if(vett.length == rows.length) {
                     obj[stanza] = vett;
