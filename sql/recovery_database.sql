@@ -42,7 +42,8 @@ CREATE TABLE prof_eventi (
 	ora INT,
 	professori VARCHAR(2000),
 	CONSTRAINT eventi_fk FOREIGN KEY(id) REFERENCES eventi(id) ON DELETE CASCADE
-);CREATE TABLE prof_liberazione ( 
+);
+CREATE TABLE prof_liberazione ( 
     liberazione INT NOT NULL,
     ora INT NOT NULL,
     professori VARCHAR(500),
