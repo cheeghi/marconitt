@@ -58,6 +58,117 @@ app.get('/', function(req, res) {
 });
 
 
+app.get('/all', function(req, res) {
+    var object = {};
+    var sql_stmt = "SELECT DISTINCT `Column 1` AS c1 FROM `GPU001` where `Column 1` NOT IN ('', 'RIC', 'D1', 'ALT', 'PRO') ORDER BY `Column 1`"
+    var vett = [];
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for (i in rows) {
+                vett.push(rows[i].c1);
+
+                if(vett.length == rows.length) {
+                    object["classes"] = vett;
+                    sql_stmt = "SELECT DISTINCT b.`Column 1` AS c1 FROM `GPU001` a INNER JOIN `GPU004` b ON a.`Column 2` = b.`Column 0` ORDER BY b.`Column 1`";
+                    
+                    connection.query(sql_stmt, function(err, rows, fields) {
+                        if (!err) {
+                            vett = [];
+
+                            for (i in rows) {
+                                vett.push(rows[i].c1);
+
+                                if(vett.length == rows.length) {
+                                    object["teachers"] = vett;
+                                    sql_stmt = "SELECT * FROM aule ORDER BY aula";
+                                    
+                                    connection.query(sql_stmt, function(err, rows, fields) {
+                                        if (!err) {
+                                            vett = [];
+
+                                            for (i in rows) {
+                                                vett.push(rows[i].aula);
+
+                                                if(vett.length == rows.length) {
+                                                    object["rooms"] = vett;
+                                                    sql_stmt = "SELECT DISTINCT progetto FROM progetti ORDER BY progetto";
+
+                                                    connection.query(sql_stmt, function(err, rows, fields) {
+                                                        if (!err) {
+                                                            vett = [];
+
+                                                            for (i in rows) {
+                                                                vett.push(rows[i].progetto);
+
+                                                                if(vett.length == rows.length) {
+                                                                    object["projects"] = vett;
+                                                                    sql_stmt = "SELECT * FROM aule_eventi ORDER BY aula";
+
+                                                                    connection.query(sql_stmt, function(err, rows, fields) {
+                                                                        if (!err) {
+                                                                            vett = [];
+
+                                                                            for (i in rows) {
+                                                                                vett.push(rows[i].aula);
+
+                                                                                if(vett.length == rows.length) {
+                                                                                    object["eventsrooms"] = vett;
+                                                                                    sql_stmt = "SELECT * FROM aule where aula like 'L%' ORDER BY aula";
+
+                                                                                    connection.query(sql_stmt, function(err, rows, fields) {
+                                                                                        if (!err) {
+                                                                                            vett = [];
+
+                                                                                            for (i in rows) {
+                                                                                                vett.push(rows[i].aula);
+
+                                                                                                if(vett.length == rows.length) {
+                                                                                                    object["labs"] = vett;
+                                                                                                    sql_stmt = "SELECT * FROM aule where aula like 'A%' ORDER BY aula";
+
+                                                                                                    connection.query(sql_stmt, function(err, rows, fields) {
+                                                                                                        if (!err) {
+                                                                                                            vett = [];
+
+                                                                                                            for (i in rows) {
+                                                                                                                vett.push(rows[i].aula);
+
+                                                                                                                if(vett.length == rows.length) {
+                                                                                                                    object["classrooms"] = vett;
+                                                                                                                    res.json(object);
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }
+                                                                                                    });
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+        }
+    });
+});
+
+
 app.get('/classesbyteacher', function(req, res) {
     var teacher = req.query.teacher;
     var sql_stmt = "SELECT distinct `column 1` AS c1 FROM `GPU001` WHERE `column 2`='" + teacher + "' AND `column 1` NOT IN ('', 'RIC', 'D1', 'ALT') ORDER BY `column 1`";
@@ -349,29 +460,20 @@ app.get('/classeventsbyday', function(req, res) {
 });
 
 
-app.get('/roomsbydate', function(req, res) {
-    //un oggetto con dentro un oggetto stanze(L + A)
-    //per ogni stanza un vettore
-    //dentro al vettore 10 oggetti con le robe della timetable per quella stanza quel giorno
-});
-
-
 app.get('/classroomsbydate', function(req, res) {
-    giorno = req.query.day;
-    sql_stmt = "SELECT * FROM aule WHERE aule.aula like 'A%' ORDER BY aula"
-    obj = {};
-    cont = 0;
+    var giorno = req.query.day;
+    var sql_stmt = "SELECT * FROM aule WHERE aule.aula like 'A%' ORDER BY aula";
+    var obj = {};
+    var cont = 0;
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
             for(i in rows) {
-                stanza = rows[i].aula;
+                var stanza = rows[i].aula;
 
-                getTTFromStanza(stanza, giorno, function(response) {
-                    obj[stanza] = response;
+                getTTFromStanza(stanza, giorno, obj, function(response) {
                     cont++;
-                    console.log(cont);
-                    
+
                     if(cont == rows.length) {
                         res.json(obj);
                     }
@@ -383,9 +485,26 @@ app.get('/classroomsbydate', function(req, res) {
 
 
 app.get('/labroomsbydate', function(req, res) {
-    //un oggetto con dentro un oggetto laboratori(L)
-    //per ogni laboratorio un vettore
-    //dentro al vettore 10 oggetti con le robe della timetable per quel laboratorio quel giorno
+    var giorno = req.query.day;
+    var sql_stmt = "SELECT * FROM aule WHERE aule.aula like 'L%' ORDER BY aula";
+    var obj = {};
+    var cont = 0;
+
+    connection.query(sql_stmt, function(err, rows, fields) {
+        if (!err) {
+            for(i in rows) {
+                var stanza = rows[i].aula;
+
+                getTTFromStanza(stanza, giorno, obj, function(response) {
+                    cont++;
+
+                    if(cont == rows.length) {
+                        res.json(obj);
+                    }
+                });
+            }
+        }
+    });
 });
 
 
@@ -629,6 +748,7 @@ apiRoutes.post('/prenota', function(req, res) {
     });
 });
 
+
 apiRoutes.post('/approva', function(req, res) {
     decodeUser(req.body.token, function (userVerified) {
         if (userVerified.admin) {
@@ -662,7 +782,7 @@ apiRoutes.post('/approva', function(req, res) {
 });
 
 
-apiRoutes.delete('/cancellaPrenotazione', function(req, res) {
+apiRoutes.post('/cancellaPrenotazione', function(req, res) {
     var today = new Date(new Date().getFullYear() + "-" + (new Date().getMonth()+1) + "-" + new Date().getDate());
     var id = req.body.id;
     var verifyUserQuery = "SELECT stanza, giorno, ora, risorsa, who FROM timetable INNER JOIN prenotazioni ON prenotazioni.id=timetable.id WHERE timetable.id="+id;
@@ -789,7 +909,7 @@ apiRoutes.post('/creaEvento', function(req, res) {
 });
 
 
-apiRoutes.delete('/cancellaEvento', function(req, res) {
+apiRoutes.post('/cancellaEvento', function(req, res) {
     decodeUser(req.body.token, function (userVerified) {
         if (userVerified.admin) {
             var id = req.body.id;
@@ -1696,9 +1816,9 @@ function verifyRoomIsEmpty(giorno, ora, stanza, callback) {
 }
 
 
-function getTTFromStanza(stanza, giorno, res) {
-    sql_stmt = "SELECT giorno, ora, stanza, risorsa, giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + giorno + "' ORDER BY ora * 1"
-    vett = [];
+function getTTFromStanza(stanza, giorno, obj, res) {
+    var sql_stmt = "SELECT giorno, ora, stanza, risorsa, giorno_settimana FROM timetable WHERE stanza = '" + stanza + "' AND giorno = '" + giorno + "' ORDER BY ora * 1"
+    var vett = [];
 
     connection.query(sql_stmt, function(err, rows, fields) {
         if (!err) {
@@ -1709,11 +1829,12 @@ function getTTFromStanza(stanza, giorno, res) {
                     'stanza': rows[i].stanza,
                     'giorno_settimana': rows[i].giorno_settimana,
                     'risorsa': rows[i].risorsa
-                }
+                };
                 vett.push(object);
 
                 if(vett.length == rows.length) {
-                    res(vett);
+                    obj[stanza] = vett;
+                    res(true);
                 }
             }
         }

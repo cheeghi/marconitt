@@ -248,7 +248,7 @@ app.
                 //var data = "token="+sessionStorage.token+"&stanza="+stanza+"&ora="+ora+"&giorno="+giorno+ "&risorsa="+ risorsa+"&username="+username;
                 var data = "token="+sessionStorage.token+"&id="+id;
                 var req = {
-                    method: 'DELETE',
+                    method: 'POST',
                     url: 'http://'+CONFIG.HOST+':8080/api/cancellaPrenotazione',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -340,7 +340,7 @@ app.
 
                 var data = "token="+sessionStorage.token+"&id="+id;
                 var req = {
-                    method: 'DELETE',
+                    method: 'POST',
                     url: 'http://'+CONFIG.HOST+':8080/api/cancellaEvento',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
