@@ -14,6 +14,7 @@ app
          */
         $scope.init = function() {
             $scope.resetCalendar(); // i need to clear the calendar because 'visualizza' and 'prenotazione' share the same calendar data
+            MaterialCalendarData.setDayContent(new Date(), '<md-button style="background-color: green;" class="md-fab md-mini md-tiny type">T<md-tooltip md-direction="top">Today!</md-tooltip></md-button>');
             $timeout(function() {
                 $scope.isLoading = false;
             }, $rootScope.loadingTime);

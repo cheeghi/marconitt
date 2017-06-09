@@ -28,7 +28,7 @@ app
                     var evento_or_eventi = parseInt(entry.quantity) > 1 ? 'eventi' : 'evento';
                     var dayContent = '<md-button class="md-fab md-mini md-tiny type">' + entry.quantity + '<md-tooltip md-direction="top">' + entry.quantity + ' ' + evento_or_eventi + '</md-tooltip></md-button>';
                     if ($scope.isToday(d)) {
-                        dayContent += '<md-button style="background-color: red;" class="md-fab md-mini md-tiny type">T<md-tooltip md-direction="top">Today!</md-tooltip></md-button>';
+                        dayContent += '<md-button style="background-color: green;" class="md-fab md-mini md-tiny type">T<md-tooltip md-direction="top">Today!</md-tooltip></md-button>';
                         isEntered = true;
                     }
                     MaterialCalendarData.setDayContent(d, dayContent);
