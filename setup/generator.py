@@ -32,9 +32,10 @@ def fn_getstanze():
 
     for i in cursore:
         aula = str(i)
-        aula = aula.replace("(u'", "")
+        aula = aula.replace("('", "")
         aula = aula.replace("',)", "")
         vett.append(aula)
+        print(aula)
 
     connessione.commit()
     connessione.close()

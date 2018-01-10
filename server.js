@@ -1610,9 +1610,17 @@ function liberazione(id, classe, ora, giorno, username) {
                     }
                 });
             } catch(e) {
-                sql_stmt = "INSERT INTO prof_liberazione VALUES(" + id + ", " + ora + ", NULL)";
-                connection.query(sql_stmt);
-                return;
+                try {
+                    sql_stmt = "INSERT INTO prof_liberazione VALUES(" + id + ", " + ora + ", NULL)";
+
+                    connection.query(sql_stmt, function(err, rows, fields) {
+                        if (err) {
+                            console.log("ERRORE");
+                        }
+                    });
+                } catch(e) {
+                    //caso liberazione rieffettuata
+                }
             }
         }
     });
